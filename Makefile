@@ -28,3 +28,12 @@ dev:
 .PHONY: clean
 clean:
 	rm -rf *.pyc *.class stamps test*.pickle *.orig *~
+
+
+.PHONY: git-update
+git-update:
+	git pull
+
+.PHONY: git-push
+git-push:
+	git push origin master
