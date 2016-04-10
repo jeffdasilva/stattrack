@@ -30,15 +30,22 @@ dev:
 clean:
 	rm -rf *.pyc *.class stamps test*.pickle *.orig *~
 
-
 .PHONY: git-update
 git-update:
 	git pull
 
+.PHONY: git-add-commit
+git-add-commit:
+	git add -u
+	git commit -a
+
+.PHONY: git-config
+git-config:
+	git config --global core.editor emacs
+
 .PHONY: git-push
 git-push:
 	git push origin master
-
 
 .PHONY: git-diff git-status
 git-diff git-status: git-%:
