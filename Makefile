@@ -1,3 +1,9 @@
+###############################################################################
+#
+# Jeff DaSilva
+# Copyright 2016 All Rights Reserved
+#
+###############################################################################
 
 SHELL := /bin/bash
 .SECONDEXPANSION:
@@ -30,6 +36,21 @@ dev:
 clean:
 	rm -rf *.pyc *.class stamps test*.pickle *.orig *~
 
+
+
+###############################################################################
+#
+# My git convenience targets
+#
+
+.PHONY: sync
+sync: git-update
+
+.PHONY: submit
+submit:
+	$(MAKE) git-add-commit
+	$(MAKE) git-push
+
 .PHONY: git-update
 git-update:
 	git pull
@@ -50,3 +71,5 @@ git-push:
 .PHONY: git-diff git-status
 git-diff git-status: git-%:
 	git $*
+
+###############################################################################
