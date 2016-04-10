@@ -6,7 +6,7 @@ import unittest
 import urllib
 
 from player import Player
-from player import PlayerDB
+from playerdb import PlayerDB
 
 
 class FootballPlayer(Player):
@@ -201,11 +201,13 @@ class FootballPlayerDB(PlayerDB):
 
         site_root = "http://www1.fantasypros.com/nfl"
         site = {}
-        site['QB'] = site_root + "/projections/qb.php"
-        site['RB'] = site_root + "/projections/rb.php"
-        site['WR'] = site_root + "/projections/wr.php"
-        site['TE'] = site_root + "/projections/te.php"
-        site['K'] = site_root + "/projections/k.php"
+        site_suffix = "?week=draft"
+
+        site['QB'] = site_root + "/projections/qb.php" + site_suffix
+        site['RB'] = site_root + "/projections/rb.php" + site_suffix
+        site['WR'] = site_root + "/projections/wr.php" + site_suffix
+        site['TE'] = site_root + "/projections/te.php" + site_suffix
+        site['K'] = site_root + "/projections/k.php" + site_suffix
 
         for position in ['QB', 'RB', 'WR', 'TE']:
 
