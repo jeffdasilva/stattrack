@@ -338,6 +338,7 @@ class TestFootballPlayerDB(unittest.TestCase):
         fdb.wget()
 
         p = fdb.player["Tom Brady - NE"]
+        print p
         self.assertEquals(p.position,["QB"])
         self.assertTrue(float(p.prop["fantasyPoints"]) > 200)
         self.assertTrue(float(p.prop["passingAttempts"]) > 500)

@@ -75,4 +75,8 @@ git-push:
 git-diff git-status: git-%:
 	git $*
 
+.PHONY: git-log
+git-log:
+	git log | head -n12
+
 ###############################################################################
