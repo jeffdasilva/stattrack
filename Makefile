@@ -46,6 +46,9 @@ clean:
 .PHONY: sync
 sync: git-update
 
+.PHONY: diff
+diff: git-diff
+
 .PHONY: submit
 submit:
 	$(MAKE) git-add-commit
