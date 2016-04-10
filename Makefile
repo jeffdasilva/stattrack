@@ -1,5 +1,6 @@
 
-
+SHELL := /bin/bash
+.SECONDEXPANSION:
 
 PYTHON_SRC := $(wildcard *.py)
 
@@ -37,3 +38,8 @@ git-update:
 .PHONY: git-push
 git-push:
 	git push origin master
+
+
+.PHONY: git-diff git-status
+git-diff git-status: git-%:
+	git $*
