@@ -24,6 +24,9 @@ class PlayerDB(object):
             self.player[player.key()] = player
 
     def save(self):
+        if not os.path.exists(os.path.dirname(self.saveFile)):
+            os.makedirs(os.path.dirname(self.saveFile))
+        
         with open(self.saveFile, 'wb') as handle:
             pickle.dump(self.player, handle)
     
@@ -119,7 +122,7 @@ class TestPlayerDB(unittest.TestCase):
 
     def testPlayerDBBasic(self):
         pDB = PlayerDB()
-        pDB.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/test_myplayerdb.pickle"
+        pDB.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/data/test_myplayerdb.pickle"
 
         pDB.add(Player("June", "Team-June", {"position":"C", "goals":24, "assists":33, "wins":1, "losses":22}))
         pDB.add(Player("Eleanor", "Team-June", {"position":"D", "goals":24, "assists":100}))
@@ -154,9 +157,9 @@ class TestPlayerDB(unittest.TestCase):
         self.assertEquals(june.prop["saves"],124)
 
         pDB_copy = PlayerDB()
-        pDB_copy.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/test_myplayerdb.pickle"        
+        pDB_copy.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/data/test_myplayerdb.pickle"        
         pDB_copy.load()
-        pDB_copy.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/test_data/test_myplayerdb.pickle"
+        pDB_copy.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/data/test_myplayerdb2.pickle"
         june = pDB_copy.player[Player("June", "Team-June").key()]
         self.assertEquals(june.name,"June")
         self.assertEquals(june.team,"Team-June")

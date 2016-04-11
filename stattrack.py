@@ -10,7 +10,6 @@ from football import FootballPlayerDB
 
 
 db = FootballPlayerDB()
-#db.load()
 db.wget()
 
 player_list = []

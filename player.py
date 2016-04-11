@@ -13,7 +13,7 @@ class Player(object):
         '''
         self.name = name
         self.nameAliases = []
-        self.team = team
+        self.team = team        
         self.position = []
         self.prop = {}
         self.isDrafted = False
@@ -25,7 +25,14 @@ class Player(object):
     def __str__(self):
 
         player_str = '{0: <20}'.format(self.name)
-        player_str += " " + '{0: <5}'.format(self.team) 
+        
+        if self.team is None:
+            team_str = "???"
+        else:
+            team_str = self.team 
+        
+        player_str += " " + '{0: <5}'.format(team_str)
+         
         player_str += " " + '{0: <6}'.format('/'.join(self.position))
 
         if self.prop.has_key("fantasyPoints"):
@@ -75,6 +82,9 @@ class Player(object):
         if self.prop.has_key("team"):
             self.team = self.prop["team"]
             del self.prop["team"]
+            
+        if self.team is not None and self.team.lower() == "unknown":
+            self.team = None
 
         if self.prop.has_key("position"):
             if self.prop["position"] not in self.position:
