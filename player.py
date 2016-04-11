@@ -40,7 +40,7 @@ class Player(object):
 
     def draft(self, cost=0):
         self.isDrafted = True
-        self.cost=cost
+        self.cost = cost
 
     def undraft(self):
         self.isDrafted = False

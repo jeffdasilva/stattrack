@@ -9,8 +9,8 @@ SHELL := /bin/bash
 .SECONDEXPANSION:
 
 PYTHON_SRC := $(wildcard *.py)
-
-PYTHON_UNITTEST_STAMPS := $(patsubst %.py,stamps/%.unittest,$(PYTHON_SRC))
+PYTHON_MAIN := stattrack.py
+PYTHON_UNITTEST_STAMPS := $(patsubst %.py,stamps/%.unittest,$(filter-out $(PYTHON_MAIN),$(PYTHON_SRC)))
 
 .PHONY: check
 check: $(PYTHON_UNITTEST_STAMPS)
@@ -26,7 +26,7 @@ tabs2space:
 
 .PHONY: run
 run:
-	python stattrack.py
+	python $(PYTHON_MAIN)
 
 .PHONY:dev
 dev:

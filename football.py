@@ -229,8 +229,11 @@ class FootballPlayerDB(PlayerDB):
                 rawdata = rawdata[2:]
 
             stats = []
-            for i in rawdata:    
-                stats += [ str(i[0]).rsplit(' ',1) + [ position ] + i[1:] ]
+            for i in rawdata:
+                if len(str(i[0]).split()) < 3 or not str(i[0]).rsplit(' ',1)[1].isupper() or str(i[0]).rsplit(' ',1)[1].isupper() > 3:                 
+                    stats += [ [ i[0] ] + [ 'unknown' ] + [ position ] + i[1:] ]                
+                else: 
+                    stats += [ str(i[0]).rsplit(' ',1) + [ position ] + i[1:] ]
 
             #print stats
 
@@ -358,7 +361,7 @@ class TestFootballPlayerDB(unittest.TestCase):
         #self.assertTrue(p.prop["fantasyPoints"] > 100) 
         #self.assertTrue(p.prop["extraPoints"] > 10) 
 
-        p = fdb.player["Calvin Johnson - DET"]
+        p = fdb.player["Calvin Johnson - unknown"]
         self.assertEquals(p.position,["WR"])
         self.assertTrue(p.prop["fantasyPoints"] > 180) 
         self.assertTrue(p.prop["receivingYards"] > 400)
