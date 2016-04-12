@@ -6,7 +6,7 @@
 
 import copy
 
-from football import FootballPlayerDB
+from footballdb import FootballPlayerDB
 
 
 db = FootballPlayerDB()
