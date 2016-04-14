@@ -28,7 +28,7 @@ tabs2space:
 run:
 	python $(PYTHON_MAIN)
 
-.PHONY:dev
+.PHONY: dev
 dev:
 	sublime-text Makefile $(PYTHON_SRC) &
 
