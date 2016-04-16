@@ -163,10 +163,12 @@ class FootballPlayer(Player):
     
     def value(self):
         
-        if self.prop.has_key("avgRank"):
+        if self.prop.has_key("hpprAvgRank"):
+            return 300-(float(self.prop["hpprAvgRank"]))
+        elif self.prop.has_key("avgRank"):
             return 50-(float(self.prop["avgRank"]))
         else:
-            return -25
+            return 0
         
         #return self.valuePassing() + self.valueRushing() + self.valueReceiveing() + self.valueMisc()
 

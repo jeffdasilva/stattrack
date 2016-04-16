@@ -131,9 +131,10 @@ class FootballPlayerDB(PlayerDB):
         site['TE'] = site_root + "/te" + site_suffix
         site['K'] = site_root + "/k" + site_suffix
         site['DEF'] = site_root + "/dst" + site_suffix
+        site['ALL'] = site_root + "/half-point-ppr" + site_suffix
         
     
-        for position in ['QB', 'RB', 'WR', 'TE', 'K', 'DEF']:
+        for position in ['QB', 'RB', 'WR', 'TE', 'K', 'DEF', 'ALL']:
 
             f = urllib.urlopen(site[position])
             html = f.read()
@@ -153,15 +154,24 @@ class FootballPlayerDB(PlayerDB):
             for i in rawdata:
                 if (len(i)) <= 1:
                     continue
-                
+
                 rank = i[0]
                 i = i[1:]
+
                 if len(str(i[0]).split()) < 3 or not str(i[0]).rsplit(' ',1)[1].isupper() or str(i[0]).rsplit(' ',1)[1].isupper() > 3:                 
-                    stats += [ [rank] + [ i[0] ] + [ 'unknown' ] + [ position ] + i[1:] ]                
+                    stats += [ [rank] + [ i[0] ] + [ 'unknown' ] ]
                 else: 
-                    stats += [ [rank] + str(i[0]).rsplit(' ',1) + [ position ] + i[1:] ]
-        
-            statDesc = ['rank', 'name', 'team', 'position', 'byeWeek', 'bestRank', 'worstRank', 'avgRank', 'stdDev']
+                    stats += [ [rank] + str(i[0]).rsplit(' ',1)]
+
+                if position != 'ALL':
+                    stats[-1] += [position]
+
+                stats[-1] += i[1:]
+
+            if position == 'ALL':
+                statDesc = ['hpprRank', 'name', 'team', 'positionAndRank', 'byeWeek', 'hpprBestRank', 'hpprWorstRank', 'hpprAvgRank', 'hpprStdDev']
+            else:
+                statDesc = ['rank', 'name', 'team', 'position', 'byeWeek', 'bestRank', 'worstRank', 'avgRank', 'stdDev']
         
             for player_stats in stats:
                 player_prop = {}
@@ -172,7 +182,6 @@ class FootballPlayerDB(PlayerDB):
                 
                 player = FootballPlayer(properties=player_prop)
                 self.add(player)
-                
     
     def moneyRemaining(self):
         total_money = self.numberOfTeams * self.moneyPerTeam
