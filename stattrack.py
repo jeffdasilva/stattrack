@@ -10,7 +10,8 @@ from footballdb import FootballPlayerDB
 
 
 db = FootballPlayerDB()
-db.wget()
+db.load()
+#db.wget()
 
 player_list = []
 undo_stack = []
@@ -174,11 +175,11 @@ while True:
 
                 if is_draft_cmd:
                     p = tmp_player_list.pop(p_index)
-                    cost = raw_input(' --> for how much? ')
-                    if cost.isdigit():
-                        cost = int(cost)
-                    else:
-                        cost = 0                    
+                    #cost = raw_input(' --> for how much? ')
+                    #if cost.isdigit():
+                    #    cost = int(cost)
+                    #else:
+                    cost = 0                    
                     p.draft(cost)
                 else:
                     p = tmp_player_list[p_index]
@@ -239,7 +240,9 @@ while True:
         for i, player in enumerate(player_list):
             if i >= 20:
                 break         
-            print '{0: >2}'.format(str(i)) + "  " + str(player) + " $" + str(player.value()*cpv_mult)
+            #print '{0: >2}'.format(str(i)) + "  " + str(player) + " $" + str(player.value()*cpv_mult)
+            print '{0: >2}'.format(str(i)) + "  " + str(player) + "  " + str(player.value())
+            
             
 if __name__ == '__main__':
     pass

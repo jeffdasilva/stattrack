@@ -83,7 +83,7 @@ class Player(object):
             self.team = self.prop["team"]
             del self.prop["team"]
             
-        if self.team is not None and self.team.lower() == "unknown":
+        if self.team is not None and (self.team.lower() == "unknown" or self.team.lower() == "FA" or self.team == "???"):
             self.team = None
 
         if self.prop.has_key("position"):

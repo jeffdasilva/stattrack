@@ -156,13 +156,19 @@ class FootballPlayer(Player):
         
         points = 0.0
         
-        if not self.prop.has_key("fumblesLost"):
-            points += (float(self.prop("fumblesLost")) * -2)
+        if self.prop.has_key("fumblesLost"):
+            points += (float(self.prop["fumblesLost"]) * -2)
             
         return points/17
     
     def value(self):
-        return self.valuePassing() + self.valueRushing() + self.valueReceiveing()
+        
+        if self.prop.has_key("avgRank"):
+            return 50-(float(self.prop["avgRank"]))
+        else:
+            return -25
+        
+        #return self.valuePassing() + self.valueRushing() + self.valueReceiveing() + self.valueMisc()
 
 
 if __name__ == '__main__':

@@ -23,12 +23,19 @@ class FootballPlayerDB(PlayerDB):
         pmap["quarterback"] = [ "QB" ]
         pmap["rb"] = [ "RB" ]
         pmap["runningback"] = [ "RB" ]
-        pmap["wr"] = [ "WR", "TE" ]
-        pmap["widereceiver"] = [ "WR", "TE" ]
+        #pmap["wr"] = [ "WR", "TE" ]
+        #pmap["widereceiver"] = [ "WR", "TE" ]
+        pmap["wr"] = [ "WR" ]
+        pmap["widereceiver"] = [ "WR" ]
         pmap["te"] = [ "TE" ]
         pmap["tightend"] = [ "TE" ]
-        #pmap["k"] = [ "K" ]
-        #pmap["kicker"] = [ "K" ]
+        pmap["k"] = [ "K" ]
+        pmap["kicker"] = [ "K" ]
+        
+        pmap["def"] = [ "DEF" ]
+        pmap["defence"] = [ "DEF" ]
+        pmap["defense"] = [ "DEF" ]
+        
         
         super(FootballPlayerDB, self).__init__(positionMap=pmap)
         
@@ -42,6 +49,7 @@ class FootballPlayerDB(PlayerDB):
         
     def wget(self):
         self.wgetFantasyPros()
+        self.wgetFantasyProsCheatsheets()
 
     def wgetFantasyPros(self):
 
@@ -110,7 +118,62 @@ class FootballPlayerDB(PlayerDB):
                 
                 player = FootballPlayer(properties=player_prop)
                 self.add(player)
+    
+    def wgetFantasyProsCheatsheets(self):
         
+        site_root = "http://www1.fantasypros.com/nfl/rankings"
+        site = {}
+        site_suffix = "-cheatsheets.php"
+
+        site['QB'] = site_root + "/qb" + site_suffix
+        site['RB'] = site_root + "/rb" + site_suffix
+        site['WR'] = site_root + "/wr" + site_suffix
+        site['TE'] = site_root + "/te" + site_suffix
+        site['K'] = site_root + "/k" + site_suffix
+        site['DEF'] = site_root + "/dst" + site_suffix
+        
+    
+        for position in ['QB', 'RB', 'WR', 'TE', 'K', 'DEF']:
+
+            f = urllib.urlopen(site[position])
+            html = f.read()
+            soup = BeautifulSoup(html)
+            table = soup.find('table', {'id': 'data'})
+
+            rawdata = []
+
+            for row in table.findAll("tr"):
+                cols = row.find_all('td')
+                cols = [ele.text.strip() for ele in cols]
+                rawdata.append([ele for ele in cols]) 
+            
+            rawdata = rawdata[1:]
+            
+            stats = []
+            for i in rawdata:
+                if (len(i)) <= 1:
+                    continue
+                
+                rank = i[0]
+                i = i[1:]
+                if len(str(i[0]).split()) < 3 or not str(i[0]).rsplit(' ',1)[1].isupper() or str(i[0]).rsplit(' ',1)[1].isupper() > 3:                 
+                    stats += [ [rank] + [ i[0] ] + [ 'unknown' ] + [ position ] + i[1:] ]                
+                else: 
+                    stats += [ [rank] + str(i[0]).rsplit(' ',1) + [ position ] + i[1:] ]
+        
+            statDesc = ['rank', 'name', 'team', 'position', 'byeWeek', 'bestRank', 'worstRank', 'avgRank', 'stdDev']
+        
+            for player_stats in stats:
+                player_prop = {}
+                index = 0
+                for stat in statDesc:                    
+                    player_prop[stat] = player_stats[index].replace(',', '')
+                    index += 1 
+                
+                player = FootballPlayer(properties=player_prop)
+                self.add(player)
+                
+    
     def moneyRemaining(self):
         total_money = self.numberOfTeams * self.moneyPerTeam
         
@@ -221,7 +284,13 @@ class TestFootballPlayerDB(unittest.TestCase):
         fdb.add(FootballPlayer("Jeffx","SF",{"fantasyPoints":"14"}))
         #self.assertEquals(fdb.get("Jeff")[0].prop['fantasyPoints'],124)
         
+    def testWgetCheatsheets(self):
+        fdb = FootballPlayerDB()
+        fdb.wgetFantasyProsCheatsheets()
         
-        
+        p = fdb.player["Julio Jones - ATL"]
+        print p
+        self.assertEquals(p.position,["WR"])
+          
 if __name__ == '__main__':
     unittest.main()
