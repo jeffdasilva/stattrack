@@ -79,4 +79,9 @@ git-diff git-status: git-%:
 git-log:
 	git log | head -n12
 
+# this one is dangerous, so be careful with it
+.PHONY: git-revert git-reset
+git-revert git-reset:
+	git reset --hard
+
 ###############################################################################
