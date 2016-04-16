@@ -16,7 +16,7 @@ db.load()
 player_list = []
 undo_stack = []
 db_stack = []
-autosave = False
+autosave = True
 
 while True:
 
