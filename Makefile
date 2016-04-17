@@ -24,7 +24,7 @@ PYTHON_UNITTEST_STAMPS := $(patsubst %.py,stamps/%.unittest,$(filter-out %/__ini
 check: $(PYTHON_UNITTEST_STAMPS)
 
 $(PYTHON_UNITTEST_STAMPS): stamps/%.unittest: %.py
-	python -m unittest $*
+	cd $(*D) && python -m unittest $(*F)
 	@mkdir -p $(@D)
 	@touch $@
 #############################
