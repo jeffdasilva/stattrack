@@ -13,34 +13,34 @@ class Player(object):
         '''
         self.name = name
         self.nameAliases = []
-        self.team = team        
+        self.team = team
         self.position = []
         self.prop = {}
         self.isDrafted = False
         self.isIgnored = False
         self.cost = 0
-        self.update(properties)       
+        self.update(properties)
         assert(self.name != None)
-        
+
     def __str__(self):
 
         player_str = '{0: <20}'.format(self.name)
-        
+
         if self.team is None:
             team_str = "???"
         else:
-            team_str = self.team 
-        
+            team_str = self.team
+
         player_str += " " + '{0: <5}'.format(team_str)
-         
+
         player_str += " " + '{0: <6}'.format('/'.join(self.position))
 
         if self.prop.has_key("fantasyPoints"):
             player_str += " " + '{0: <8}'.format(str(self.prop["fantasyPoints"]))
 
-        player_str += " " + '{0: <8}'.format(str(self.value()))    
-        
-        return player_str 
+        player_str += " " + '{0: <8}'.format(str(self.value()))
+
+        return player_str
 
     def value(self):
         return 0
@@ -71,7 +71,7 @@ class Player(object):
             return self.name + " - " + "unknown"
         else:
             return self.name + " - " + self.team
-    
+
     def update(self, properties):
         self.prop.update(properties)
 
@@ -82,7 +82,7 @@ class Player(object):
         if self.prop.has_key("team"):
             self.team = self.prop["team"]
             del self.prop["team"]
-            
+
         if self.team is not None and (self.team.lower() == "unknown" or self.team.lower() == "FA" or self.team == "???"):
             self.team = None
 
@@ -96,7 +96,7 @@ class Player(object):
         if self.name != player.name:
             if player.name not in self.nameAliases:
                 self.nameAliases.append(player.name)
-        
+
         for n in player.nameAliases:
             if n not in self.nameAliases:
                 self.nameAliases.append(n)
@@ -113,16 +113,16 @@ class Player(object):
                 self.position.append(p)
         self.update(player.prop)
 
-    
+
 class TestPlayer(unittest.TestCase):
-    
+
     def testNoNamePlayer(self):
         try:
             Player()
             self.assertTrue(False)
         except AssertionError:
             pass
-            
+
     def testNamedPlayer(self):
         p = Player("Jeff DaSilva")
         self.assertEquals(p.name, "Jeff DaSilva")
@@ -158,7 +158,7 @@ class TestPlayer(unittest.TestCase):
         self.assertTrue(not p.prop.has_key("position"))
 
     def testPositionFeature(self):
-        p = Player("Jeff") 
+        p = Player("Jeff")
         self.assertEquals(p.position,[])
         p.position += [ "LW" ]
         self.assertEquals(p.position,["LW"])
@@ -182,7 +182,7 @@ class TestPlayer(unittest.TestCase):
         self.assertTrue(not p.prop.has_key("position"))
         self.assertTrue(not p2.prop.has_key("position"))
 
-      
+
 
 if __name__ == '__main__':
     unittest.main()

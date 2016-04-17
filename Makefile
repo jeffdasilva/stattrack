@@ -12,7 +12,7 @@ PYTHON_SRC := $(wildcard *.py)
 PYTHON_MAIN := stattrack.py
 PYTHON_UNITTEST_STAMPS := $(patsubst %.py,stamps/%.unittest,$(filter-out $(PYTHON_MAIN),$(PYTHON_SRC)))
 
-a.PHONY: check
+.PHONY: check
 check: $(PYTHON_UNITTEST_STAMPS)
 
 $(PYTHON_UNITTEST_STAMPS): stamps/%.unittest: %.py
@@ -22,7 +22,16 @@ $(PYTHON_UNITTEST_STAMPS): stamps/%.unittest: %.py
 
 .PHONY: tabs2space
 tabs2space:
-	find . -type f -name '*.py' -exec sed -i.orig 's/\t/    /g' {} +
+	find . -type f -name '*.py' -exec sed -i 's/\t/    /g' {} \;
+
+.PHONY: remove-trailing-whitespace
+remove-trailing-whitespace:
+	find . -type f -name '*.py' -exec sed -i 's/[ \t]*$$//g' {} \;
+
+.PHONY: lint
+lint: remove-trailing-whitespace tabs2space
+	$(MAKE) check
+	$(MAKE) clean
 
 .PHONY: run
 run:
@@ -50,7 +59,7 @@ pull sync: git-update
 diff: git-diff
 
 .PHONY: push submit
-push submit:
+push submit: lint
 	$(MAKE) git-add-commit
 	$(MAKE) git-push
 

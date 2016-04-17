@@ -10,7 +10,7 @@ from player import Player
 
 
 class PlayerDB(object):
-    
+
     def __init__(self, positionMap={}):
         self.player = {}
         self.positionMap = {"all":["all"]}
@@ -26,13 +26,13 @@ class PlayerDB(object):
     def save(self):
         if not os.path.exists(os.path.dirname(self.saveFile)):
             os.makedirs(os.path.dirname(self.saveFile))
-        
+
         with open(self.saveFile, 'wb') as handle:
             pickle.dump(self.player, handle)
-    
+
     def load(self):
-        
-        if os.path.isfile(self.saveFile):        
+
+        if os.path.isfile(self.saveFile):
             with open(self.saveFile, 'rb') as handle:
                 playerData = pickle.load(handle)
                 self.update(playerData)
@@ -51,7 +51,7 @@ class PlayerDB(object):
 
             if not listDrafted and playerObj.isDrafted:
                 continue
-            
+
             match_found = False
             position_to_match = self.positionMap[position]
             for pos_i in position_to_match:
@@ -62,7 +62,7 @@ class PlayerDB(object):
                     if pos_i == pos_j:
                         match_found = True
                         break
-            
+
             if not match_found:
                 continue
 
@@ -70,35 +70,35 @@ class PlayerDB(object):
                 player_list.append(playerObj)
 
         player_list.sort(reverse=True)
-        return player_list 
+        return player_list
 
     def get(self, searchString="", position="all", listDrafted=False, listIgnored=False):
-        
+
         if searchString == "":
             searchString = '.*'
         else:
             searchString = '.*' + searchString + '.*'
-        
+
         return self.getRE(searchString, position=position, listDrafted=listDrafted, listIgnored=listIgnored)
 
     def numberOfPlayersDrafted(self, position="all"):
         plist = self.get(position=position, listDrafted=True)
-        
+
         draft_count = 0
-        
+
         for p in plist:
             if p.isDrafted:
                 draft_count += 1
-                
+
         return draft_count
-    
+
 class TestPlayerDB(unittest.TestCase):
 
     def testPlayerGet(self):
         pDB = PlayerDB()
-        
+
         self.assertEquals(pDB.numberOfPlayersDrafted(), 0)
-        
+
         pDB.add(Player("June"))
         pl = pDB.get("Ju")
         self.assertEquals(len(pl),1)
@@ -113,11 +113,11 @@ class TestPlayerDB(unittest.TestCase):
         self.assertEquals(len(pDB.get("uN")),2)
         self.assertEquals(len(pDB.get("i")),4)
         self.assertEquals(len(pDB.get("OPHIA")),2)
-        
+
         pDB.get("JuneBug")[0].draft()
         self.assertEquals(pDB.numberOfPlayersDrafted(), 1)
-        
-        
+
+
         pass
 
     def testPlayerDBBasic(self):
@@ -130,7 +130,7 @@ class TestPlayerDB(unittest.TestCase):
         pDB.add(Player("Sophia", "Team Stuffins"))
         pDB.add(Player("June", "Team-June", {"position":"RW", "goals":24, "ties":4}))
         pDB.add(Player("June", "Team-June", {"position":"G", "saves":124, "wins":6}))
-                
+
         june = pDB.player[Player("June", "Team-June").key()]
         print june
         self.assertEquals(june.name,"June")
@@ -157,7 +157,7 @@ class TestPlayerDB(unittest.TestCase):
         self.assertEquals(june.prop["saves"],124)
 
         pDB_copy = PlayerDB()
-        pDB_copy.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/data/test_myplayerdb.pickle"        
+        pDB_copy.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/data/test_myplayerdb.pickle"
         pDB_copy.load()
         pDB_copy.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/data/test_myplayerdb2.pickle"
         june = pDB_copy.player[Player("June", "Team-June").key()]

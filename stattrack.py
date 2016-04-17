@@ -22,12 +22,12 @@ while True:
 
     undo_operation = False
     cmd_accepted = False
-    
+
     if autosave:
         db.save()
-    
+
     cmd = raw_input('% ')
-    
+
     if cmd == "undo":
         if len(undo_stack) == 0:
             print "Nothing to undo"
@@ -39,7 +39,7 @@ while True:
 
     if cmd == "autosave":
         autosave = not autosave
-        
+
         if autosave:
             print "autosave is on"
         else:
@@ -56,18 +56,18 @@ while True:
         else:
             db = db_stack.pop()
             print "Popping DB Stack to restore old state"
-            
+
             if not undo_operation:
                 undo_stack.append("push")
-            
+
             continue
     elif cmd == "push":
         db_stack.append(copy.deepcopy(db))
         print "Pushing DB on stack"
-        
+
         if not undo_operation:
             undo_stack.append("pop")
-        
+
         continue
 
     cmdArr = cmd.split()
@@ -103,17 +103,17 @@ while True:
             undo_stack.append("pop")
 
         continue
-   
+
     elif cmd == "list" or cmd == "ls":
         cmd_accepted = True
 
     elif cmdArr[0] == "ignore" or cmdArr[0] == "unignore":
-                    
+
         is_ignore_cmd = (cmdArr[0] == "ignore")
 
         tmp_player_list = player_list
         p_index = 0
-        
+
         if len(cmdArr) > 1:
             if cmdArr[1].isdigit():
                 p_index = int(cmdArr[1])
@@ -148,15 +148,15 @@ while True:
 
                 continue
     elif cmdArr[0] == "draft" or cmdArr[0] == "d" or cmdArr[0] == "undraft":
-        
+
         if cmdArr[0] == "d":
             cmdArr[0] = "draft"
-            
+
         is_draft_cmd = (cmdArr[0] == "draft")
 
         tmp_player_list = player_list
         p_index = 0
-        
+
         if len(cmdArr) > 1:
             if cmdArr[1].isdigit():
                 p_index = int(cmdArr[1])
@@ -179,7 +179,7 @@ while True:
                     #if cost.isdigit():
                     #    cost = int(cost)
                     #else:
-                    cost = 0                    
+                    cost = 0
                     p.draft(cost)
                 else:
                     p = tmp_player_list[p_index]
@@ -208,11 +208,11 @@ while True:
 
         continue
     elif cmd == "stats":
-        print "Money Remaining: $" + str(db.moneyRemaining()) 
+        print "Money Remaining: $" + str(db.moneyRemaining())
         print "Good Value Remaining: " + str(db.valueRemaining())
         print "Cost Per Value Unit: " + str(db.costPerValueUnit())
         continue
-       
+
     if not cmd_accepted:
         for key in db.positionMap.keys():
             if cmdArr[0].lower() == key:
@@ -230,19 +230,19 @@ while True:
                 print "No Players Found for search string: " + cmd
                 continue
             player_list = player_list_query
-    
+
     if len(player_list) == 0:
         print "Player Queue is Empty"
     else:
-        
+
         cpv_mult = db.costPerValueUnit()
-        
+
         for i, player in enumerate(player_list):
             if i >= 20:
-                break         
+                break
             #print '{0: >2}'.format(str(i)) + "  " + str(player) + " $" + str(player.value()*cpv_mult)
             print '{0: >2}'.format(str(i)) + "  " + str(player) + "  " + str(player.value())
-            
-            
+
+
 if __name__ == '__main__':
     pass
