@@ -19,6 +19,7 @@ class SiteScraper(object):
             self.soup = None
             return
 
+        #urllib way to do the same thing
         #f = urllib.urlopen(self.url)
         #html = f.read()
 
@@ -26,13 +27,6 @@ class SiteScraper(object):
         html = urllib2.urlopen(request)
 
         self.soup = BeautifulSoup(html)
-
-        #self.table = self.soup.find('table', {'id': 'data'})
-        #self.table = self.soup.find('table')
-#        for link in self.soup.findAll('a'):
-#            print 'found an url'
-#            if link.has_attr('href'):
-#                print link['href']
 
 class TestSiteScraper(unittest.TestCase):
 
@@ -45,6 +39,20 @@ class TestSiteScraper(unittest.TestCase):
         table = s.soup.find('table')
         #print table
         self.assertNotEquals(table,None)
+
+        linkList = []
+        for link in s.soup.findAll('a'):
+            #print 'found an url'
+            if link.has_attr('href'):
+                if link['href'][0] == '/':
+                    linkList += [ s.url + link['href'] ]
+                else:
+                    linkList += [ link['href'] ]
+        
+        #print linkList
+        #print len(linkList) 
+        self.assertGreaterEqual(len(linkList),10)
+
 
     def testTable(self):
         s = SiteScraper("http://www.html.am/html-codes/tables/")
