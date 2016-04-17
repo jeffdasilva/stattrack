@@ -12,7 +12,7 @@ PYTHON_SRC := $(wildcard *.py)
 PYTHON_MAIN := stattrack.py
 PYTHON_UNITTEST_STAMPS := $(patsubst %.py,stamps/%.unittest,$(filter-out $(PYTHON_MAIN),$(PYTHON_SRC)))
 
-.PHONY: check
+a.PHONY: check
 check: $(PYTHON_UNITTEST_STAMPS)
 
 $(PYTHON_UNITTEST_STAMPS): stamps/%.unittest: %.py
@@ -43,14 +43,14 @@ clean:
 # My git convenience targets
 #
 
-.PHONY: sync
-sync: git-update
+.PHONY: pull sync
+pull sync: git-update
 
 .PHONY: diff
 diff: git-diff
 
-.PHONY: submit
-submit:
+.PHONY: push submit
+push submit:
 	$(MAKE) git-add-commit
 	$(MAKE) git-push
 
@@ -66,6 +66,9 @@ git-add-commit:
 .PHONY: git-config
 git-config:
 	git config --global core.editor emacs
+
+git-set-remote:
+	git remote set-url origin git@github.com:jeffdasilva/stattrack.git
 
 .PHONY: git-push
 git-push:
