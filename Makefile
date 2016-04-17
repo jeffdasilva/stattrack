@@ -59,7 +59,7 @@ pull sync: git-update
 diff: git-diff
 
 .PHONY: push submit
-push submit: lint
+push submit:
 	$(MAKE) git-add-commit
 	$(MAKE) git-push
 
