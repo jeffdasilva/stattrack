@@ -60,9 +60,16 @@ dev:
 #############################
 
 #############################
+CLEAN_FILES_RE += *.pyc *.class stamps test*.pickle *.orig *~
+CLEAN_FILES += $(sort $(wildcard $(strip \
+	$(foreach dir,. $(PYTHON_PACKAGES),\
+	$(foreach re,$(CLEAN_FILES_RE), \
+		$(dir)/$(re) \
+)))))
+
 .PHONY: clean
 clean:
-	rm -rf *.pyc *.class stamps test*.pickle *.orig *~
+	$(if $(CLEAN_FILES),rm -rf $(CLEAN_FILES))
 #############################
 
 
