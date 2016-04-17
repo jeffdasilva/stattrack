@@ -5,13 +5,21 @@
 #
 ###############################################################################
 
+#############################
 SHELL := /bin/bash
 .SECONDEXPANSION:
+#############################
 
-PYTHON_SRC := $(wildcard *.py)
+
+#############################
+PYTHON_PACKAGES = $(foreach subdir,* */* */*/*,$(patsubst %/__init__.py,%,$(wildcard $(subdir)/__init__.py)))
+PYTHON_SRC := $(wildcard *.py) $(foreach pkg,$(PYTHON_PACKAGES),$(wildcard $(pkg)/*.py))
 PYTHON_MAIN := stattrack.py
-PYTHON_UNITTEST_STAMPS := $(patsubst %.py,stamps/%.unittest,$(filter-out $(PYTHON_MAIN),$(PYTHON_SRC)))
+PYTHON_UNITTEST_STAMPS := $(patsubst %.py,stamps/%.unittest,$(filter-out %/__init__.py,$(filter-out $(PYTHON_MAIN),$(PYTHON_SRC))))
+#############################
 
+
+#############################
 .PHONY: check
 check: $(PYTHON_UNITTEST_STAMPS)
 
@@ -19,7 +27,10 @@ $(PYTHON_UNITTEST_STAMPS): stamps/%.unittest: %.py
 	python -m unittest $*
 	@mkdir -p $(@D)
 	@touch $@
+#############################
 
+
+#############################
 .PHONY: tabs2space
 tabs2space:
 	find . -type f -name '*.py' -exec sed -i 's/\t/    /g' {} \;
@@ -32,19 +43,27 @@ remove-trailing-whitespace:
 lint: remove-trailing-whitespace tabs2space
 	$(MAKE) check
 	$(MAKE) clean
+#############################
 
+
+#############################
 .PHONY: run
 run:
 	python $(PYTHON_MAIN)
+#############################
 
+
+#############################
 .PHONY: dev
 dev:
 	sublime-text Makefile $(PYTHON_SRC) &
+#############################
 
+#############################
 .PHONY: clean
 clean:
 	rm -rf *.pyc *.class stamps test*.pickle *.orig *~
-
+#############################
 
 
 ###############################################################################
