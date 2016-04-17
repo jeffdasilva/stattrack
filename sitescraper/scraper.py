@@ -48,9 +48,9 @@ class TestSiteScraper(unittest.TestCase):
                     linkList += [ s.url + link['href'] ]
                 else:
                     linkList += [ link['href'] ]
-        
+
         #print linkList
-        #print len(linkList) 
+        #print len(linkList)
         self.assertGreaterEqual(len(linkList),10)
 
 
