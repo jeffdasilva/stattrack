@@ -28,6 +28,21 @@ class SiteScraper(object):
 
         self.soup = BeautifulSoup(html)
 
+    def scrapeTable(self, attrs={}):
+
+        self.scrape()
+        self.table = self.soup.find('table', attrs=attrs)
+
+        if self.table is None:
+            self.tableData = None
+            return
+
+        self.tableData = []
+        for row in self.table.findAll("tr"):
+            cols = row.find_all('td')
+            cols = [ele.text.strip() for ele in cols]
+            self.tableData.append([ele for ele in cols])
+
 class TestSiteScraper(unittest.TestCase):
 
     def testGoogle(self):
@@ -63,6 +78,10 @@ class TestSiteScraper(unittest.TestCase):
         table = s.soup.find('table', {'class': 'example'})
         #print table
         self.assertNotEquals(table,None)
+
+        s.scrapeTable({'class': 'example'})
+        print s.tableData
+
 
 
 if __name__ == '__main__':

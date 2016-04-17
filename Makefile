@@ -33,11 +33,11 @@ $(PYTHON_UNITTEST_STAMPS): stamps/%.unittest: %.py
 #############################
 .PHONY: tabs2space
 tabs2space:
-	find . -type f -name '*.py' -exec sed -i 's/\t/    /g' {} \;
+	@find . -type f -name '*.py' -exec sed -i 's/\t/    /g' {} \;
 
 .PHONY: remove-trailing-whitespace
 remove-trailing-whitespace:
-	find . -type f -name '*.py' -exec sed -i 's/[ \t]*$$//g' {} \;
+	@find . -type f -name '*.py' -exec sed -i 's/[ \t]*$$//g' {} \;
 
 .PHONY: lint
 lint: remove-trailing-whitespace tabs2space
