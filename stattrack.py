@@ -88,16 +88,16 @@ while True:
         mflSite = MyFantasyLeagueDotComScraper(43790,2016)
         mflSite.scrape()
         for p in mflSite.draftGrid:
-            playerSearch = db.getRE(p[0], position=p[2], listDrafted=True, listIgnored=True)
+            playerSearch = db.getRE(p['name'], position=p['position'], listDrafted=True, listIgnored=True)
             if playerSearch is None or len(playerSearch) == 0:
-                print "ERROR: Player " + p[0] + " is unknown. Skipping!"
+                print "ERROR: Player " + p['name'] + " is unknown. Skipping!"
             elif len(playerSearch) == 1:
                 if not playerSearch[0].isDrafted:
-                    print playerSearch[0].name + " was drafted by " + p[3]
+                    print playerSearch[0].name + " was drafted by " + p['owner']
                     playerSearch[0].draft()
-                playerSearch[0].update({'franchise':p[3]})
+                playerSearch[0].update({'franchise':p['owner']})
             else:
-                print "ERROR: Player " + p[0] + " is ambiguous. Skipping!"
+                print "ERROR: Player " + p['name'] + " is ambiguous. Skipping!"
                 for ply in playerSearch:
                     print " --> " + ply.name
 

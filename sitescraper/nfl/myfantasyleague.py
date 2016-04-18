@@ -44,18 +44,16 @@ class MyFantasyLeagueDotComScraper(SiteScraper):
                     nameTeamPosition = nameTeamPosition.rsplit(" ",1)[0]
                     nameTeamPositionSplit = nameTeamPosition.rsplit(" ",1)
 
+                draftGridEntry = {}
                 nameTeamSplit = nameTeamPosition.rsplit(" ",1)[0].rsplit(" ",1);
                 nameSplit = nameTeamSplit[0].split(",",1)
-                name = nameSplit[1].strip() + " " + nameSplit[0].strip()
-                team = nameTeamSplit[1]
-                position = nameTeamPositionSplit[1];
+                draftGridEntry['name'] = nameSplit[1].strip() + " " + nameSplit[0].strip()
+                draftGridEntry['team'] = nameTeamSplit[1]
+                draftGridEntry['position'] = nameTeamPositionSplit[1];
+                draftGridEntry['owner'] = row[2]
 
-                franchise = row[2]
-                #print "franchise [" + franchise + "] selects: " + player
-
-                #print name + " " + team
-
-                self.draftGrid.append( ( name, team, position, franchise ) )
+                #self.draftGrid.append( ( name, team, position, owner ) )
+                self.draftGrid.append( draftGridEntry )
 
 
 
