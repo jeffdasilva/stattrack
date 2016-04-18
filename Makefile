@@ -8,18 +8,30 @@
 #############################
 SHELL := /bin/bash
 .SECONDEXPANSION:
+
+.PHONY: default
+default: check
 #############################
 
 
 #############################
-PYTHON_PACKAGES = $(foreach subdir,* */* */*/*,$(patsubst %/__init__.py,%,$(wildcard $(subdir)/__init__.py)))
+PYTHON_PACKAGES = $(foreach subdir,* */* */*/* */*/*/*,$(patsubst %/__init__.py,%,$(wildcard $(subdir)/__init__.py)))
 PYTHON_SRC := $(wildcard *.py) $(foreach pkg,$(PYTHON_PACKAGES),$(wildcard $(pkg)/*.py))
 PYTHON_MAIN := stattrack.py
-PYTHON_UNITTEST_STAMPS := $(patsubst %.py,stamps/%.unittest,$(filter-out %/__init__.py,$(filter-out $(PYTHON_MAIN),$(PYTHON_SRC))))
 #############################
 
 
 #############################
+
+.PHONY: all
+all: check
+
+PYTHON_UNITTEST_STAMPS := $(strip \
+	$(patsubst %.py,stamps/%.unittest,\
+	$(filter-out %/__init__.py,\
+	$(filter-out $(PYTHON_MAIN),$(PYTHON_SRC))\
+	)))
+
 .PHONY: check
 check: $(PYTHON_UNITTEST_STAMPS)
 
@@ -63,8 +75,8 @@ dev:
 CLEAN_FILES_RE += *.pyc *.class stamps test*.pickle *.orig *~
 CLEAN_FILES += $(sort $(wildcard $(strip \
 	$(foreach dir,. $(PYTHON_PACKAGES),\
-	$(foreach re,$(CLEAN_FILES_RE), \
-		$(dir)/$(re) \
+	$(foreach clean_re,$(CLEAN_FILES_RE), \
+		$(dir)/$(clean_re) \
 )))))
 
 .PHONY: clean

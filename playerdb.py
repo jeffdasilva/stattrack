@@ -41,7 +41,7 @@ class PlayerDB(object):
         for key in playerData:
             self.add(playerData[key])
 
-    def getRE(self, playerNameREString, position="all", listDrafted=False, listIgnored=False):
+    def getRE(self, playerNameREString, position="all", team="all", listDrafted=False, listIgnored=False):
         reObj = re.compile(playerNameREString, re.IGNORECASE)
         player_list = []
         for playerObj in self.player.itervalues():
@@ -53,7 +53,11 @@ class PlayerDB(object):
                 continue
 
             match_found = False
-            position_to_match = self.positionMap[position]
+            if self.positionMap.has_key(position.lower()):
+                position_to_match = self.positionMap[position.lower()]
+            else:
+                position_to_match = [ position ]
+
             for pos_i in position_to_match:
                 if pos_i == "all":
                     match_found = True
@@ -72,14 +76,14 @@ class PlayerDB(object):
         player_list.sort(reverse=True)
         return player_list
 
-    def get(self, searchString="", position="all", listDrafted=False, listIgnored=False):
+    def get(self, searchString="", position="all", team="all", listDrafted=False, listIgnored=False):
 
         if searchString == "":
             searchString = '.*'
         else:
             searchString = '.*' + searchString + '.*'
 
-        return self.getRE(searchString, position=position, listDrafted=listDrafted, listIgnored=listIgnored)
+        return self.getRE(searchString, position=position, team=team, listDrafted=listDrafted, listIgnored=listIgnored)
 
     def numberOfPlayersDrafted(self, position="all"):
         plist = self.get(position=position, listDrafted=True)

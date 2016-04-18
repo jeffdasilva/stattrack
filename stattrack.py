@@ -7,6 +7,7 @@
 import copy
 
 from footballdb import FootballPlayerDB
+from sitescraper.nfl.myfantasyleague import MyFantasyLeagueDotComScraper
 
 
 db = FootballPlayerDB()
@@ -83,9 +84,27 @@ while True:
         print "Updating Player Database from Web Info. Please Wait..."
         db_stack.append(copy.deepcopy(db))
         db.wget()
+
+        mflSite = MyFantasyLeagueDotComScraper(43790,2016)
+        mflSite.scrape()
+        for p in mflSite.draftGrid:
+            playerSearch = db.getRE(p[0], position=p[2], listDrafted=True, listIgnored=True)
+            if playerSearch is None or len(playerSearch) == 0:
+                print "ERROR: Player " + p[0] + " is unknown. Skipping!"
+            elif len(playerSearch) == 1:
+                if not playerSearch[0].isDrafted:
+                    print playerSearch[0].name + " was drafted by " + p[3]
+                    playerSearch[0].draft()
+                playerSearch[0].update({'franchise':p[3]})
+            else:
+                print "ERROR: Player " + p[0] + " is ambiguous. Skipping!"
+                for ply in playerSearch:
+                    print " --> " + ply.name
+
         if not undo_operation:
             undo_stack.append("pop")
         continue
+
     elif cmdArr[0] == "save":
         print "Saving Player DB to Disk"
         db.save()

@@ -30,19 +30,32 @@ class MyFantasyLeagueDotComScraper(SiteScraper):
 
         for row in s.tableData:
             if len(row) > 3:
-                player = row[3]
+                nameTeamPosition = row[3]
 
-                if player is None or player == "":
+                if nameTeamPosition is None or nameTeamPosition == "":
                     continue
-                elif player == "Pre-Draft Selection Made":
+                elif nameTeamPosition == "Pre-Draft Selection Made":
                     continue
-                elif player.startswith("Waiting On "):
+                elif nameTeamPosition.startswith("Waiting On "):
                     continue
+
+                nameTeamPositionSplit = nameTeamPosition.rsplit(" ",1)
+                if nameTeamPositionSplit[1][0] == '(':
+                    nameTeamPosition = nameTeamPosition.rsplit(" ",1)[0]
+                    nameTeamPositionSplit = nameTeamPosition.rsplit(" ",1)
+
+                nameTeamSplit = nameTeamPosition.rsplit(" ",1)[0].rsplit(" ",1);
+                nameSplit = nameTeamSplit[0].split(",",1)
+                name = nameSplit[1].strip() + " " + nameSplit[0].strip()
+                team = nameTeamSplit[1]
+                position = nameTeamPositionSplit[1];
 
                 franchise = row[2]
                 #print "franchise [" + franchise + "] selects: " + player
 
-                self.draftGrid.append( ( player, franchise ) )
+                #print name + " " + team
+
+                self.draftGrid.append( ( name, team, position, franchise ) )
 
 
 
@@ -58,7 +71,9 @@ class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
                                           )
         s.scrape()
         self.assertNotEquals(s.draftGrid,None)
-        #print s.draftGrid
+
+        for p in s.draftGrid:
+            print p
 
 if __name__ == '__main__':
     unittest.main()
