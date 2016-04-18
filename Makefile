@@ -82,6 +82,17 @@ CLEAN_FILES += $(sort $(wildcard $(strip \
 .PHONY: clean
 clean:
 	$(if $(CLEAN_FILES),rm -rf $(CLEAN_FILES))
+
+TARBALL_TIMESTAMP := $(shell date +%m%d%Y_%k%M%S)
+TARBALL_FILE := tgz/$(notdir $(abspath .))_$(TARBALL_TIMESTAMP).tar.gz
+
+.PHONY: archive tarball tgz
+archive tarball tgz: $(TARBALL_FILE)
+
+$(TARBALL_FILE): clean
+	@mkdir -p $(@D)
+	@echo "Generating $@..."
+	tar -czf $@ $(filter-out tgz,$(wildcard *))
 #############################
 
 
