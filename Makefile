@@ -9,6 +9,8 @@
 SHELL := /bin/bash
 .SECONDEXPANSION:
 
+SPACE := $(empty) $(empty)
+
 .PHONY: default
 default: check
 #############################
@@ -83,7 +85,7 @@ CLEAN_FILES += $(sort $(wildcard $(strip \
 clean:
 	$(if $(CLEAN_FILES),rm -rf $(CLEAN_FILES))
 
-TARBALL_TIMESTAMP := $(shell date +%m%d%Y_%k%M%S)
+TARBALL_TIMESTAMP := $(strip $(subst $(SPACE),,$(shell date +%m%d%Y_%k%M%S)))
 TARBALL_FILE := tgz/$(notdir $(abspath .))_$(TARBALL_TIMESTAMP).tar.gz
 
 .PHONY: archive tarball tgz
