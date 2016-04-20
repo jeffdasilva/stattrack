@@ -20,7 +20,7 @@ class SiteScraper(object):
             return
 
         #urllib way to do the same thing
-        #f = urllib.urlopen(self.url)
+        #f = urllib.urlopen(self.projectionsURL)
         #html = f.read()
 
         request = urllib2.Request(self.url)
@@ -57,7 +57,7 @@ class TestSiteScraper(unittest.TestCase):
 
         linkList = []
         for link in s.soup.findAll('a'):
-            #print 'found an url'
+            #print 'found an projectionsURL'
             if link.has_attr('href'):
                 if link['href'][0] == '/':
                     linkList += [ s.url + link['href'] ]

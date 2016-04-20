@@ -104,7 +104,7 @@ class FootballPlayerDB(PlayerDB):
                 if position != 'QB':
                     statDesc += ['receptions', 'receivingYards', 'receivingTDs' ]
 
-                statDesc += ['fumblesLost' ]
+                statDesc += [ 'fumblesLost' ]
 
             statDesc += [ 'fantasyPoints' ]
 

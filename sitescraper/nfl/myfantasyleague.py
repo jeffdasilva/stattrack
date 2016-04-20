@@ -11,12 +11,11 @@ class MyFantasyLeagueDotComScraper(SiteScraper):
 
         self.leagueID = leagueID
         self.year = year
-        self.url = None
-
+        self.projectionsURL = None
 
     def scrape(self):
-        #url = "http://home.myfantasyleague.com"
-        #url = "http://www56.myfantasyleague.com/" + str(year) + "/home/" + str(leagueID)
+        #projectionsURL = "http://home.myfantasyleague.com"
+        #projectionsURL = "http://www56.myfantasyleague.com/" + str(year) + "/home/" + str(leagueID)
 
         url = "http://www56.myfantasyleague.com/" + str(self.year) + "/options?L=" + str(self.leagueID) + "&O=17"
         s = SiteScraper(url)
