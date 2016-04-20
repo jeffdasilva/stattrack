@@ -6,7 +6,7 @@ import pickle
 import re
 import unittest
 
-from player import Player
+from db.player.player import Player
 
 
 class PlayerDB(object):

@@ -6,7 +6,7 @@
 
 import copy
 
-from footballdb import FootballPlayerDB
+from db.footballdb import FootballPlayerDB
 from sitescraper.nfl.myfantasyleague import MyFantasyLeagueDotComScraper
 
 

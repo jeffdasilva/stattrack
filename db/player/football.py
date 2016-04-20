@@ -3,7 +3,7 @@
 '''
 import unittest
 
-from player import Player
+from db.player.player import Player
 
 
 class FootballPlayer(Player):

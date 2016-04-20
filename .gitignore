@@ -6,5 +6,6 @@
 .project
 .pydevproject
 /data/
+/db/data/
 /stamps/
 /tgz/

@@ -4,14 +4,13 @@ Created on April 12, 2016
 @author: jdasilva
 '''
 
+from bs4 import BeautifulSoup
 import unittest
 import urllib
 
-from player import Player
-from football import FootballPlayer
-from playerdb import PlayerDB
-
-from bs4 import BeautifulSoup
+from db.player.football import FootballPlayer
+from db.player.player import Player
+from db.playerdb import PlayerDB
 
 
 class FootballPlayerDB(PlayerDB):
