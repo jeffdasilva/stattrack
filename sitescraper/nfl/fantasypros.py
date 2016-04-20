@@ -3,9 +3,6 @@ import unittest
 from sitescraper.scraper import SiteScraper
 
 class FantasyProsDotComScraper(SiteScraper):
-    '''
-    classdocs
-    '''
 
     def __init__(self):
         super(SiteScraper, self).__init__()
@@ -22,14 +19,6 @@ class FantasyProsDotComScraper(SiteScraper):
 
         self.setProjectionKeys()
 
-    def setCheatSheetURLs(self):
-        url_base = "http://www1.fantasypros.com/nfl/rankings/"
-        url_suffix = "-cheatsheets.php"
-
-        self.cheatsheetURL = {}
-        for p in [ 'QB', 'RB', 'WR', 'TE', 'K', 'dst', 'half-point-ppr' ]:
-            self.cheatsheetURL[p] = url_base + p.lower() + url_suffix
-
     def setProjectionKeys(self):
         keysPositionNameTeam = ['position', 'name', 'team']
         keysPassingStats = ['passingAttempts', 'passingCompletions', 'passingYards', 'passingTDs', 'passingInterceptions']
@@ -44,6 +33,13 @@ class FantasyProsDotComScraper(SiteScraper):
         self.keys['TE'] = keysPositionNameTeam + keysReceivingStats + keysMiscStats
         self.keys['K'] = keysPositionNameTeam + ['fieldGoals', 'fieldGoalAttempts', 'extraPoints', 'fantasyPoints']
 
+    def setCheatSheetURLs(self):
+        url_base = "http://www1.fantasypros.com/nfl/rankings/"
+        url_suffix = "-cheatsheets.php"
+
+        self.cheatsheetURL = {}
+        for p in [ 'QB', 'RB', 'WR', 'TE', 'K', 'dst', 'consensus', 'ppr', 'half-point-ppr' ]:
+            self.cheatsheetURL[p] = url_base + p.lower() + url_suffix
 
     def scrapeCheatSheets(self):
 
@@ -55,6 +51,7 @@ class FantasyProsDotComScraper(SiteScraper):
             s.scrapeTable({'id': 'data'})
 
             if s.tableData is None:
+                print "ERROR: table for " + p + " from " + self.cheatsheetURL[p] + " could not be extracted"
                 continue
 
             s.tableData = s.tableData[1:]
@@ -64,16 +61,19 @@ class FantasyProsDotComScraper(SiteScraper):
             else:
                 pos = p;
 
-            if p == "half-point-ppr":
-                dataKeys = ['hpprRank', 'name', 'team', 'positionAndRank', 'byeWeek', 'hpprBestRank', 'hpprWorstRank', 'hpprAvgRank', 'hpprStdDev']
+            if p == "consensus":
+                dataKeys = ['stdRank', 'name', 'team', 'stdPositionAndRank', 'byeWeek', 'stdBestRank', 'stdWorstRank', 'stdAvgRank', 'stdStdDev']                
+            elif p == "ppr":
+                dataKeys = ['pprRank', 'name', 'team', 'pprPositionAndRank', 'byeWeek', 'pprBestRank', 'pprWorstRank', 'pprAvgRank', 'pprStdDev']                
+            elif p == "half-point-ppr":
+                dataKeys = ['hpprRank', 'name', 'team', 'hpprPositionAndRank', 'byeWeek', 'hpprBestRank', 'hpprWorstRank', 'hpprAvgRank', 'hpprStdDev']
             else:
                 dataKeys = ['position', 'positionRank', 'name', 'team', 'byeWeek', 'bestRank', 'worstRank', 'avgRank', 'stdDev']
 
             for data in s.tableData:
                 if len(data) < 2:
                     continue
-                #print str(data) + " " + str(len(data))
-                if p == "half-point-ppr":
+                if p == "half-point-ppr" or p == "ppr" or p == "consensus":
                     d = dict(zip(dataKeys,[data[0]] + self.splitNameTeamString(data[1]) + data[2:]))
                 else:
                     d = dict(zip(dataKeys,[pos] + [data[0]] + self.splitNameTeamString(data[1]) + data[2:]))
@@ -146,10 +146,8 @@ class TestFantasyProsDotComScraper(unittest.TestCase):
                     self.assertEqual(player['position'], "DEF")
                 seattleFound += 1
 
-        self.assertEquals(andrewLuckFound,2)
-        self.assertEquals(seattleFound,2)
-
-
+        self.assertEquals(andrewLuckFound,4)
+        self.assertEquals(seattleFound,4)
 
     def testsplitNameTeamString(self):
         s = FantasyProsDotComScraper();
