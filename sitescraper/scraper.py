@@ -22,8 +22,8 @@ class SiteScraper(object):
         #urllib way to do the same thing
         #f = urllib.urlopen(self.projectionsURL)
         #html = f.read()
-
-        request = urllib2.Request(self.url)
+        hdr = {'User-Agent':'Mozilla/5.0'}
+        request = urllib2.Request(self.url,headers=hdr)
         html = urllib2.urlopen(request)
 
         self.soup = BeautifulSoup(html)
