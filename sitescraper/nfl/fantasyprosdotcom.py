@@ -100,8 +100,12 @@ class FantasyProsDotComScraper(SiteScraper):
                 self.projections.append(d)
 
     def scrape(self):
-        self.scrapeProjections()
+        self.cheatsheets = []
+        self.projections = []
+        #self.scrapeProjections()
         self.scrapeCheatSheets()
+        self.data = self.cheatsheets + self.projections
+        return self.data
 
     def splitNameTeamString(self, nameTeamStr):
 

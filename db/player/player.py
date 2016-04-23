@@ -42,6 +42,15 @@ class Player(object):
 
         return player_str
 
+    def printAll(self):
+        print "Name: " + self.name
+        if len(self.nameAliases) > 0:
+            print "Aliases: " + self.nameAliases
+        print "Team: " + self.team
+        print "Properties: "
+        for prop in self.prop:
+            print "  " + prop + ": " + str(self.prop[prop])
+
     def value(self):
         return 0
 

@@ -7,12 +7,13 @@
 import copy
 
 from db.footballdb import FootballPlayerDB
+from sitescraper.nfl.footballdbdotcom import FootballDBDotComScraper
 from sitescraper.nfl.myfantasyleaguedotcom import MyFantasyLeagueDotComScraper
 
 
-db = FootballPlayerDB()
+db = FootballPlayerDB(league="Oracle")
 db.load()
-#db.wget()
+#db.update()
 
 player_list = []
 undo_stack = []
@@ -80,7 +81,7 @@ while True:
         continue
     elif cmd == "exit" or cmd == "quit" or cmd == "q":
         break
-    elif cmd == "update" or cmd == "wget":
+    elif cmd == "update" or cmd == "update":
         print "Updating Player Database from Web Info. Please Wait..."
         db_stack.append(copy.deepcopy(db))
         db.wget()
@@ -88,9 +89,9 @@ while True:
         mflSite = MyFantasyLeagueDotComScraper(43790,2016)
         mflSite.scrape()
 
-        if mflSite.draftGrid is not None:
+        if mflSite.data is not None:
 
-            for p in mflSite.draftGrid:
+            for p in mflSite.data:
                 playerSearch = db.getRE(p['name'], position=p['position'], listDrafted=True, listIgnored=True)
                 if playerSearch is None or len(playerSearch) == 0:
                     print "ERROR: Player " + p['name'] + " is unknown. Skipping!"
@@ -220,10 +221,16 @@ while True:
         else:
             print "Can't Draft! No Players Queued Up Currently"
             continue
+    elif cmd == "info":
+        if len(player_list) > 0:
+            player_list[0].printAll()
+        else:
+            print "player queue is empty"
+        continue
     elif cmd == "factory-reset":
-        db_stack.append(db)
+        db_stack.append(copy.deepcopy(db))
         db = FootballPlayerDB()
-        db.wget()
+        db.wget(scrapers=[FootballDBDotComScraper()])
 
         if not undo_operation:
             undo_stack.append("pop")

@@ -4,14 +4,12 @@ Created on April 12, 2016
 @author: jdasilva
 '''
 
-from bs4 import BeautifulSoup
 import unittest
-import urllib
 
 from db.player.football import FootballPlayer
 from db.player.player import Player
 from db.playerdb import PlayerDB
-
+from sitescraper.nfl.fantasyprosdotcom import FantasyProsDotComScraper
 
 class FootballPlayerDB(PlayerDB):
 
@@ -34,7 +32,6 @@ class FootballPlayerDB(PlayerDB):
 
 
         super(FootballPlayerDB, self).__init__(positionMap=pmap)
-        #self.league = "Oracle"
         self.league = league
 
         if self.league == "O-League":
@@ -54,140 +51,14 @@ class FootballPlayerDB(PlayerDB):
             self.numberOfScrubs = 0
             self.moneyPerTeam = 0
 
-    def wget(self):
-        # note reliable
-        #self.wgetFantasyPros()
-        self.wgetFantasyProsCheatsheets()
+    def wget(self, scrapers=[]):
 
-    def wgetFantasyPros(self):
+        scrapers += [FantasyProsDotComScraper()]
 
-        site_root = "http://www1.fantasypros.com/nfl"
-        site = {}
-        site_suffix = "?week=draft"
-
-        site['QB'] = site_root + "/projections/qb.php" + site_suffix
-        site['RB'] = site_root + "/projections/rb.php" + site_suffix
-        site['WR'] = site_root + "/projections/wr.php" + site_suffix
-        site['TE'] = site_root + "/projections/te.php" + site_suffix
-        site['K'] = site_root + "/projections/k.php" + site_suffix
-
-        for position in ['QB', 'RB', 'WR', 'TE']:
-
-            f = urllib.urlopen(site[position])
-            html = f.read()
-            soup = BeautifulSoup(html)
-            table = soup.find('table', {'id': 'data'})
-
-            rawdata = []
-
-            for row in table.findAll("tr"):
-                cols = row.find_all('td')
-                cols = [ele.text.strip() for ele in cols]
-                rawdata.append([ele for ele in cols if ele])
-
-            if position == 'K':
-                rawdata = rawdata[1:]
-            else:
-                rawdata = rawdata[2:]
-
-            stats = []
-            for i in rawdata:
-                if len(str(i[0]).split()) < 3 or not str(i[0]).rsplit(' ',1)[1].isupper() or str(i[0]).rsplit(' ',1)[1].isupper() > 3:
-                    stats += [ [ i[0] ] + [ 'unknown' ] + [ position ] + i[1:] ]
-                else:
-                    stats += [ str(i[0]).rsplit(' ',1) + [ position ] + i[1:] ]
-
-            #print stats
-
-            statDesc = ['name', 'team', 'position']
-
-            if position == 'K':
-                statDesc += ['fieldGoals', 'fieldGoalAttempts', 'extraPoints']
-            else:
-                if position == 'QB':
-                    statDesc += ['passingAttempts', 'passingCompletions', 'passingYards', 'passingTDs', 'passingInterceptions']
-
-                if position != 'TE':
-                    statDesc += ['rushingAttempts', 'rushingYards', 'rushingTDs' ]
-
-                if position != 'QB':
-                    statDesc += ['receptions', 'receivingYards', 'receivingTDs' ]
-
-                statDesc += [ 'fumblesLost' ]
-
-            statDesc += [ 'fantasyPoints' ]
-
-            for player_stats in stats:
-                player_prop = {}
-                index = 0
-                for stat in statDesc:
-                    player_prop[stat] = player_stats[index].replace(',', '')
-                    index += 1
-
-                player = FootballPlayer(properties=player_prop)
-                self.add(player)
-
-    def wgetFantasyProsCheatsheets(self):
-
-        site_root = "http://www1.fantasypros.com/nfl/rankings"
-        site = {}
-        site_suffix = "-cheatsheets.php"
-
-        site['QB'] = site_root + "/qb" + site_suffix
-        site['RB'] = site_root + "/rb" + site_suffix
-        site['WR'] = site_root + "/wr" + site_suffix
-        site['TE'] = site_root + "/te" + site_suffix
-        site['K'] = site_root + "/k" + site_suffix
-        site['DEF'] = site_root + "/dst" + site_suffix
-        site['ALL'] = site_root + "/half-point-ppr" + site_suffix
-
-
-        for position in ['QB', 'RB', 'WR', 'TE', 'K', 'DEF', 'ALL']:
-
-            f = urllib.urlopen(site[position])
-            html = f.read()
-            soup = BeautifulSoup(html)
-            table = soup.find('table', {'id': 'data'})
-
-            rawdata = []
-
-            for row in table.findAll("tr"):
-                cols = row.find_all('td')
-                cols = [ele.text.strip() for ele in cols]
-                rawdata.append([ele for ele in cols])
-
-            rawdata = rawdata[1:]
-
-            stats = []
-            for i in rawdata:
-                if (len(i)) <= 1:
-                    continue
-
-                rank = i[0]
-                i = i[1:]
-
-                if len(str(i[0]).split()) < 3 or not str(i[0]).rsplit(' ',1)[1].isupper() or str(i[0]).rsplit(' ',1)[1].isupper() > 3:
-                    stats += [ [rank] + [ i[0] ] + [ 'unknown' ] ]
-                else:
-                    stats += [ [rank] + str(i[0]).rsplit(' ',1)]
-
-                if position != 'ALL':
-                    stats[-1] += [position]
-
-                stats[-1] += i[1:]
-
-            if position == 'ALL':
-                statDesc = ['hpprRank', 'name', 'team', 'positionAndRank', 'byeWeek', 'hpprBestRank', 'hpprWorstRank', 'hpprAvgRank', 'hpprStdDev']
-            else:
-                statDesc = ['rank', 'name', 'team', 'position', 'byeWeek', 'bestRank', 'worstRank', 'avgRank', 'stdDev']
-
-            for player_stats in stats:
-                player_prop = {}
-                index = 0
-                for stat in statDesc:
-                    player_prop[stat] = player_stats[index].replace(',', '')
-                    index += 1
-
+        for s in scrapers:
+            s.scrape()
+            for player_prop in s.data:
+                #print player_prop
                 player = FootballPlayer(properties=player_prop)
                 self.add(player)
 
@@ -249,7 +120,6 @@ class TestFootballPlayerDB(unittest.TestCase):
 
         print fdb.valueRemaining(), fdb.moneyRemaining(), fdb.costPerValueUnit()
 
-
     def testMoneyRemaining(self):
         fdb = FootballPlayerDB(league='O-League')
         fdb.add(Player("June"))
@@ -261,7 +131,6 @@ class TestFootballPlayerDB(unittest.TestCase):
 
         fdb.get("Sophia")[0].draft(111)
         self.assertEqual(fdb.moneyRemaining(),3209)
-
 
 
     def testWget(self):
@@ -303,7 +172,7 @@ class TestFootballPlayerDB(unittest.TestCase):
 
     def testWgetCheatsheets(self):
         fdb = FootballPlayerDB()
-        fdb.wgetFantasyProsCheatsheets()
+        fdb.wget()
 
         p = fdb.player["Julio Jones - ATL"]
         print p

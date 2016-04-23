@@ -1,5 +1,8 @@
+import datetime
 import unittest
+
 from sitescraper.scraper import SiteScraper
+
 
 class FootballDBDotComScraper(SiteScraper):
 
@@ -34,14 +37,21 @@ class FootballDBDotComScraper(SiteScraper):
 
                 if player[0] in self.link:
                     s = SiteScraper(self.url + self.link[player[0]])
+                    s.debug = self.debug
                     s.scrapeTable(attrs={'class':'statistics scrollable'},index=-1)
                     s.data = s.data[2:]
-                    stats = {'name':player[0], 'position':position}
+                    name = str(player[0]).rsplit(',',1)[1].strip() + " " + str(player[0]).rsplit(',',1)[0].strip()
+                    stats = {'name':name, 'position':position}
                     for yearData in s.data:
                         year = yearData[0]
-                        #print year
                         stats[year] = {}
                         stats[year] = dict(zip(FootballDBDotComScraper.Stats,yearData[1:]))
+
+                    currentYear = str(datetime.datetime.now().year)
+
+                    if currentYear in stats:
+                        if 'team' in stats[currentYear]:
+                            stats['team'] = stats[currentYear]['team']
 
                     #print stats
                     self.historicalStats.append(stats)
@@ -64,12 +74,12 @@ class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
 
 
         print s.data[0]['name']
+        print s.data[0]['team']
         print s.data[0]['position']
         self.assertEquals(s.data[0]['position'],'QB')
         print s.data[0]['2016']['team']
         print s.data[0]['2016']['PassingTD']
         self.assertGreaterEqual(int(s.data[0]['2016']['PassingTD']),0)
-
 
 
 if __name__ == '__main__':
