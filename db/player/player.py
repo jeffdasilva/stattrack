@@ -1,8 +1,5 @@
-'''
-Created on Aug 30, 2015
 
-@author: jdasilva
-'''
+
 import unittest
 
 class Player(object):
@@ -35,8 +32,8 @@ class Player(object):
 
         player_str += " " + '{0: <6}'.format('/'.join(self.position))
 
-        if self.prop.has_key("fantasyPoints"):
-            player_str += " " + '{0: <8}'.format(str(self.prop["fantasyPoints"]))
+        #if self.prop.has_key("fantasyPoints"):
+        #    player_str += " " + '{0: <8}'.format(str(self.prop["fantasyPoints"]))
 
         player_str += " " + '{0: <8}'.format(str(self.value()))
 
