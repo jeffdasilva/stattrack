@@ -95,6 +95,13 @@ class Player(object):
         if self.team is not None and (self.team.lower() == "unknown" or self.team.lower() == "FA" or self.team == "???"):
             self.team = None
 
+        if self.team is not None:
+            self.team = self.team.upper()
+
+        # ToDo: Move this to Football Class
+        if self.team == "JAC":
+            self.team = "JAX"
+
         if self.prop.has_key("position"):
             if self.prop["position"] not in self.position:
                 self.position.append(self.prop["position"])
@@ -147,7 +154,7 @@ class TestPlayer(unittest.TestCase):
     def testNameTeamPropSet(self):
         player_prop = {}
         player_prop["name"] = 'foo'
-        player_prop["team"] = 'SJ'
+        player_prop["team"] = 'sj'
         player_prop["foo"] = 'bar'
 
         p = Player(properties=player_prop)

@@ -138,7 +138,7 @@ class TestPlayerDB(unittest.TestCase):
         june = pDB.player[Player("June", "Team-June").key()]
         print june
         self.assertEquals(june.name,"June")
-        self.assertEquals(june.team,"Team-June")
+        self.assertEquals(june.team,"TEAM-JUNE")
         self.assertEquals(june.position,["C","RW","G"])
         self.assertEquals(june.prop["goals"],24)
         self.assertEquals(june.prop["assists"],33)
@@ -151,7 +151,7 @@ class TestPlayerDB(unittest.TestCase):
         pDB.load()
         june = pDB.player[Player("June", "Team-June").key()]
         self.assertEquals(june.name,"June")
-        self.assertEquals(june.team,"Team-June")
+        self.assertEquals(june.team,"TEAM-JUNE")
         self.assertEquals(june.position,["C","RW","G"])
         self.assertEquals(june.prop["goals"],24)
         self.assertEquals(june.prop["assists"],33)
@@ -166,7 +166,7 @@ class TestPlayerDB(unittest.TestCase):
         pDB_copy.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/data/test_myplayerdb2.pickle"
         june = pDB_copy.player[Player("June", "Team-June").key()]
         self.assertEquals(june.name,"June")
-        self.assertEquals(june.team,"Team-June")
+        self.assertEquals(june.team,"TEAM-JUNE")
         self.assertEquals(june.position,["C","RW","G"])
         self.assertEquals(june.prop["goals"],24)
         self.assertEquals(june.prop["assists"],33)
