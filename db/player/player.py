@@ -73,10 +73,20 @@ class Player(object):
             return 0
 
     def key(self):
-        if self.team is None:
-            return self.name + " - " + "unknown"
-        else:
-            return self.name + " - " + self.team
+
+        nameToKey = self.name.lower()
+        teamToKey = self.team
+
+        for suffix in [" Jr.", " III"]:
+            if nameToKey.endswith(suffix.lower()):
+                nameToKey = nameToKey.rsplit(suffix.lower(),1)[0]
+
+        if teamToKey == None:
+            teamToKey = "unknown"
+
+        teamToKey = teamToKey.lower()
+
+        return str(nameToKey) + " - " + str(teamToKey)
 
     def update(self, properties):
         self.prop.update(properties)
@@ -195,6 +205,23 @@ class TestPlayer(unittest.TestCase):
         self.assertTrue(not p.prop.has_key("position"))
         self.assertTrue(not p2.prop.has_key("position"))
 
+    def testKeyMethod(self):
+
+        p = Player(name="Jeff")
+        print p.key()
+        self.assertEqual(p.key(), "jeff - unknown")
+
+        p = Player(name="Jeff", team="JDS")
+        print p.key()
+        self.assertEqual(p.key(), "jeff - jds")
+
+        p = Player(name="JeFF III", team="JdSx")
+        print p.key()
+        self.assertEqual(p.key(), "jeff - jdsx")
+
+        p = Player(name="Jeff JR.")
+        print p.key()
+        self.assertEqual(p.key(), "jeff - unknown")
 
 
 if __name__ == '__main__':

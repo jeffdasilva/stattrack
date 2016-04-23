@@ -65,9 +65,7 @@ class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
                                           TestMyFantasyLeagueDotComScraper.OracleLeagueYear, \
                                           )
         s.scrape()
-        #self.assertNotEquals(s.draftGrid,None)
-        # site is down for maintenance
-        self.assertEquals(s.data,None)
+        self.assertNotEquals(s.data,None)
 
         #for p in s.draftGrid:
         #    print p

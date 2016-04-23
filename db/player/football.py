@@ -15,6 +15,20 @@ class FootballPlayer(Player):
         self.rushingSDMult = 2.4
         self.receivingSDMult = 2.0
 
+
+    def getStat(self,statName,year):
+        return 0;
+
+
+    def fantasyPoints(self):
+        points = 0
+
+        if '2015' in self.prop:
+            if 'PassingTD' in self.prop['2015']:
+                points = int(self.prop['2015']['PassingTD']) * 4
+
+        return points
+
     def __valuePassingYards(self,passingYards):
         points = 0.0
 

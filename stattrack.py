@@ -267,10 +267,10 @@ while True:
         cpv_mult = db.costPerValueUnit()
 
         for i, player in enumerate(player_list):
-            if i >= 20:
+            if i >= 25:
                 break
             #print '{0: >2}'.format(str(i)) + "  " + str(player) + " $" + str(player.value()*cpv_mult)
-            print '{0: >2}'.format(str(i)) + "  " + str(player) + "  " + str(player.value())
+            print '{0: >2}'.format(str(i)) + "  " + str(player) + "  " + str(player.fantasyPoints())
 
 
 if __name__ == '__main__':

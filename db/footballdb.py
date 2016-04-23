@@ -137,7 +137,7 @@ class TestFootballPlayerDB(unittest.TestCase):
         fdb = FootballPlayerDB()
         fdb.wget()
 
-        p = fdb.player["Tom Brady - NE"]
+        p = fdb.player["tom brady - ne"]
         print p
         #self.assertEquals(p.position,["QB"])
         #self.assertTrue(float(p.prop["fantasyPoints"]) > 200)
@@ -146,7 +146,7 @@ class TestFootballPlayerDB(unittest.TestCase):
 
         print p.value()
 
-        p = fdb.player["Rob Gronkowski - NE"]
+        p = fdb.player["rob gronkowski - ne"]
         self.assertEquals(p.position,["TE"])
         #self.assertTrue(p.prop["fantasyPoints"] > 100)
         #self.assertTrue(p.prop["receivingYards"] > 400)
@@ -174,7 +174,7 @@ class TestFootballPlayerDB(unittest.TestCase):
         fdb = FootballPlayerDB()
         fdb.wget()
 
-        p = fdb.player["Julio Jones - ATL"]
+        p = fdb.player["julio jones - atl"]
         print p
         self.assertEquals(p.position,["WR"])
 
