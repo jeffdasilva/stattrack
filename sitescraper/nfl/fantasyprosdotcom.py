@@ -5,17 +5,17 @@ from sitescraper.scraper import SiteScraper
 class FantasyProsDotComScraper(SiteScraper):
 
     def __init__(self):
-        super(SiteScraper, self).__init__()
+        super(FantasyProsDotComScraper, self).__init__(url="http://www1.fantasypros.com/nfl")
         self.setProjectionURLs()
         self.setCheatSheetURLs()
 
     def setProjectionURLs(self):
-        url_base = "http://www1.fantasypros.com/nfl/projections/"
-        url_suffix = "?week=draft"
+        url_offset = "/projections/"
+        url_suffix = ".php?week=draft"
 
         self.projectionsURL = {}
         for p in ['QB', 'RB', 'WR', 'TE', 'K']:
-            self.projectionsURL[p] = url_base + p.lower() + ".php" + url_suffix
+            self.projectionsURL[p] = url_offset + p.lower() + url_suffix
 
         self.setProjectionKeys()
 
@@ -34,27 +34,26 @@ class FantasyProsDotComScraper(SiteScraper):
         self.keys['K'] = keysPositionNameTeam + ['fieldGoals', 'fieldGoalAttempts', 'extraPoints', 'fantasyPoints']
 
     def setCheatSheetURLs(self):
-        url_base = "http://www1.fantasypros.com/nfl/rankings/"
+        url_offset = "/rankings/"
         url_suffix = "-cheatsheets.php"
 
         self.cheatsheetURL = {}
         for p in [ 'QB', 'RB', 'WR', 'TE', 'K', 'dst', 'consensus', 'ppr', 'half-point-ppr' ]:
-            self.cheatsheetURL[p] = url_base + p.lower() + url_suffix
+            self.cheatsheetURL[p] = url_offset + p.lower() + url_suffix
+
 
     def scrapeCheatSheets(self):
 
         self.cheatsheets = []
 
         for p in self.cheatsheetURL:
-            s = SiteScraper(self.cheatsheetURL[p])
-            #print s.url
-            s.scrapeTable({'id': 'data'})
+            self.scrapeTable(urlOffset=self.cheatsheetURL[p], attrs={'id': 'data'})
 
-            if s.tableData is None:
+            if self.data is None:
                 print "ERROR: table for " + p + " from " + self.cheatsheetURL[p] + " could not be extracted"
                 continue
 
-            s.tableData = s.tableData[1:]
+            self.data = self.data[1:]
 
             if p == "dst":
                 pos = "DEF"
@@ -70,7 +69,7 @@ class FantasyProsDotComScraper(SiteScraper):
             else:
                 dataKeys = ['position', 'positionRank', 'name', 'team', 'byeWeek', 'bestRank', 'worstRank', 'avgRank', 'stdDev']
 
-            for data in s.tableData:
+            for data in self.data:
                 if len(data) < 2:
                     continue
                 if p == "half-point-ppr" or p == "ppr" or p == "consensus":
@@ -85,18 +84,18 @@ class FantasyProsDotComScraper(SiteScraper):
         self.projections = []
 
         for p in self.projectionsURL:
-            s = SiteScraper(self.projectionsURL[p])
-            s.scrapeTable({'id': 'data'})
+            #s = SiteScraper(self.projectionsURL[p])
+            self.scrapeTable(urlOffset=self.projectionsURL[p], attrs={'id': 'data'})
 
-            if s.tableData is None:
+            if self.data is None:
                 continue
 
             if p == 'K':
-                s.tableData = s.tableData[1:]
+                self.data = self.data[1:]
             else:
-                s.tableData = s.tableData[2:]
+                self.data = self.data[2:]
 
-            for data in s.tableData:
+            for data in self.data:
                 d = dict(zip(self.keys[p],[p] + self.splitNameTeamString(data[0]) + data[1:]))
                 self.projections.append(d)
 

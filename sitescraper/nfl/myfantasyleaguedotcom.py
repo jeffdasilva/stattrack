@@ -7,27 +7,24 @@ from sitescraper.scraper import SiteScraper
 class MyFantasyLeagueDotComScraper(SiteScraper):
 
     def __init__(self, leagueID, year=datetime.datetime.now().year):
-        super(SiteScraper, self).__init__()
+        super(MyFantasyLeagueDotComScraper, self).__init__(url="http://www56.myfantasyleague.com")
 
         self.leagueID = leagueID
         self.year = year
         self.projectionsURL = None
 
     def scrape(self):
-        #projectionsURL = "http://home.myfantasyleague.com"
-        #projectionsURL = "http://www56.myfantasyleague.com/" + str(year) + "/home/" + str(leagueID)
 
-        url = "http://www56.myfantasyleague.com/" + str(self.year) + "/options?L=" + str(self.leagueID) + "&O=17"
-        s = SiteScraper(url)
-        s.scrapeTable({'class' : 'report nocaption'})
+        urlOffset = "/" + str(self.year) + "/options?L=" + str(self.leagueID) + "&O=17"
+        self.scrapeTable(urlOffset=urlOffset, attrs={'class' : 'report nocaption'})
 
-        if s.tableData is None:
+        if self.data is None:
             self.draftGrid = None
             return
 
         self.draftGrid = []
 
-        for row in s.tableData:
+        for row in self.data:
             if len(row) > 3:
                 nameTeamPosition = row[3]
 
@@ -54,6 +51,7 @@ class MyFantasyLeagueDotComScraper(SiteScraper):
                 #self.draftGrid.append( ( name, team, position, owner ) )
                 self.draftGrid.append( draftGridEntry )
 
+        self.data = self.draftGrid
 
 
 class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
@@ -69,7 +67,7 @@ class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
         s.scrape()
         #self.assertNotEquals(s.draftGrid,None)
         # site is down for maintenance
-        self.assertEquals(s.draftGrid,None)
+        self.assertEquals(s.data,None)
 
         #for p in s.draftGrid:
         #    print p

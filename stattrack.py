@@ -7,7 +7,7 @@
 import copy
 
 from db.footballdb import FootballPlayerDB
-from sitescraper.nfl.myfantasyleague import MyFantasyLeagueDotComScraper
+from sitescraper.nfl.myfantasyleaguedotcom import MyFantasyLeagueDotComScraper
 
 
 db = FootballPlayerDB()

@@ -15,7 +15,7 @@ from db.playerdb import PlayerDB
 
 class FootballPlayerDB(PlayerDB):
 
-    def __init__(self):
+    def __init__(self, league=""):
 
         pmap = {}
         pmap["qb"] = [ "QB" ]
@@ -24,27 +24,35 @@ class FootballPlayerDB(PlayerDB):
         pmap["runningback"] = [ "RB" ]
         pmap["wr"] = [ "WR", "TE" ]
         pmap["widereceiver"] = [ "WR", "TE" ]
-        #pmap["wr"] = [ "WR" ]
-        #pmap["widereceiver"] = [ "WR" ]
         pmap["te"] = [ "TE" ]
         pmap["tightend"] = [ "TE" ]
         pmap["k"] = [ "K" ]
         pmap["kicker"] = [ "K" ]
-
         pmap["def"] = [ "DEF" ]
         pmap["defence"] = [ "DEF" ]
         pmap["defense"] = [ "DEF" ]
 
 
         super(FootballPlayerDB, self).__init__(positionMap=pmap)
+        #self.league = "Oracle"
+        self.league = league
 
-        self.numberOfTeams = 10
-        self.numberOfStarting = {}
-        self.numberOfStarting['qb'] = 2
-        self.numberOfStarting['rb'] = 3
-        self.numberOfStarting['wr'] = 4
-        self.numberOfScrubs = 14 - self.numberOfStarting['qb'] - self.numberOfStarting['rb'] - self.numberOfStarting['wr']
-        self.moneyPerTeam = 333
+        if self.league == "O-League":
+            self.numberOfTeams = 10
+            self.numberOfStarting = {}
+            self.numberOfStarting['qb'] = 2
+            self.numberOfStarting['rb'] = 3
+            self.numberOfStarting['wr'] = 4
+            self.numberOfScrubs = 14 - self.numberOfStarting['qb'] - self.numberOfStarting['rb'] - self.numberOfStarting['wr']
+            self.moneyPerTeam = 333
+        else:
+            self.numberOfTeams = 16
+            self.numberOfStarting = {}
+            self.numberOfStarting['qb'] = 1
+            self.numberOfStarting['rb'] = 3
+            self.numberOfStarting['wr'] = 4
+            self.numberOfScrubs = 0
+            self.moneyPerTeam = 0
 
     def wget(self):
         # note reliable
@@ -243,7 +251,7 @@ class TestFootballPlayerDB(unittest.TestCase):
 
 
     def testMoneyRemaining(self):
-        fdb = FootballPlayerDB()
+        fdb = FootballPlayerDB(league='O-League')
         fdb.add(Player("June"))
         fdb.add(Player("Sophia"))
         self.assertEqual(fdb.moneyRemaining(),3330)

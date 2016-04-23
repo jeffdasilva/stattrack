@@ -1,62 +1,105 @@
 
 import unittest
+import httplib
+import socket
 import urllib2
+import time
+import sys
 from bs4 import BeautifulSoup
 
 
 class SiteScraper(object):
 
-    def __init__(self, url=None):
+    def __init__(self, url=None, retries=0):
         '''
         Constructor
         '''
         self.url = url
-        self.soup = None
+        self.data = None
+        self.retries = retries
+        self.debug = False
 
-    def scrape(self):
+    def scrape(self, urlOffset=None):
 
         if self.url is None:
-            self.soup = None
-            return
+            return None
 
-        #urllib way to do the same thing
-        #f = urllib.urlopen(self.projectionsURL)
-        #html = f.read()
-        hdr = {'User-Agent':'Mozilla/5.0'}
-        request = urllib2.Request(self.url,headers=hdr)
-        html = urllib2.urlopen(request)
+        self.data = None
 
-        self.soup = BeautifulSoup(html)
+        url = self.url
+        if urlOffset is not None:
+            url = url + urlOffset
 
-    def scrapeTable(self, attrs={}):
+        retryCount = 0
+        while True:
+            error = False
+            try:
+                if self.debug:
+                    print " SCRAPE: " + url
+                hdr = {'User-Agent':'Mozilla/5.0'}
+                request = urllib2.Request(url,headers=hdr)
+                html = urllib2.urlopen(request)
+            except (socket.error, httplib.BadStatusLine):
+                time.sleep(0.4)
+                error = True
 
-        self.scrape()
-        self.table = self.soup.find('table', attrs=attrs)
+            if not error:
+                break
+            if retryCount > self.retries:
+                print >>sys.stderr, 'ERROR: site "' + self.url + '" is not responding'
+                break
 
-        if self.table is None:
-            self.tableData = None
-            return
+            retryCount = retryCount + 1
 
-        self.tableData = []
-        for row in self.table.findAll("tr"):
+        if html is not None:
+            self.data = BeautifulSoup(html)
+
+        return self.data
+
+
+    def scrapeTable(self, urlOffset=None, attrs={}, index=None):
+
+        SiteScraper.scrape(self,urlOffset=urlOffset)
+
+        if self.data is not None:
+            if index is None:
+                table = self.data.find('table', attrs=attrs)
+            else:
+                table = self.data.find_all('table', attrs=attrs)[index]
+
+        self.data = None
+
+        if table is None:
+            return  self.data
+
+        self.link = {}
+
+        for link in table.findAll("a"):
+            if link.has_attr('href'):
+                self.link[link.text.strip()] = link['href']
+
+        self.data = []
+
+        for row in table.findAll("tr"):
             cols = row.find_all('td')
             cols = [ele.text.strip() for ele in cols]
-            self.tableData.append([ele for ele in cols])
+            self.data.append([ele for ele in cols])
+
+        return self.data
 
 class TestSiteScraper(unittest.TestCase):
 
     def testGoogle(self):
         s = SiteScraper("http://www.google.com")
         s.scrape()
-        self.assertNotEquals(s.soup,None)
-        #print s.soup
+        self.assertNotEquals(s.data,None)
 
-        table = s.soup.find('table')
+        table = s.data.find('table')
         #print table
         self.assertNotEquals(table,None)
 
         linkList = []
-        for link in s.soup.findAll('a'):
+        for link in s.data.findAll('a'):
             #print 'found an projectionsURL'
             if link.has_attr('href'):
                 if link['href'][0] == '/':
@@ -72,15 +115,14 @@ class TestSiteScraper(unittest.TestCase):
     def testTable(self):
         s = SiteScraper("http://www.html.am/html-codes/tables/")
         s.scrape()
-        self.assertNotEquals(s.soup,None)
-        #print s.soup
+        self.assertNotEquals(s.data,None)
 
-        table = s.soup.find('table', {'class': 'example'})
+        table = s.data.find('table', {'class': 'example'})
         #print table
         self.assertNotEquals(table,None)
 
-        s.scrapeTable({'class': 'example'})
-        print s.tableData
+        s.scrapeTable(attrs={'class': 'example'})
+        print s.data
 
 
 
