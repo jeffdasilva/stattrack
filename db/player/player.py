@@ -35,7 +35,7 @@ class Player(object):
         #if self.prop.has_key("fantasyPoints"):
         #    player_str += " " + '{0: <8}'.format(str(self.prop["fantasyPoints"]))
 
-        player_str += " " + '{0: <8}'.format(str(self.value()))
+        player_str += " " + '{0: <7}'.format(str(self.value()))
 
         return player_str
 

@@ -266,11 +266,23 @@ while True:
 
         cpv_mult = db.costPerValueUnit()
 
+        print "---------------------------------------------------------------------"     
+        print '{0: >4}'.format("Rank") + \
+                " " + '{0: >24}'.format("Player              Team  Pos") + \
+                "    " + '{0: <6}'.format("Value") + \
+                "   " + '{0: <6}'.format("2013") + \
+                "  " + '{0: <6}'.format("2014") + \
+                "  " + '{0: <6}'.format("2015")
+                            
+        print "---------------------------------------------------------------------"     
         for i, player in enumerate(player_list):
             if i >= 25:
                 break
-            #print '{0: >2}'.format(str(i)) + "  " + str(player) + " $" + str(player.value()*cpv_mult)
-            print '{0: >2}'.format(str(i)) + "  " + str(player) + "  " + str(player.points(year=2015))
+            print '{0: >2}'.format(str(i)) + "  " + str(player) + \
+                "  " + '{0: <6}'.format(str(player.points(year=2013))) + \
+                "  " + '{0: <6}'.format(str(player.points(year=2014))) + \
+                "  " + '{0: <6}'.format(str(player.points(year=2015))) 
+        print "---------------------------------------------------------------------"     
 
 
 if __name__ == '__main__':
