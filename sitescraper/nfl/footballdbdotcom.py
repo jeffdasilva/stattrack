@@ -11,8 +11,29 @@ class FootballDBDotComScraper(SiteScraper):
     PassingStats = ["Passing" + stat for stat in ["Att", "Cmp", "Yds", "TD", "Int", "2Pt"] ]
     RushingStats = ["Rushing" + stat for stat in ["Att", "Yds", "TD", "2Pt" ] ]
     ReceivingStats = ["Receiving" + stat for stat in ["Rec", "Yds", "TD", "2Pt"] ]
-    MiscStats = ["FL", "TD", "Pts" ]
-    Stats = ["team"] + PassingStats + RushingStats + ReceivingStats + MiscStats
+    FumbleStats = ["FL", "TD", "Pts" ]
+    Stats = ["team"] + PassingStats + RushingStats + ReceivingStats + FumbleStats
+
+    PassingAttempts = PassingStats[0]
+    PassingCompletions = PassingStats[1]
+    PassingYards = PassingStats[2]
+    PassingTDs = PassingStats[3]
+    PassingInterceptionsThrown = PassingStats[4]
+    PassingTwoPointers = PassingStats[5]
+
+    RushingAttempts = RushingStats[0]
+    RushingYards = RushingStats[1]
+    RushingTDs = RushingStats[2]
+    RushingTwoPointers = RushingStats[3]
+
+    Receptions = ReceivingStats[0]
+    ReceivingYards = ReceivingStats[1]
+    ReceivingTDs = ReceivingStats[2]
+    ReceivingTwoPointers = ReceivingStats[3]
+
+    FumblesLost = FumbleStats[0]
+    FumbleTDs = FumbleStats[1]
+
 
     def __init__(self):
         super(FootballDBDotComScraper, self).__init__(url="http://www.footballdb.com")

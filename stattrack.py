@@ -270,7 +270,7 @@ while True:
             if i >= 25:
                 break
             #print '{0: >2}'.format(str(i)) + "  " + str(player) + " $" + str(player.value()*cpv_mult)
-            print '{0: >2}'.format(str(i)) + "  " + str(player) + "  " + str(player.fantasyPoints())
+            print '{0: >2}'.format(str(i)) + "  " + str(player) + "  " + str(player.points(year=2015))
 
 
 if __name__ == '__main__':

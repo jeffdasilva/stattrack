@@ -1,9 +1,11 @@
 '''
 @author: jdasilva
 '''
+import datetime
 import unittest
 
 from db.player.player import Player
+from sitescraper.nfl.footballdbdotcom import FootballDBDotComScraper
 
 
 class FootballPlayer(Player):
@@ -16,16 +18,81 @@ class FootballPlayer(Player):
         self.receivingSDMult = 2.0
 
 
-    def getStat(self,statName,year):
+    def getStat(self, statName, year=datetime.datetime.now().year):
+        if str(year) in self.prop:
+            if statName in self.prop[str(year)]:
+                stat = self.prop[str(year)][statName].replace(',','')
+                return stat
+
         return 0;
 
+    def passingAttempts(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.PassingAttempts, year))
 
-    def fantasyPoints(self):
-        points = 0
+    def passingCompletions(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.PassingCompletions, year))
 
-        if '2015' in self.prop:
-            if 'PassingTD' in self.prop['2015']:
-                points = int(self.prop['2015']['PassingTD']) * 4
+    def passingYards(self,year=datetime.datetime.now().year):
+        return float(self.getStat(FootballDBDotComScraper.PassingYards, year))
+
+    def passingTDs(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.PassingTDs, year))
+
+    def passingInterceptionsThrown(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.PassingInterceptionsThrown, year))
+
+    def passingTwoPointers(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.PassingTwoPointers, year))
+
+    def rushingAttempts(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.RushingAttempts, year))
+
+    def rushingYards(self,year=datetime.datetime.now().year):
+        return float(self.getStat(FootballDBDotComScraper.RushingYards, year))
+
+    def rushingTDs(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.RushingTDs, year))
+
+    def rushingTwoPointers(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.ReceivingTwoPointers, year))
+
+    def receptions(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.Receptions, year))
+
+    def receivingYards(self,year=datetime.datetime.now().year):
+        return float(self.getStat(FootballDBDotComScraper.ReceivingYards, year))
+
+    def receivingTDs(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.ReceivingTDs, year))
+
+    def receivingTwoPointers(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.ReceivingTwoPointers, year))
+
+    def fumblesLost(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.FumblesLost, year))
+
+    def fumbleTDs(self,year=datetime.datetime.now().year):
+        return int(self.getStat(FootballDBDotComScraper.FumbleTDs, year))
+
+    def points(self,year=datetime.datetime.now().year):
+
+        points = 0.0
+        points += self.passingTDs(year) * (4)
+        points += self.passingYards(year) * (0.04)
+        points += self.passingInterceptionsThrown(year) * (-1)
+        points += self.passingTwoPointers(year) * (2)
+        points += self.rushingTDs(year) * (6)
+        points += self.rushingYards(year) * (0.1)
+        points += self.rushingTwoPointers(year) * (2)
+        points += self.receivingTDs(year) * (6)
+        points += self.receivingYards(year) * (0.1)
+        points += self.receptions(year) * (0.5)
+        points += self.receivingTwoPointers(year) * (2)
+        # fieldgoal stats needed
+        # punt return TDs * 6
+        # kick return TDs * 6
+        points += self.fumblesLost(year) * (-2)
+        points += self.fumbleTDs(year) * (6)
 
         return points
 
