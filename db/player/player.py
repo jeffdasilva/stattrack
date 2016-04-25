@@ -12,7 +12,7 @@ class Player(object):
         self.nameAliases = []
         self.team = team
         self.position = []
-        self.prop = {}
+        self.property = {}
         self.isDrafted = False
         self.isIgnored = False
         self.cost = 0
@@ -32,9 +32,6 @@ class Player(object):
 
         player_str += " " + '{0: <6}'.format('/'.join(self.position))
 
-        #if self.prop.has_key("fantasyPoints"):
-        #    player_str += " " + '{0: <8}'.format(str(self.prop["fantasyPoints"]))
-
         player_str += " " + '{0: <7}'.format(str(self.value()))
 
         return player_str
@@ -45,8 +42,8 @@ class Player(object):
             print "Aliases: " + self.nameAliases
         print "Team: " + self.team
         print "Properties: "
-        for prop in self.prop:
-            print "  " + prop + ": " + str(self.prop[prop])
+        for prop in self.property:
+            print "  " + prop + ": " + str(self.property[prop])
 
     def value(self):
         return 0
@@ -89,15 +86,19 @@ class Player(object):
         return str(nameToKey) + " - " + str(teamToKey)
 
     def update(self, properties):
-        self.prop.update(properties)
 
-        if self.prop.has_key("name"):
-            self.name = self.prop["name"]
-            del self.prop["name"]
+        # this dict update needs to get fancier!
+        #   ...because if the dict contains a dict then we need to update those
+        #      dict's recursively
+        self.property.update(properties)
 
-        if self.prop.has_key("team"):
-            self.team = self.prop["team"]
-            del self.prop["team"]
+        if self.property.has_key("name"):
+            self.name = self.property["name"]
+            del self.property["name"]
+
+        if self.property.has_key("team"):
+            self.team = self.property["team"]
+            del self.property["team"]
 
         if self.team is not None and (self.team.lower() == "unknown" or self.team.lower() == "FA" or self.team == "???"):
             self.team = None
@@ -109,10 +110,10 @@ class Player(object):
         if self.team == "JAC":
             self.team = "JAX"
 
-        if self.prop.has_key("position"):
-            if self.prop["position"] not in self.position:
-                self.position.append(self.prop["position"])
-            del self.prop["position"]
+        if self.property.has_key("position"):
+            if self.property["position"] not in self.position:
+                self.position.append(self.property["position"])
+            del self.property["position"]
 
     def merge(self, player):
 
@@ -129,12 +130,16 @@ class Player(object):
 
         self.cost = max(self.cost, player.cost)
 
-        if player.team != None:
+        # note that if you change teams, your key changes
+        # playerdb class handles this case in it's add(player) method
+        if player.team != None and self.team != player.team:
             self.team = player.team
+
         for p in player.position:
             if p not in self.position:
                 self.position.append(p)
-        self.update(player.prop)
+
+        self.update(player.property)
 
 
 class TestPlayer(unittest.TestCase):
@@ -167,18 +172,18 @@ class TestPlayer(unittest.TestCase):
         p = Player(properties=player_prop)
         self.assertEquals(p.team, "SJ")
         self.assertEquals(p.name, "foo")
-        self.assertEquals(p.prop["foo"],'bar')
-        self.assertTrue(not p.prop.has_key("name"))
-        self.assertTrue(not p.prop.has_key("team"))
+        self.assertEquals(p.property["foo"],'bar')
+        self.assertTrue(not p.property.has_key("name"))
+        self.assertTrue(not p.property.has_key("team"))
 
         player_prop["name"] = 'foo2'
         p.update(player_prop)
         self.assertEquals(p.team, "SJ")
         self.assertEquals(p.name, "foo2")
-        self.assertEquals(p.prop["foo"],'bar')
-        self.assertTrue(not p.prop.has_key("name"))
-        self.assertTrue(not p.prop.has_key("team"))
-        self.assertTrue(not p.prop.has_key("position"))
+        self.assertEquals(p.property["foo"],'bar')
+        self.assertTrue(not p.property.has_key("name"))
+        self.assertTrue(not p.property.has_key("team"))
+        self.assertTrue(not p.property.has_key("position"))
 
     def testPositionFeature(self):
         p = Player("Jeff")
@@ -202,8 +207,8 @@ class TestPlayer(unittest.TestCase):
         p.merge(p2)
         self.assertEquals(p.position,["LW","RW","G","D"])
 
-        self.assertTrue(not p.prop.has_key("position"))
-        self.assertTrue(not p2.prop.has_key("position"))
+        self.assertTrue(not p.property.has_key("position"))
+        self.assertTrue(not p2.property.has_key("position"))
 
     def testKeyMethod(self):
 

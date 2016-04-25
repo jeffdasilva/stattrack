@@ -19,9 +19,9 @@ class FootballPlayer(Player):
 
 
     def getStat(self, statName, year=datetime.datetime.now().year):
-        if str(year) in self.prop:
-            if statName in self.prop[str(year)]:
-                stat = self.prop[str(year)][statName].replace(',','')
+        if str(year) in self.property:
+            if statName in self.property[str(year)]:
+                stat = self.property[str(year)][statName].replace(',','')
                 return stat
 
         return 0;
@@ -163,25 +163,25 @@ class FootballPlayer(Player):
         Sacks    -.5    0
         '''
 
-        if not self.prop.has_key("passingYards"):
+        if not self.property.has_key("passingYards"):
             return 0
 
         points = 0.0
-        points += float(self.prop['passingCompletions']) * 0.25
-        points += (float(self.prop['passingAttempts']) - float(self.prop['passingCompletions'])) * -0.5
+        points += float(self.property['passingCompletions']) * 0.25
+        points += (float(self.property['passingAttempts']) - float(self.property['passingCompletions'])) * -0.5
 
-        passing_yards_avg = float(self.prop['passingYards'])/17
+        passing_yards_avg = float(self.property['passingYards'])/17
         passing_yards_low = passing_yards_avg / self.passingSDMult
         passing_yards_high = passing_yards_avg * self.passingSDMult
         points += (self.__valuePassingYards(passing_yards_low)*17)/2
         points += (self.__valuePassingYards(passing_yards_high)*17)/2
 
-        points += float(self.prop['passingTDs'])*6
+        points += float(self.property['passingTDs'])*6
 
-        points += float(self.prop['passingInterceptions'])*(-2)
+        points += float(self.property['passingInterceptions'])*(-2)
 
         # 1 in 4 interceptions are pick 6
-        points += float(self.prop['passingInterceptions'])/4*(-6)
+        points += float(self.property['passingInterceptions'])/4*(-6)
 
         return points/17
 
@@ -192,20 +192,20 @@ class FootballPlayer(Player):
         Rushing Touchdowns    6
         '''
 
-        if not self.prop.has_key("rushingYards"):
+        if not self.property.has_key("rushingYards"):
             return 0
 
         points = 0.0
 
-        points +=  float(self.prop['rushingAttempts'])*(0.1)
+        points +=  float(self.property['rushingAttempts'])*(0.1)
 
-        rushing_yards_avg = float(self.prop['rushingYards'])/17
+        rushing_yards_avg = float(self.property['rushingYards'])/17
         rushing_yards_low = rushing_yards_avg / self.rushingSDMult
         rushing_yards_high = rushing_yards_avg * self.rushingSDMult
         points += (self.__valueRushingYards(rushing_yards_low)*17)/2
         points += (self.__valueRushingYards(rushing_yards_high)*17)/2
 
-        points += float(self.prop['rushingTDs'])*6
+        points += float(self.property['rushingTDs'])*6
 
         return points/17
 
@@ -216,20 +216,20 @@ class FootballPlayer(Player):
         Reception Touchdowns    6
         '''
 
-        if not self.prop.has_key("receivingYards"):
+        if not self.property.has_key("receivingYards"):
             return 0
 
         points = 0.0
 
-        points += float(self.prop['receptions'])
+        points += float(self.property['receptions'])
 
-        receiving_yards_avg = float(self.prop['receivingYards'])/17
+        receiving_yards_avg = float(self.property['receivingYards'])/17
         receiving_yards_low = receiving_yards_avg / self.receivingSDMult
         receiving_yards_high = receiving_yards_avg * self.receivingSDMult
         points += (self.__valueReceivingYards(receiving_yards_low)*17)/2
         points += (self.__valueReceivingYards(receiving_yards_high)*17)/2
 
-        points += float(self.prop['receivingTDs'])*6
+        points += float(self.property['receivingTDs'])*6
 
         return points/17
 
@@ -237,17 +237,17 @@ class FootballPlayer(Player):
 
         points = 0.0
 
-        if self.prop.has_key("fumblesLost"):
-            points += (float(self.prop["fumblesLost"]) * -2)
+        if self.property.has_key("fumblesLost"):
+            points += (float(self.property["fumblesLost"]) * -2)
 
         return points/17
 
     def value(self):
 
-        if self.prop.has_key("hpprAvgRank"):
-            return 300-(float(self.prop["hpprAvgRank"]))
-        elif self.prop.has_key("avgRank"):
-            return 50-(float(self.prop["avgRank"]))
+        if self.property.has_key("hpprAvgRank"):
+            return 300-(float(self.property["hpprAvgRank"]))
+        elif self.property.has_key("avgRank"):
+            return 50-(float(self.property["avgRank"]))
         else:
             return 0
 

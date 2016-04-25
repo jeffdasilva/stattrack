@@ -15,11 +15,16 @@ class PlayerDB(object):
         self.player = {}
         self.positionMap = {"all":["all"]}
         self.positionMap.update(positionMap)
-        self.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/data/playerdb.pickle"
+        self.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/../data/playerdb.pickle"
 
     def add(self, player):
         if self.player.has_key(player.key()):
-            self.player[player.key()].merge(player)
+            playerKeyIn = player.key()
+            self.player[playerKeyIn].merge(player)
+            if self.player[playerKeyIn].key() != playerKeyIn:
+                player = self.player[playerKeyIn]
+                del self.player[playerKeyIn]
+                self.player[player.key()] = player
         else:
             self.player[player.key()] = player
 
@@ -31,7 +36,6 @@ class PlayerDB(object):
             pickle.dump(self.player, handle)
 
     def load(self):
-
         if os.path.isfile(self.saveFile):
             with open(self.saveFile, 'rb') as handle:
                 playerData = pickle.load(handle)
@@ -41,7 +45,7 @@ class PlayerDB(object):
         for key in playerData:
             self.add(playerData[key])
 
-    def getRE(self, playerNameREString, position="all", team="all", listDrafted=False, listIgnored=False):
+    def getWithRegularExpression(self, playerNameREString, position="all", team="all", listDrafted=False, listIgnored=False):
         reObj = re.compile(playerNameREString, re.IGNORECASE)
         player_list = []
         for playerObj in self.player.itervalues():
@@ -83,7 +87,7 @@ class PlayerDB(object):
         else:
             searchString = '.*' + searchString + '.*'
 
-        return self.getRE(searchString, position=position, team=team, listDrafted=listDrafted, listIgnored=listIgnored)
+        return self.getWithRegularExpression(searchString, position=position, team=team, listDrafted=listDrafted, listIgnored=listIgnored)
 
     def numberOfPlayersDrafted(self, position="all"):
         plist = self.get(position=position, listDrafted=True)
@@ -126,7 +130,7 @@ class TestPlayerDB(unittest.TestCase):
 
     def testPlayerDBBasic(self):
         pDB = PlayerDB()
-        pDB.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/data/test_myplayerdb.pickle"
+        pDB.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/../data/test_myplayerdb.pickle"
 
         pDB.add(Player("June", "Team-June", {"position":"C", "goals":24, "assists":33, "wins":1, "losses":22}))
         pDB.add(Player("Eleanor", "Team-June", {"position":"D", "goals":24, "assists":100}))
@@ -140,12 +144,12 @@ class TestPlayerDB(unittest.TestCase):
         self.assertEquals(june.name,"June")
         self.assertEquals(june.team,"TEAM-JUNE")
         self.assertEquals(june.position,["C","RW","G"])
-        self.assertEquals(june.prop["goals"],24)
-        self.assertEquals(june.prop["assists"],33)
-        self.assertEquals(june.prop["wins"],6)
-        self.assertEquals(june.prop["losses"],22)
-        self.assertEquals(june.prop["ties"],4)
-        self.assertEquals(june.prop["saves"],124)
+        self.assertEquals(june.property["goals"],24)
+        self.assertEquals(june.property["assists"],33)
+        self.assertEquals(june.property["wins"],6)
+        self.assertEquals(june.property["losses"],22)
+        self.assertEquals(june.property["ties"],4)
+        self.assertEquals(june.property["saves"],124)
 
         pDB.save()
         pDB.load()
@@ -153,24 +157,24 @@ class TestPlayerDB(unittest.TestCase):
         self.assertEquals(june.name,"June")
         self.assertEquals(june.team,"TEAM-JUNE")
         self.assertEquals(june.position,["C","RW","G"])
-        self.assertEquals(june.prop["goals"],24)
-        self.assertEquals(june.prop["assists"],33)
-        self.assertEquals(june.prop["wins"],6)
-        self.assertEquals(june.prop["losses"],22)
-        self.assertEquals(june.prop["ties"],4)
-        self.assertEquals(june.prop["saves"],124)
+        self.assertEquals(june.property["goals"],24)
+        self.assertEquals(june.property["assists"],33)
+        self.assertEquals(june.property["wins"],6)
+        self.assertEquals(june.property["losses"],22)
+        self.assertEquals(june.property["ties"],4)
+        self.assertEquals(june.property["saves"],124)
 
         pDB_copy = PlayerDB()
-        pDB_copy.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/data/test_myplayerdb.pickle"
+        pDB_copy.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/../data/test_myplayerdb.pickle"
         pDB_copy.load()
-        pDB_copy.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/data/test_myplayerdb2.pickle"
+        pDB_copy.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/../data/test_myplayerdb2.pickle"
         june = pDB_copy.player[Player("June", "Team-June").key()]
         self.assertEquals(june.name,"June")
         self.assertEquals(june.team,"TEAM-JUNE")
         self.assertEquals(june.position,["C","RW","G"])
-        self.assertEquals(june.prop["goals"],24)
-        self.assertEquals(june.prop["assists"],33)
-        self.assertEquals(june.prop["wins"],6)
-        self.assertEquals(june.prop["losses"],22)
-        self.assertEquals(june.prop["ties"],4)
-        self.assertEquals(june.prop["saves"],124)
+        self.assertEquals(june.property["goals"],24)
+        self.assertEquals(june.property["assists"],33)
+        self.assertEquals(june.property["wins"],6)
+        self.assertEquals(june.property["losses"],22)
+        self.assertEquals(june.property["ties"],4)
+        self.assertEquals(june.property["saves"],124)

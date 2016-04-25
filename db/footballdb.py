@@ -98,7 +98,7 @@ class TestFootballPlayer(unittest.TestCase):
         self.assertEquals(fp.name,"DaSilva")
         self.assertEquals(fp.team,"SF")
         self.assertEquals(fp.position,["WR"])
-        self.assertEquals(fp.prop["foo"],"bar")
+        self.assertEquals(fp.property["foo"],"bar")
 
 
 class TestFootballPlayerDB(unittest.TestCase):
@@ -140,26 +140,26 @@ class TestFootballPlayerDB(unittest.TestCase):
         p = fdb.player["tom brady - ne"]
         print p
         #self.assertEquals(p.position,["QB"])
-        #self.assertTrue(float(p.prop["fantasyPoints"]) > 200)
-        #self.assertTrue(float(p.prop["passingAttempts"]) > 500)
-        #self.assertTrue(float(p.prop["passingYards"]) > 3000)
+        #self.assertTrue(float(p.property["fantasyPoints"]) > 200)
+        #self.assertTrue(float(p.property["passingAttempts"]) > 500)
+        #self.assertTrue(float(p.property["passingYards"]) > 3000)
 
         print p.value()
 
         p = fdb.player["rob gronkowski - ne"]
         self.assertEquals(p.position,["TE"])
-        #self.assertTrue(p.prop["fantasyPoints"] > 100)
-        #self.assertTrue(p.prop["receivingYards"] > 400)
+        #self.assertTrue(p.property["fantasyPoints"] > 100)
+        #self.assertTrue(p.property["receivingYards"] > 400)
 
         #p = fdb.player["Garrett Hartley - PIT"]
         #self.assertEquals(p.position,["K"])
-        #self.assertTrue(p.prop["fantasyPoints"] > 100)
-        #self.assertTrue(p.prop["extraPoints"] > 10)
+        #self.assertTrue(p.property["fantasyPoints"] > 100)
+        #self.assertTrue(p.property["extraPoints"] > 10)
 
         #p = fdb.player["Calvin Johnson - unknown"]
         #self.assertEquals(p.position,["WR"])
-        #self.assertTrue(p.prop["fantasyPoints"] > 180)
-        #self.assertTrue(p.prop["receivingYards"] > 400)
+        #self.assertTrue(p.property["fantasyPoints"] > 180)
+        #self.assertTrue(p.property["receivingYards"] > 400)
 
         pass
 
@@ -168,7 +168,7 @@ class TestFootballPlayerDB(unittest.TestCase):
         fdb.add(FootballPlayer("Jeff DS","SF",{"fantasyPoints":"24"}))
         fdb.add(FootballPlayer("Jeff","SF",{"fantasyPoints":"124"}))
         fdb.add(FootballPlayer("Jeffx","SF",{"fantasyPoints":"14"}))
-        #self.assertEquals(fdb.get("Jeff")[0].prop['fantasyPoints'],124)
+        #self.assertEquals(fdb.get("Jeff")[0].property['fantasyPoints'],124)
 
     def testWgetCheatsheets(self):
         fdb = FootballPlayerDB()

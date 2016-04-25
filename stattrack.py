@@ -92,7 +92,7 @@ while True:
         if mflSite.data is not None:
 
             for p in mflSite.data:
-                playerSearch = db.getRE(p['name'], position=p['position'], listDrafted=True, listIgnored=True)
+                playerSearch = db.getWithRegularExpression(p['name'], position=p['position'], listDrafted=True, listIgnored=True)
                 if playerSearch is None or len(playerSearch) == 0:
                     print "ERROR: Player " + p['name'] + " is unknown. Skipping!"
                 elif len(playerSearch) == 1:
@@ -266,23 +266,23 @@ while True:
 
         cpv_mult = db.costPerValueUnit()
 
-        print "---------------------------------------------------------------------"     
+        print "---------------------------------------------------------------------"
         print '{0: >4}'.format("Rank") + \
                 " " + '{0: >24}'.format("Player              Team  Pos") + \
                 "    " + '{0: <6}'.format("Value") + \
                 "   " + '{0: <6}'.format("2013") + \
                 "  " + '{0: <6}'.format("2014") + \
                 "  " + '{0: <6}'.format("2015")
-                            
-        print "---------------------------------------------------------------------"     
+
+        print "---------------------------------------------------------------------"
         for i, player in enumerate(player_list):
             if i >= 25:
                 break
             print '{0: >2}'.format(str(i)) + "  " + str(player) + \
                 "  " + '{0: <6}'.format(str(player.points(year=2013))) + \
                 "  " + '{0: <6}'.format(str(player.points(year=2014))) + \
-                "  " + '{0: <6}'.format(str(player.points(year=2015))) 
-        print "---------------------------------------------------------------------"     
+                "  " + '{0: <6}'.format(str(player.points(year=2015)))
+        print "---------------------------------------------------------------------"
 
 
 if __name__ == '__main__':
