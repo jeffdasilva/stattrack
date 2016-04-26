@@ -22,7 +22,7 @@ class Player(object):
         self.cost = 0
         self.update(properties)
         assert(self.name != None)
-        
+
     def __str__(self):
 
         player_str = '{0: <20}'.format(self.name)

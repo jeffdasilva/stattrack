@@ -5,17 +5,17 @@
 import unittest
 
 class HierarchicalDict(dict):
-    def __init__(self,initialDict={}):
-        super(HierarchicalDict, self).__init__(initialDict)
+    def __init__(self,initialDictionary={}):
+        super(HierarchicalDict, self).__init__(initialDictionary)
 
     def update(self,dict2):
 
-        if dict2 is None:
+        if dict2 is None or not isinstance(dict2, dict):
+            # then do whatever the parent dict() class does in this error case
             dict.update(self,dict2)
 
         for key in dict2:
             if key in self:
-
                 if isinstance(self[key], dict) and not isinstance(self[key], HierarchicalDict):
                     self[key] = HierarchicalDict(self[key])
 
@@ -67,18 +67,19 @@ class TestHierarchicalDict(unittest.TestCase):
 
         stat1 = {'foo':{'2015':{'a':'b', 'c':'d', 'e':'f'}}}
         hd = HierarchicalDict(stat1)
+
         self.assertEquals(hd['foo']['2015']['a'],'b')
         self.assertEquals(len(hd),1)
         self.assertEquals(len(hd['foo']),1)
         self.assertEquals(len(hd['foo']['2015']),3)
 
-        # this should really do nothing
+        # this next set of updates with {} and stat1 should do absolutely nothing
+        hd.update({})
         hd.update(stat1)
         self.assertEquals(hd['foo']['2015']['a'],'b')
         self.assertEquals(len(hd),1)
         self.assertEquals(len(hd['foo']),1)
         self.assertEquals(len(hd['foo']['2015']),3)
-
 
         stat2 = {'bar':{'2014':{'x':'y', 'r':'t', 'w':'x'}}}
         hd.update(stat2)
@@ -88,7 +89,6 @@ class TestHierarchicalDict(unittest.TestCase):
         self.assertEquals(len(hd),2)
         self.assertEquals(len(hd['foo']),1)
         self.assertEquals(len(hd['foo']['2015']),3)
-
 
         stat3 = {'foobar':{'2015':{'x':'y', 'r':'t', 'w':'x'}}}
         hd.update(stat3)
@@ -125,13 +125,9 @@ class TestHierarchicalDict(unittest.TestCase):
 
         stat7 = {'foo':{'2015':{'a':{'this':'deep'}}}}
         hd.update(stat7)
-        #print hd['foo']['2015']['a']
         self.assertEquals(hd['foo']['2015']['a']['this'],'deep')
         self.assertEquals(hd['foo']['2015']['a'][''],'x')
         self.assertEquals(len(hd['foo']['2015']['a']),2)
-
-        print hd
-
 
 if __name__ == '__main__':
     unittest.main()
