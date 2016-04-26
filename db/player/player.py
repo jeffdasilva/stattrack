@@ -1,6 +1,10 @@
-
+'''
+@author: jdasilva
+'''
 
 import unittest
+
+from db.player.hdict import HierarchicalDict
 
 class Player(object):
 
@@ -12,13 +16,13 @@ class Player(object):
         self.nameAliases = []
         self.team = team
         self.position = []
-        self.property = {}
+        self.property = HierarchicalDict()
         self.isDrafted = False
         self.isIgnored = False
         self.cost = 0
         self.update(properties)
         assert(self.name != None)
-
+        
     def __str__(self):
 
         player_str = '{0: <20}'.format(self.name)
