@@ -9,6 +9,7 @@ import copy
 from db.footballdb import FootballPlayerDB
 from sitescraper.nfl.footballdbdotcom import FootballDBDotComScraper
 from sitescraper.nfl.myfantasyleaguedotcom import MyFantasyLeagueDotComScraper
+from sitescraper.multisport.rotoworlddotcom import RotoWorldDotComScraper
 
 
 db = FootballPlayerDB(league="Oracle")
@@ -230,7 +231,18 @@ while True:
     elif cmd == "factory-reset":
         db_stack.append(copy.deepcopy(db))
         db = FootballPlayerDB()
+
         db.wget(scrapers=[FootballDBDotComScraper()])
+        #db.wget()
+
+        rotoScrape = RotoWorldDotComScraper()
+        for p in db.player:
+            if 'DEF' in db.player[p].position:
+                continue
+            print "RotoWorld: Learning about " + db.player[p].name + "..."
+            pStats = rotoScrape.scrape(playerName=db.player[p].name, league="nfl")
+            if pStats is not None:
+                db.player[p].update(pStats)
 
         if not undo_operation:
             undo_stack.append("pop")

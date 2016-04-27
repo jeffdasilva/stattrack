@@ -78,7 +78,7 @@ class Player(object):
         nameToKey = self.name.lower()
         teamToKey = self.team
 
-        for suffix in [" Jr.", " III"]:
+        for suffix in [" Sr.", " Jr.", " III"]:
             if nameToKey.endswith(suffix.lower()):
                 nameToKey = nameToKey.rsplit(suffix.lower(),1)[0]
 
