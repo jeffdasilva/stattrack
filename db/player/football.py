@@ -78,6 +78,13 @@ class FootballPlayer(Player):
     def gamesPlayed(self,year=datetime.datetime.now().year):
         return int(self.getStat(RotoWorldDotComScraper.GamesPlayed, year))
 
+    def age(self,year=datetime.datetime.now().year):
+        if 'rotoworld' in self.property:
+            age = str(self.property['rotoworld'][1][1]).split(' / ')[0].lstrip('(').rstrip(')')
+            return int(age)
+        else:
+            return 0
+
     def points(self,year=datetime.datetime.now().year):
 
         points = 0.0

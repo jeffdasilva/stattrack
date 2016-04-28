@@ -282,7 +282,8 @@ while True:
         print '{0: >4}'.format("Rank") + \
                 " " + '{0: >24}'.format("Player              Team  Pos") + \
                 "    " + '{0: <6}'.format("Value") + \
-                "   " + '{0: <6}'.format("2013") + \
+                "  " + '{0: <4}'.format("Age") + \
+                " " + '{0: <6}'.format("2013") + \
                 "  " + '{0: <6}'.format("2014") + \
                 "  " + '{0: <6}'.format("2015")
 
@@ -291,7 +292,8 @@ while True:
             if i >= 25:
                 break
             print '{0: >2}'.format(str(i)) + "  " + str(player) + \
-                "  " + '{0: <6}'.format(str(player.points(year=2013))) + \
+                " " + '{0: <4}'.format(str(player.age())) + \
+                " " + '{0: <6}'.format(str(player.points(year=2013))) + \
                 "  " + '{0: <6}'.format(str(player.points(year=2014))) + \
                 "  " + '{0: <6}'.format(str(player.points(year=2015))) + \
                 "  " + '{0: <6}'.format(str(round(player.pointsPerGame(year=2015),2)) \
