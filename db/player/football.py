@@ -27,7 +27,7 @@ class FootballPlayer(Player):
                 return stat
 
         return 0;
-    
+
     def passingAttempts(self,year=datetime.datetime.now().year):
         return int(self.getStat(FootballDBDotComScraper.PassingAttempts, year))
 

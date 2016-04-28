@@ -47,7 +47,7 @@ class FootballDBDotComScraper(SiteScraper):
             urlOffset = "/players/current.html?pos=" + position
             playerList = self.scrapeTable(urlOffset=urlOffset,attrs={'class':'statistics scrollable'})
             playerLinks = self.link.copy()
-            
+
             playerCount = 0
 
             for player in playerList:
