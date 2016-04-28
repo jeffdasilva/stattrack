@@ -37,8 +37,7 @@ class FootballDBDotComScraper(SiteScraper):
 
     def __init__(self):
         super(FootballDBDotComScraper, self).__init__(url="http://www.footballdb.com")
-        self.testmode = False
-
+        self.maxCacheTime = datetime.timedelta(days=90)
 
     def scrape(self):
 
@@ -47,7 +46,8 @@ class FootballDBDotComScraper(SiteScraper):
         for position in [ "QB", "RB", "WR", "TE"]:
             urlOffset = "/players/current.html?pos=" + position
             playerList = self.scrapeTable(urlOffset=urlOffset,attrs={'class':'statistics scrollable'})
-
+            playerLinks = self.link.copy()
+            
             playerCount = 0
 
             for player in playerList:
@@ -56,14 +56,13 @@ class FootballDBDotComScraper(SiteScraper):
                 if self.testmode and playerCount > 3:
                     break
 
-                if player[0] in self.link:
-                    s = SiteScraper(self.url + self.link[player[0]])
-                    s.debug = self.debug
-                    s.scrapeTable(attrs={'class':'statistics scrollable'},index=-1)
-                    s.data = s.data[2:]
+                if player[0] in playerLinks:
+                    #print player[0] + " --- " + playerLinks[player[0]]
+                    self.scrapeTable(urlOffset=playerLinks[player[0]], attrs={'class':'statistics scrollable'},index=-1)
+                    self.data = self.data[2:]
                     name = str(player[0]).rsplit(',',1)[1].strip() + " " + str(player[0]).rsplit(',',1)[0].strip()
                     stats = {'name':name, 'position':position}
-                    for yearData in s.data:
+                    for yearData in self.data:
                         year = yearData[0]
                         stats[year] = {}
                         stats[year] = dict(zip(FootballDBDotComScraper.Stats,yearData[1:]))

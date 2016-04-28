@@ -8,7 +8,8 @@ class MyFantasyLeagueDotComScraper(SiteScraper):
 
     def __init__(self, leagueID, year=datetime.datetime.now().year):
         super(MyFantasyLeagueDotComScraper, self).__init__(url="http://www56.myfantasyleague.com")
-
+        self.maxCacheTime = datetime.timedelta(seconds=30)
+        #self.debug = True
         self.leagueID = leagueID
         self.year = year
         self.projectionsURL = None

@@ -1,14 +1,15 @@
+import datetime
 import unittest
 
 from sitescraper.scraper import SiteScraper
 
-
 class RotoWorldDotComScraper(SiteScraper):
 
+    GamesPlayed = 'G'
 
     def __init__(self):
         super(RotoWorldDotComScraper, self).__init__(url="http://www.rotoworld.com")
-        self.testmode = False
+        self.maxCacheTime = datetime.timedelta(days=90)
 
     def scrape(self, playerName, league):
 

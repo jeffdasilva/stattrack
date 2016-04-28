@@ -6,6 +6,7 @@ import datetime
 import unittest
 
 from db.player.player import Player
+from sitescraper.multisport.rotoworlddotcom import RotoWorldDotComScraper
 from sitescraper.nfl.footballdbdotcom import FootballDBDotComScraper
 
 
@@ -26,7 +27,7 @@ class FootballPlayer(Player):
                 return stat
 
         return 0;
-
+    
     def passingAttempts(self,year=datetime.datetime.now().year):
         return int(self.getStat(FootballDBDotComScraper.PassingAttempts, year))
 
@@ -75,6 +76,9 @@ class FootballPlayer(Player):
     def fumbleTDs(self,year=datetime.datetime.now().year):
         return int(self.getStat(FootballDBDotComScraper.FumbleTDs, year))
 
+    def gamesPlayed(self,year=datetime.datetime.now().year):
+        return int(self.getStat(RotoWorldDotComScraper.GamesPlayed, year))
+
     def points(self,year=datetime.datetime.now().year):
 
         points = 0.0
@@ -97,6 +101,14 @@ class FootballPlayer(Player):
 
         return points
 
+    def pointsPerGame(self,year=datetime.datetime.now().year):
+        if self.gamesPlayed() == 0:
+            return 0.0
+        else:
+            return self.points(year)/self.gamesPlayed(year)
+
+
+    # deprecated
     def __valuePassingYards(self,passingYards):
         points = 0.0
 
@@ -116,6 +128,7 @@ class FootballPlayer(Player):
 
         return points
 
+    # deprecated
     def __valueRushingYards(self,rushingYards):
         points = 0.0
 
@@ -135,6 +148,7 @@ class FootballPlayer(Player):
 
         return points
 
+    # deprecated
     def __valueReceivingYards(self,receivingYards):
         points = 0.0
 
@@ -154,6 +168,7 @@ class FootballPlayer(Player):
 
         return points
 
+    # deprecated
     def valuePassing(self):
         '''
         Completions    .25    0
@@ -186,6 +201,7 @@ class FootballPlayer(Player):
 
         return points/17
 
+    # deprecated
     def valueRushing(self):
         '''
         Rushing Attempts    .1    0
@@ -210,6 +226,7 @@ class FootballPlayer(Player):
 
         return points/17
 
+    # deprecated
     def valueReceiveing(self):
         '''
         Receptions    1    0
@@ -234,6 +251,7 @@ class FootballPlayer(Player):
 
         return points/17
 
+    # deprecated
     def valueMisc(self):
 
         points = 0.0
@@ -243,6 +261,8 @@ class FootballPlayer(Player):
 
         return points/17
 
+
+    # ToDo: Make this better!!!
     def value(self):
 
         if self.property.has_key("hpprAvgRank"):

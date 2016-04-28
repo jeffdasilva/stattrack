@@ -7,44 +7,42 @@ import time
 import sys
 import datetime
 import os
-import json
+import pickle
 from bs4 import BeautifulSoup
 
 
 class SiteScraper(object):
 
     def __init__(self, url, retries=0):
-        '''
-        Constructor
-        '''
 
-        if url is None:
-            raise ValueError('URL given to SiteScraper is None')
+        if url is None or url == "":
+            raise ValueError('url given to SiteScraper is Not valid')
 
         self.url = url
-        self.data = None
         self.retries = retries
+        self.data = None
         self.debug = False
+        self.testmode = False
         self.cache = {}
         self.maxCacheTime = datetime.timedelta(days=1)
         self.saveCacheDir = os.path.dirname(os.path.abspath(__file__)) + "/../data/cache/sites"
-        #self.loadCache()
+        self.cacheLoad()
 
-    def cacheFile(self):
-        return self.saveCacheDir + "/" + self.url.rsplit('://',1)[-1].strip('/').replace('/','_') + "_scrape.json"
+    def cacheFileName(self):
+        return self.saveCacheDir + "/" + self.url.rsplit('://',1)[-1].strip('/').replace('/','_') + "_scrape.pickle"
 
-    def saveCache(self):
-        if not os.path.exists(os.path.dirname(self.cacheFile())):
-            os.makedirs(os.path.dirname(self.cacheFile()))
+    def cacheSave(self):
+        if not os.path.exists(os.path.dirname(self.cacheFileName())):
+            os.makedirs(os.path.dirname(self.cacheFileName()))
 
-        with open(self.cacheFile(), 'wb') as handle:
-            json.dump(self.cache, handle)
+        with open(self.cacheFileName(), 'wb') as handle:
+            pickle.dump(self.cache, handle)
 
-    def loadCache(self):
-        if os.path.isfile(self.cacheFile()):
-            with open(self.cacheFile(), 'rb') as handle:
-                siteCache = json.load(handle)
-                self.update(siteCache)
+    def cacheLoad(self):
+        if os.path.isfile(self.cacheFileName()):
+            with open(self.cacheFileName(), 'rb') as handle:
+                siteCache = pickle.load(handle)
+                self.cache.update(siteCache)
 
     def scrape(self, urlOffset=None):
 
@@ -57,12 +55,14 @@ class SiteScraper(object):
         if urlOffset is not None:
             url = url + urlOffset
 
-        if self.cache != None and url in self.cache and 'soup' in self.cache[url] \
+        if self.cache != None and url in self.cache and 'html' in self.cache[url] \
             and 'timestamp' in self.cache[url]:
 
             elapsedTimeInCache = datetime.datetime.now() - self.cache[url]['timestamp']
             if elapsedTimeInCache < self.maxCacheTime:
-                self.data = self.cache[url]['soup']
+                html = self.cache[url]['html']
+                soup = BeautifulSoup(html)
+                self.data = soup
                 return self.data
 
         retryCount = 0
@@ -73,7 +73,8 @@ class SiteScraper(object):
                     print " SCRAPE: " + url
                 hdr = {'User-Agent':'Mozilla/5.0'}
                 request = urllib2.Request(url,headers=hdr)
-                html = urllib2.urlopen(request)
+                htmlFP = urllib2.urlopen(request)
+                html = htmlFP.read()
             except (socket.error, httplib.BadStatusLine):
                 time.sleep(0.4)
                 error = True
@@ -87,10 +88,11 @@ class SiteScraper(object):
             retryCount = retryCount + 1
 
         if html is not None:
-            self.data = BeautifulSoup(html)
+            soup = BeautifulSoup(html)
+            self.data = soup
             if self.cache is not None:
-                self.cache[url] = {'soup':self.data, 'timestamp':datetime.datetime.now()}
-                #self.saveCache()
+                self.cache[url] = {'html':html, 'timestamp':datetime.datetime.now()}
+                self.cacheSave()
             return self.data
 
         return self.data
@@ -130,6 +132,7 @@ class TestSiteScraper(unittest.TestCase):
 
     def testGoogle(self):
         s = SiteScraper("http://www.google.com")
+        s.debug = True
         s.scrape()
         self.assertNotEquals(s.data,None)
 
