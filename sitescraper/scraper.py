@@ -5,19 +5,46 @@ import socket
 import urllib2
 import time
 import sys
+import datetime
+import os
+import json
 from bs4 import BeautifulSoup
 
 
 class SiteScraper(object):
 
-    def __init__(self, url=None, retries=0):
+    def __init__(self, url, retries=0):
         '''
         Constructor
         '''
+
+        if url is None:
+            raise ValueError('URL given to SiteScraper is None')
+
         self.url = url
         self.data = None
         self.retries = retries
         self.debug = False
+        self.cache = {}
+        self.maxCacheTime = datetime.timedelta(days=1)
+        self.saveCacheDir = os.path.dirname(os.path.abspath(__file__)) + "/../data/cache/sites"
+        #self.loadCache()
+
+    def cacheFile(self):
+        return self.saveCacheDir + "/" + self.url.rsplit('://',1)[-1].strip('/').replace('/','_') + "_scrape.json"
+
+    def saveCache(self):
+        if not os.path.exists(os.path.dirname(self.cacheFile())):
+            os.makedirs(os.path.dirname(self.cacheFile()))
+
+        with open(self.cacheFile(), 'wb') as handle:
+            json.dump(self.cache, handle)
+
+    def loadCache(self):
+        if os.path.isfile(self.cacheFile()):
+            with open(self.cacheFile(), 'rb') as handle:
+                siteCache = json.load(handle)
+                self.update(siteCache)
 
     def scrape(self, urlOffset=None):
 
@@ -29,6 +56,14 @@ class SiteScraper(object):
         url = self.url
         if urlOffset is not None:
             url = url + urlOffset
+
+        if self.cache != None and url in self.cache and 'soup' in self.cache[url] \
+            and 'timestamp' in self.cache[url]:
+
+            elapsedTimeInCache = datetime.datetime.now() - self.cache[url]['timestamp']
+            if elapsedTimeInCache < self.maxCacheTime:
+                self.data = self.cache[url]['soup']
+                return self.data
 
         retryCount = 0
         while True:
@@ -53,6 +88,10 @@ class SiteScraper(object):
 
         if html is not None:
             self.data = BeautifulSoup(html)
+            if self.cache is not None:
+                self.cache[url] = {'soup':self.data, 'timestamp':datetime.datetime.now()}
+                #self.saveCache()
+            return self.data
 
         return self.data
 
@@ -114,6 +153,8 @@ class TestSiteScraper(unittest.TestCase):
 
     def testTable(self):
         s = SiteScraper("http://www.html.am/html-codes/tables/")
+        s.debug = True
+        s.scrape()
         s.scrape()
         self.assertNotEquals(s.data,None)
 
