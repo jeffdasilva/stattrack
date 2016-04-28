@@ -10,6 +10,13 @@ import os
 import pickle
 from bs4 import BeautifulSoup
 
+'''
+# [Note to my future self]
+# You can scrape an entire site for offline scraping with
+# this command if needed:
+ % wget --mirror --convert-links
+    --adjust-extension --page-requisites --no-parent <site>
+'''
 
 class SiteScraper(object):
 

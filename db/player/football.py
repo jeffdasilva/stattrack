@@ -25,7 +25,6 @@ class FootballPlayer(Player):
             if statName in self.property[str(year)]:
                 stat = self.property[str(year)][statName].replace(',','')
                 return stat
-
         return 0;
 
     def passingAttempts(self,year=datetime.datetime.now().year):
@@ -102,7 +101,7 @@ class FootballPlayer(Player):
         return points
 
     def pointsPerGame(self,year=datetime.datetime.now().year):
-        if self.gamesPlayed() == 0:
+        if self.gamesPlayed(year) == 0:
             return 0.0
         else:
             return self.points(year)/self.gamesPlayed(year)

@@ -293,7 +293,9 @@ while True:
             print '{0: >2}'.format(str(i)) + "  " + str(player) + \
                 "  " + '{0: <6}'.format(str(player.points(year=2013))) + \
                 "  " + '{0: <6}'.format(str(player.points(year=2014))) + \
-                "  " + '{0: <6}'.format(str(player.points(year=2015)))
+                "  " + '{0: <6}'.format(str(player.points(year=2015))) + \
+                "  " + '{0: <6}'.format(str(round(player.pointsPerGame(year=2015),2)) \
+                                         + "(" + str(player.gamesPlayed(year=2015)) + ")")
         print "---------------------------------------------------------------------"
 
 
