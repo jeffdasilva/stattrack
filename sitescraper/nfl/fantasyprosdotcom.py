@@ -9,7 +9,7 @@ class FantasyProsDotComScraper(SiteScraper):
 
     def __init__(self):
         super(FantasyProsDotComScraper, self).__init__(url="http://www1.fantasypros.com/nfl")
-        self.maxCacheTime = datetime.timedelta(days=1)
+        self.maxCacheTime = datetime.timedelta(hours=3)
         self.setProjectionURLs()
         self.setCheatSheetURLs()
 

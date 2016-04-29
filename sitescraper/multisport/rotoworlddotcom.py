@@ -13,13 +13,22 @@ class RotoWorldDotComScraper(SiteScraper):
 
     def scrape(self, playerName, league):
 
-        playerSearchString = playerName
-        for suffix in [" Sr.", " Jr.", " III"]:
-            if playerSearchString.endswith(suffix):
-                playerSearchString = playerSearchString.rsplit(suffix,1)[0]
+        if playerName == "Steve Smith":
+            playerSearchString = "Smith Sr"
+        elif playerName == "Javorius Allen":
+            playerSearchString = "Allen,Buck"
+        elif playerName == "Austin Seferian-Jenkins":
+            playerSearchString = "Seferian-Jenkins"
+        else:
+            playerSearchString = playerName
+            for suffix in [" Sr.", " Jr.", " III"]:
+                if playerSearchString.endswith(suffix):
+                    playerSearchString = playerSearchString.rsplit(suffix,1)[0]
 
-        playerSearchString = str(playerSearchString.rsplit(' ',1)[1] + \
-                                 ", " + playerSearchString.rsplit(' ',1)[0]).replace(' ','%20')
+            playerSearchString = str(playerSearchString.rsplit(' ',1)[1] + \
+                ", " + playerSearchString.rsplit(' ',1)[0])
+
+        playerSearchString = playerSearchString.replace(' ','%20')
         urlOffset = "/content/playersearch.aspx?searchname=" + playerSearchString + "&sport=" + league.lower()
         self.scrapeTable(urlOffset=urlOffset, attrs={'id':'cp1_ctl00_tblPlayerDetails'})
         playerDetails = self.data
@@ -74,20 +83,33 @@ class TestRotoWorldDotComScraper(unittest.TestCase):
         s.testmode = True
 
         s.scrape(playerName="Eli Manning", league="nfl")
-        #print s.data
         self.assertNotEquals(s.data, None)
+        self.assertGreater(int(s.data['2015']['G']),0)
 
         s.scrape(playerName="Tom Brady", league="nfl")
-        #print s.data
         self.assertNotEquals(s.data, None)
+        self.assertGreater(int(s.data['2015']['G']),0)
 
         s.scrape(playerName="Joe Thornton", league="nhl")
-        #print s.data
         self.assertNotEquals(s.data, None)
 
         s.scrape(playerName="Odell Beckham Jr.", league="nfl")
-        #print s.data
         self.assertNotEquals(s.data, None)
+        self.assertGreater(int(s.data['2015']['G']),0)
+
+        s.scrape(playerName="Steve Smith", league="nfl")
+        self.assertNotEquals(s.data, None)
+        self.assertGreater(int(s.data['2015']['G']),0)
+
+        s.scrape(playerName="Javorius Allen", league="nfl")
+        self.assertNotEquals(s.data, None)
+        self.assertGreater(int(s.data['2015']['G']),0)
+
+        s.cache = None
+        s.scrape(playerName="Austin Seferian-Jenkins", league="nfl")
+        print s.data
+        self.assertNotEquals(s.data, None)
+
 
 
 if __name__ == '__main__':

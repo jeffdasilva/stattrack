@@ -29,6 +29,7 @@ class SiteScraper(object):
         self.retries = retries
         self.data = None
         self.debug = False
+        self.verbose = True
         self.testmode = False
         self.cache = {}
         self.maxCacheTime = datetime.timedelta(days=1)
@@ -39,6 +40,9 @@ class SiteScraper(object):
         return self.saveCacheDir + "/" + self.url.rsplit('://',1)[-1].strip('/').replace('/','_') + "_scrape.pickle"
 
     def cacheSave(self):
+        if self.cache is None:
+            return
+
         if not os.path.exists(os.path.dirname(self.cacheFileName())):
             os.makedirs(os.path.dirname(self.cacheFileName()))
 
@@ -46,6 +50,9 @@ class SiteScraper(object):
             pickle.dump(self.cache, handle)
 
     def cacheLoad(self):
+        if self.cache is None:
+            return
+
         if os.path.isfile(self.cacheFileName()):
             with open(self.cacheFileName(), 'rb') as handle:
                 siteCache = pickle.load(handle)
@@ -76,8 +83,8 @@ class SiteScraper(object):
         while True:
             error = False
             try:
-                if self.debug:
-                    print " SCRAPE: " + url
+                #if self.debug or self.verbose:
+                print " [SCRAPE] " + url
                 hdr = {'User-Agent':'Mozilla/5.0'}
                 request = urllib2.Request(url,headers=hdr)
                 htmlFP = urllib2.urlopen(request)
@@ -174,6 +181,11 @@ class TestSiteScraper(unittest.TestCase):
 
         s.scrapeTable(attrs={'class': 'example'})
         print s.data
+
+        s.cache = None
+        s.data = None
+        s.scrape()
+        self.assertNotEquals(s.data,None)
 
 
 
