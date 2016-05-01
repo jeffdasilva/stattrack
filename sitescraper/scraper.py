@@ -68,23 +68,34 @@ class SiteScraper(object):
         url = self.url
         if urlOffset is not None:
             url = url + urlOffset
+        url = url.strip()
 
-        if self.cache != None and url in self.cache and 'html' in self.cache[url] \
-            and 'timestamp' in self.cache[url]:
+        if self.cache != None:
+            if url in self.cache and 'html' in self.cache[url]:
+                if 'timestamp' in self.cache[url]:
+                    if self.debug: print " [Cache Hit] " + url
+                    elapsedTimeInCache = datetime.datetime.now() - self.cache[url]['timestamp']
+                    if elapsedTimeInCache < self.maxCacheTime:
+                        html = self.cache[url]['html']
+                        soup = BeautifulSoup(html)
+                        self.data = soup
+                        return self.data
+                    else:
+                        if self.debug:
+                            print " [Cache Expired] " + url
+                            print "  Elapsed time in cache: " + str(elapsedTimeInCache)
+                            print "  Max time in cache:     " + str(self.maxCacheTime)
+            else:
+                if self.debug: print " [Cache Miss] " + url
+        else:
+            if self.debug: print " [Cache Disabled] " + url
 
-            elapsedTimeInCache = datetime.datetime.now() - self.cache[url]['timestamp']
-            if elapsedTimeInCache < self.maxCacheTime:
-                html = self.cache[url]['html']
-                soup = BeautifulSoup(html)
-                self.data = soup
-                return self.data
 
         retryCount = 0
         while True:
             error = False
             try:
-                if self.debug or self.verbose:
-                    print " [SCRAPE] " + url
+                if self.debug or self.verbose: print " [SCRAPE] " + url
                 hdr = {'User-Agent':'Mozilla/5.0'}
                 request = urllib2.Request(url,headers=hdr)
                 htmlFP = urllib2.urlopen(request)
@@ -96,7 +107,7 @@ class SiteScraper(object):
             if not error:
                 break
             if retryCount > self.retries:
-                print >>sys.stderr, 'ERROR: site "' + self.url + '" is not responding'
+                print >>sys.stderr, 'ERROR: site "' + url + '" is not responding'
                 break
 
             retryCount = retryCount + 1
@@ -105,6 +116,7 @@ class SiteScraper(object):
             soup = BeautifulSoup(html)
             self.data = soup
             if self.cache is not None:
+                if self.debug: print " [Cache Updated] " + url
                 self.cache[url] = {'html':html, 'timestamp':datetime.datetime.now()}
                 self.cacheSave()
             return self.data

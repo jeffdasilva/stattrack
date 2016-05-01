@@ -41,13 +41,21 @@ class Player(object):
         return player_str
 
     def printAll(self):
-        print "Name: " + self.name
-        if len(self.nameAliases) > 0:
+        if self.name is not None:
+            print "Name: " + self.name
+
+        if self.nameAliases is not None and len(self.nameAliases) > 0:
             print "Aliases: " + self.nameAliases
-        print "Team: " + self.team
-        print "Properties: "
-        for prop in self.property:
-            print "  " + prop + ": " + str(self.property[prop])
+
+        if self.team is not None:
+            print "Team: " + self.team
+        else:
+            print "Team: None"
+
+        if self.property is not None:
+            print "Properties: "
+            for prop in self.property:
+                print "  " + prop + ": " + str(self.property[prop])
 
     def value(self):
         return 0

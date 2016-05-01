@@ -17,6 +17,9 @@ class PlayerDB(object):
         self.positionMap.update(positionMap)
         self.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/../data/playerdb.pickle"
 
+
+
+
     def add(self, player):
         if self.player.has_key(player.key()):
             playerKeyIn = player.key()
