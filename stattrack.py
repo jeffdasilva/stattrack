@@ -7,9 +7,10 @@
 import copy
 
 from db.footballdb import FootballPlayerDB
+from db.player.football import FootballPlayer
+from sitescraper.multisport.rotoworlddotcom import RotoWorldDotComScraper
 from sitescraper.nfl.footballdbdotcom import FootballDBDotComScraper
 from sitescraper.nfl.myfantasyleaguedotcom import MyFantasyLeagueDotComScraper
-from sitescraper.multisport.rotoworlddotcom import RotoWorldDotComScraper
 
 
 db = FootballPlayerDB(league="Oracle")
@@ -95,7 +96,10 @@ while True:
             for p in mflSite.data:
                 playerSearch = db.getWithRegularExpression(p['name'], position=p['position'], listDrafted=True, listIgnored=True)
                 if playerSearch is None or len(playerSearch) == 0:
-                    print "ERROR: Player " + p['name'] + " is unknown. Skipping!"
+                    print "Warning: Player " + p['name'] + " is unknown. Adding this unknown Player to DB!"
+                    newPlayer=FootballPlayer(properties=p)
+                    db.add(newPlayer)
+                    newPlayer.draft()
                 elif len(playerSearch) == 1:
                     if not playerSearch[0].isDrafted:
                         print playerSearch[0].name + " was drafted by " + p['owner']

@@ -104,7 +104,7 @@ class Player(object):
             self.team = self.property["team"]
             del self.property["team"]
 
-        if self.team is not None and (self.team.lower() == "unknown" or self.team.lower() == "FA" or self.team == "???"):
+        if self.team is not None and (self.team.lower() == "unknown" or self.team.lower() == "fa" or self.team == "???"):
             self.team = None
 
         if self.team is not None:

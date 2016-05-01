@@ -83,8 +83,8 @@ class SiteScraper(object):
         while True:
             error = False
             try:
-                #if self.debug or self.verbose:
-                print " [SCRAPE] " + url
+                if self.debug or self.verbose:
+                    print " [SCRAPE] " + url
                 hdr = {'User-Agent':'Mozilla/5.0'}
                 request = urllib2.Request(url,headers=hdr)
                 htmlFP = urllib2.urlopen(request)

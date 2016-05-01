@@ -25,8 +25,22 @@ class PlayerDB(object):
                 player = self.player[playerKeyIn]
                 del self.player[playerKeyIn]
                 self.player[player.key()] = player
-        else:
-            self.player[player.key()] = player
+            return
+
+        playerMatchByName = self.get(searchString=player.name, listDrafted=True, listIgnored=True)
+        if len(playerMatchByName) == 1:
+            #print "Looking for (by name) " + player.name + " " + str(player.team)
+            #print "Found (by name) " + playerMatchByName[0].name + " " + str(playerMatchByName[0].team)
+            playerKeyIn = playerMatchByName[0].key()
+            self.player[playerKeyIn].merge(player)
+            if self.player[playerKeyIn].key() != playerKeyIn:
+                #print "  Changing Teams!!!"
+                player = self.player[playerKeyIn]
+                del self.player[playerKeyIn]
+                self.player[player.key()] = player
+            return
+
+        self.player[player.key()] = player
 
     def save(self):
         if not os.path.exists(os.path.dirname(self.saveFile)):
