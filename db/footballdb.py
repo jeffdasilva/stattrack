@@ -53,12 +53,11 @@ class FootballPlayerDB(PlayerDB):
 
     def wget(self, scrapers=[]):
 
-        scrapers += [FantasyProsDotComScraper()]
+        allScrapers = scrapers + [FantasyProsDotComScraper()]
 
-        for s in scrapers:
+        for s in allScrapers:
             s.scrape()
             for player_prop in s.data:
-                #print player_prop
                 player = FootballPlayer(properties=player_prop)
                 self.add(player)
 
