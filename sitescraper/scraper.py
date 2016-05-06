@@ -85,6 +85,7 @@ class SiteScraper(object):
                     else:
                         if self.debug:
                             print " [Cache Expired] " + url
+                            print "   Timestamp is:           " + str(self.cache[url].timestamp)
                             print "   Elapsed time in cache: " + str(elapsedTimeInCache)
                             print "   Max time in cache:     " + str(self.maxCacheTime)
             else:
@@ -116,6 +117,7 @@ class SiteScraper(object):
                     if self.debug: print " [Cache Updated] " + url
                     self.cache[url] = {'html':html, 'timestamp':datetime.datetime.now()}
                     self.cacheSave()
+                    if self.debug: print "   Timestamp is:           " + str(self.cache[url].timestamp)
                 break
             else:
                 if self.debug: print " [SCRAPE returned no html] " + url
