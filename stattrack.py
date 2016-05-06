@@ -94,7 +94,11 @@ while True:
         if mflSite.data is not None:
 
             for p in mflSite.data:
+
                 playerSearch = db.getWithRegularExpression(p['name'], position=p['position'], listDrafted=True, listIgnored=True)
+                if playerSearch is None or len(playerSearch) == 0:
+                    playerSearch = db.getWithRegularExpression(p['name'], listDrafted=True, listIgnored=True)
+
                 if playerSearch is None or len(playerSearch) == 0:
                     print "Warning: Player " + p['name'] + " is unknown. Adding this unknown Player to DB!"
                     newPlayer=FootballPlayer(properties=p)

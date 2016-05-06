@@ -33,6 +33,8 @@ class SiteScraper(object):
         self.testmode = False
         self.cache = {}
         self.maxCacheTime = datetime.timedelta(days=1)
+        #self.maxCacheTime = datetime.timedelta(seconds=1)
+
         self.saveCacheDir = os.path.dirname(os.path.abspath(__file__)) + "/../data/cache/sites"
         self.cacheLoad()
 
@@ -73,9 +75,9 @@ class SiteScraper(object):
         if self.cache != None:
             if url in self.cache and 'html' in self.cache[url]:
                 if 'timestamp' in self.cache[url]:
-                    if self.debug: print " [Cache Hit] " + url
                     elapsedTimeInCache = datetime.datetime.now() - self.cache[url]['timestamp']
                     if elapsedTimeInCache < self.maxCacheTime:
+                        if self.debug: print " [Cache Hit] " + url
                         html = self.cache[url]['html']
                         soup = BeautifulSoup(html)
                         self.data = soup
@@ -83,8 +85,8 @@ class SiteScraper(object):
                     else:
                         if self.debug:
                             print " [Cache Expired] " + url
-                            print "  Elapsed time in cache: " + str(elapsedTimeInCache)
-                            print "  Max time in cache:     " + str(self.maxCacheTime)
+                            print "   Elapsed time in cache: " + str(elapsedTimeInCache)
+                            print "   Max time in cache:     " + str(self.maxCacheTime)
             else:
                 if self.debug: print " [Cache Miss] " + url
         else:
@@ -104,22 +106,25 @@ class SiteScraper(object):
                 time.sleep(0.4)
                 error = True
 
-            if not error:
+            if error:
+                if self.debug: print " [SCRAPE ERROR] " + url
+
+            if not error and html is not None:
+                soup = BeautifulSoup(html)
+                self.data = soup
+                if self.cache is not None:
+                    if self.debug: print " [Cache Updated] " + url
+                    self.cache[url] = {'html':html, 'timestamp':datetime.datetime.now()}
+                    self.cacheSave()
                 break
-            if retryCount > self.retries:
+            else:
+                if self.debug: print " [SCRAPE returned no html] " + url
+
+            if retryCount >= self.retries:
                 print >>sys.stderr, 'ERROR: site "' + url + '" is not responding'
                 break
 
             retryCount = retryCount + 1
-
-        if html is not None:
-            soup = BeautifulSoup(html)
-            self.data = soup
-            if self.cache is not None:
-                if self.debug: print " [Cache Updated] " + url
-                self.cache[url] = {'html':html, 'timestamp':datetime.datetime.now()}
-                self.cacheSave()
-            return self.data
 
         return self.data
 

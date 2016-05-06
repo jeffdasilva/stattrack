@@ -13,7 +13,7 @@ class FantasyProsDotComScraper(SiteScraper):
         #self.maxCacheTime = datetime.timedelta(minutes=1)
         self.setProjectionURLs()
         self.setCheatSheetURLs()
-        #self.debug = True
+        self.debug = True
 
     def setProjectionURLs(self):
         url_offset = "/projections/"
