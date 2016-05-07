@@ -10,10 +10,9 @@ class FantasyProsDotComScraper(SiteScraper):
     def __init__(self):
         super(FantasyProsDotComScraper, self).__init__(url="http://www1.fantasypros.com/nfl")
         self.maxCacheTime = datetime.timedelta(hours=3)
-        #self.maxCacheTime = datetime.timedelta(minutes=1)
         self.setProjectionURLs()
         self.setCheatSheetURLs()
-        self.debug = True
+        #self.debug = True
 
     def setProjectionURLs(self):
         url_offset = "/projections/"
