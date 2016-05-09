@@ -13,6 +13,9 @@ class RotoWorldDotComScraper(SiteScraper):
 
     def scrape(self, playerName, league):
 
+        # ToDo:
+        # Steve johnson vs Stevie johnson (sd) vs steven johnson (pit) is an issue
+
         if playerName == "Steve Smith":
             playerSearchString = "Smith Sr"
         elif playerName == "Javorius Allen":
