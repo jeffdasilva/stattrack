@@ -9,6 +9,7 @@
 #
 # prerequisites:
 #  % sudo apt-get install python-bs4
+#  % sudo easy_install jsonpickle
 #
 # unittest by doing:
 #  % make
