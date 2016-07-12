@@ -10,10 +10,10 @@
 # prerequisites:
 #  % sudo apt-get install python-bs4
 #
-# unit test by doing:
+# unittest by doing:
 #  % make
 #
-# run with:
+# Run with:
 #  % make run
 #############################
 
