@@ -37,6 +37,8 @@ git-add-commit:
 .PHONY: git-config
 git-config:
 	git config --global core.editor emacs
+	git config --global user.email $(if $(EMAIL),$(EMAIL),$(error ERROR: EMAIL not set))
+	git config --global user.name jeffdasilva
 
 git-set-remote:
 	git remote set-url origin git@github.com:jeffdasilva/stattrack.git
