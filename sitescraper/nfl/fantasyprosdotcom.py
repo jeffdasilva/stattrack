@@ -107,7 +107,7 @@ class FantasyProsDotComScraper(SiteScraper):
     def scrape(self):
         self.cheatsheets = []
         self.projections = []
-        #self.scrapeProjections()
+        self.scrapeProjections()
         self.scrapeCheatSheets()
         self.data = self.cheatsheets + self.projections
         return self.data
@@ -133,7 +133,7 @@ class TestFantasyProsDotComScraper(unittest.TestCase):
         camNewtonFound = False
         for player in s.projections:
             if player['name'] == "Cam Newton":
-                #print player
+                print player
                 self.assertGreater(player['passingYards'], 2000)
                 self.assertGreater(player['rushingYards'], 200)
                 self.assertEqual(player['team'], "CAR")

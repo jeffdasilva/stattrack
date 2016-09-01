@@ -11,9 +11,10 @@ from db.player.player import Player
 from db.playerdb import PlayerDB
 from sitescraper.nfl.fantasyprosdotcom import FantasyProsDotComScraper
 
+
 class FootballPlayerDB(PlayerDB):
 
-    def __init__(self, league=""):
+    def __init__(self, league=None):
 
         pmap = {}
         pmap["qb"] = [ "QB" ]
@@ -34,7 +35,13 @@ class FootballPlayerDB(PlayerDB):
         super(FootballPlayerDB, self).__init__(positionMap=pmap)
         self.league = league
 
+        if self.league is None:
+            self.league = "Oracle"
+
+
         if self.league == "O-League":
+            #2016 settings
+            #https://football.fantasysports.yahoo.com/f1/66542/6/settings
             self.numberOfTeams = 10
             self.numberOfStarting = {}
             self.numberOfStarting['qb'] = 2
@@ -42,7 +49,7 @@ class FootballPlayerDB(PlayerDB):
             self.numberOfStarting['wr'] = 4
             self.numberOfScrubs = 14 - self.numberOfStarting['qb'] - self.numberOfStarting['rb'] - self.numberOfStarting['wr']
             self.moneyPerTeam = 333
-        else:
+        elif self.league == "Oracle":
             self.numberOfTeams = 16
             self.numberOfStarting = {}
             self.numberOfStarting['qb'] = 1
@@ -50,6 +57,8 @@ class FootballPlayerDB(PlayerDB):
             self.numberOfStarting['wr'] = 4
             self.numberOfScrubs = 0
             self.moneyPerTeam = 0
+        else:
+            raise ValueError("unknown league type")
 
     def wget(self, scrapers=[]):
 

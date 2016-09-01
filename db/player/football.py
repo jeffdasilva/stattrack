@@ -21,6 +21,9 @@ class FootballPlayer(Player):
 
 
     def getStat(self, statName, year=datetime.datetime.now().year):
+
+        # if year is this year and year has not started, then we want projection?
+
         if str(year) in self.property:
             if statName in self.property[str(year)]:
                 stat = self.property[str(year)][statName].replace(',','')

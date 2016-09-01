@@ -7,13 +7,15 @@
 import copy
 
 from db.footballdb import FootballPlayerDB
-from db.player.football import FootballPlayer
+#from db.player.football import FootballPlayer
 from sitescraper.multisport.rotoworlddotcom import RotoWorldDotComScraper
 from sitescraper.nfl.footballdbdotcom import FootballDBDotComScraper
-from sitescraper.nfl.myfantasyleaguedotcom import MyFantasyLeagueDotComScraper
+#from sitescraper.nfl.myfantasyleaguedotcom import MyFantasyLeagueDotComScraper
 
 
-db = FootballPlayerDB(league="Oracle")
+#db = FootballPlayerDB(league="Oracle")
+db = FootballPlayerDB(league="O-League")
+
 db.load()
 #db.update()
 
@@ -88,6 +90,8 @@ while True:
         db_stack.append(copy.deepcopy(db))
         db.wget()
 
+
+        '''
         mflSite = MyFantasyLeagueDotComScraper(43790,2016)
         mflSite.scrape()
 
@@ -113,6 +117,7 @@ while True:
                     print "ERROR: Player " + p['name'] + " is ambiguous. Skipping!"
                     for ply in playerSearch:
                         print " --> " + ply.name
+        '''
 
         if not undo_operation:
             undo_stack.append("pop")
@@ -207,11 +212,12 @@ while True:
 
                 if is_draft_cmd:
                     p = tmp_player_list.pop(p_index)
-                    #cost = raw_input(' --> for how much? ')
-                    #if cost.isdigit():
-                    #    cost = int(cost)
-                    #else:
-                    cost = 0
+                    cost = raw_input(' --> for how much? ')
+                    if cost.isdigit():
+                        cost = int(cost)
+                    else:
+                        print "Invalid Cost Amount! Setting cost to 0"
+                        cost = 0
                     p.draft(cost)
                 else:
                     p = tmp_player_list[p_index]
@@ -239,7 +245,6 @@ while True:
     elif cmd == "factory-reset":
         db_stack.append(copy.deepcopy(db))
         db = FootballPlayerDB()
-
         db.wget(scrapers=[FootballDBDotComScraper()])
         #db.wget()
 
