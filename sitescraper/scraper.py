@@ -79,7 +79,7 @@ class SiteScraper(object):
                     if elapsedTimeInCache < self.maxCacheTime:
                         if self.debug: print " [Cache Hit] " + url
                         html = self.cache[url]['html']
-                        soup = BeautifulSoup(html)
+                        soup = BeautifulSoup(html, "lxml")
                         self.data = soup
                         return self.data
                     else:
@@ -112,7 +112,7 @@ class SiteScraper(object):
                 if self.debug: print " [SCRAPE ERROR] " + url
 
             if not error and html is not None:
-                soup = BeautifulSoup(html)
+                soup = BeautifulSoup(html, "lxml")
                 self.data = soup
                 if self.cache is not None:
                     if self.debug: print " [Cache Updated] " + url

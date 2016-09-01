@@ -30,6 +30,7 @@ class FootballDBDotComScraper(SiteScraper):
     ReceivingYards = ReceivingStats[1]
     ReceivingTDs = ReceivingStats[2]
     ReceivingTwoPointers = ReceivingStats[3]
+    
 
     FumblesLost = FumbleStats[0]
     FumbleTDs = FumbleStats[1]
@@ -88,9 +89,11 @@ class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
         s.testmode = True
         s.scrape()
 
-        #for d in s.data:
-        #    print d
-        self.assertGreater(len(s.data[0]),6)
+        for d in s.data:
+            print d
+            
+        print s.data[0]
+        #self.assertGreater(len(s.data[0]),6)
 
 
         print s.data[0]['name']
