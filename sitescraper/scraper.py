@@ -32,6 +32,7 @@ class SiteScraper(object):
         self.verbose = True
         self.testmode = False
         self.cache = {}
+        self.link = {}
         self.maxCacheTime = datetime.timedelta(days=1)
         #self.maxCacheTime = datetime.timedelta(seconds=1)
 
@@ -136,6 +137,8 @@ class SiteScraper(object):
 
         SiteScraper.scrape(self,urlOffset=urlOffset)
 
+        self.link = {}
+
         if self.data is not None:
             if index is None:
                 table = self.data.find('table', attrs=attrs)
@@ -146,8 +149,6 @@ class SiteScraper(object):
 
         if table is None:
             return  self.data
-
-        self.link = {}
 
         for link in table.findAll("a"):
             if link.has_attr('href'):

@@ -31,7 +31,6 @@ class FootballDBDotComScraper(SiteScraper):
     ReceivingTDs = ReceivingStats[2]
     ReceivingTwoPointers = ReceivingStats[3]
 
-
     FumblesLost = FumbleStats[0]
     FumbleTDs = FumbleStats[1]
 
@@ -46,20 +45,26 @@ class FootballDBDotComScraper(SiteScraper):
 
         for position in [ "QB", "RB", "WR", "TE"]:
             urlOffset = "/players/current.html?pos=" + position
-            playerList = self.scrapeTable(urlOffset=urlOffset,attrs={'class':'statistics scrollable'})
+            #playerList = self.scrapeTable(urlOffset=urlOffset,attrs={'class':'statistics scrollable'})
+            playerList = self.scrapeTable(urlOffset=urlOffset,attrs={'class':'statistics'})
             playerLinks = self.link.copy()
 
             playerCount = 0
 
+            if playerList is None:
+                continue
+
             for player in playerList:
 
                 playerCount += 1
-                if self.testmode and playerCount > 3:
+                if self.testmode and playerCount > 5:
                     break
 
                 if player[0] in playerLinks:
                     #print player[0] + " --- " + playerLinks[player[0]]
-                    self.scrapeTable(urlOffset=playerLinks[player[0]], attrs={'class':'statistics scrollable'},index=-1)
+                    #self.scrapeTable(urlOffset=playerLinks[player[0]], attrs={'class':'statistics scrollable'},index=-1)
+                    # -7 is not right here -- need to search for the correct table
+                    self.scrapeTable(urlOffset=playerLinks[player[0]], attrs={'class':'statistics'},index=-7)
                     self.data = self.data[2:]
                     name = str(player[0]).rsplit(',',1)[1].strip() + " " + str(player[0]).rsplit(',',1)[0].strip()
                     stats = {'name':name, 'position':position}
@@ -92,17 +97,18 @@ class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
         for d in s.data:
             print d
 
-        print s.data[0]
-        #self.assertGreater(len(s.data[0]),6)
+        for i in range(0,3):
+            print "--- s.data[" + str(i) + "] ---"
+            print s.data[i]
+            self.assertGreater(len(s.data[i]),3)
 
-
-        print s.data[0]['name']
-        print s.data[0]['team']
-        print s.data[0]['position']
-        self.assertEquals(s.data[0]['position'],'QB')
-        print s.data[0]['2016']['team']
-        print s.data[0]['2016']['PassingTD']
-        self.assertGreaterEqual(int(s.data[0]['2016']['PassingTD']),0)
+            print s.data[i]['name']
+            print s.data[i]['team']
+            print s.data[i]['position']
+            self.assertEquals(s.data[i]['position'],'QB')
+            print s.data[i]['2016']['team']
+            print s.data[i]['2016']['PassingTD']
+            self.assertGreaterEqual(int(s.data[i]['2016']['PassingTD']),0)
 
 
 if __name__ == '__main__':
