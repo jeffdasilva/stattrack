@@ -114,6 +114,10 @@ class FantasyProsDotComScraper(SiteScraper):
 
     def splitNameTeamString(self, nameTeamStr):
 
+        if len(nameTeamStr.rsplit(' ',1)) > 1 and \
+            len(nameTeamStr.rsplit(' ',1)[1]) == 1:
+            nameTeamStr = nameTeamStr.rsplit(' ',1)[0]
+
         if len(str(nameTeamStr).split()) < 3 or \
             not str(nameTeamStr).rsplit(' ',1)[1].isupper() or \
             len(str(nameTeamStr).rsplit(' ',1)[1]) > 3:
@@ -131,6 +135,7 @@ class TestFantasyProsDotComScraper(unittest.TestCase):
         s.scrape()
 
         camNewtonFound = False
+        tomBradyFound = False
         for player in s.projections:
             if player['name'] == "Cam Newton":
                 print player
@@ -140,8 +145,13 @@ class TestFantasyProsDotComScraper(unittest.TestCase):
                 self.assertEqual(player['position'], "QB")
                 self.assertEquals(camNewtonFound,False)
                 camNewtonFound = True
-        # site sometimes doesn't work
-        #self.assertEquals(camNewtonFound,True)
+
+            if player['name'] == "Tom Brady":
+                print player
+                tomBradyFound = True
+
+        self.assertEquals(camNewtonFound,True)
+        self.assertEquals(tomBradyFound,True)
 
         andrewLuckFound = 0
         seattleFound = 0
