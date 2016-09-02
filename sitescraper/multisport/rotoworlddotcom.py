@@ -9,12 +9,15 @@ class RotoWorldDotComScraper(SiteScraper):
 
     def __init__(self):
         super(RotoWorldDotComScraper, self).__init__(url="http://www.rotoworld.com")
-        self.maxCacheTime = datetime.timedelta(days=90)
+        self.maxCacheTime = datetime.timedelta(days=4)
+        #self.maxCacheTime = datetime.timedelta(hours=1)
+
 
     def scrape(self, playerName, league):
 
         # ToDo:
         # Steve johnson vs Stevie johnson (sd) vs steven johnson (pit) is an issue
+        urlOffset = None
 
         if playerName == "Steve Smith":
             playerSearchString = "Smith Sr"
@@ -22,6 +25,10 @@ class RotoWorldDotComScraper(SiteScraper):
             playerSearchString = "Allen,Buck"
         elif playerName == "Austin Seferian-Jenkins":
             playerSearchString = "Seferian-Jenkins"
+        elif playerName == "Cam Newton":
+            urlOffset = "/player/nfl/6491/cam-newton"
+        elif playerName == "David Johnson":
+            urlOffset = "/player/nfl/10404/david-johnson"
         else:
             playerSearchString = playerName
             for suffix in [" Sr.", " Jr.", " III"]:
@@ -31,8 +38,11 @@ class RotoWorldDotComScraper(SiteScraper):
             playerSearchString = str(playerSearchString.rsplit(' ',1)[1] + \
                 ", " + playerSearchString.rsplit(' ',1)[0])
 
-        playerSearchString = playerSearchString.replace(' ','%20')
-        urlOffset = "/content/playersearch.aspx?searchname=" + playerSearchString + "&sport=" + league.lower()
+        if urlOffset is None:
+            playerSearchString = playerSearchString.replace(' ','%20')
+            urlOffset = "/content/playersearch.aspx?searchname=" + playerSearchString + "&sport=" + league.lower()
+
+
         self.scrapeTable(urlOffset=urlOffset, attrs={'id':'cp1_ctl00_tblPlayerDetails'})
         playerDetails = self.data
         #print playerDetails
@@ -84,6 +94,7 @@ class TestRotoWorldDotComScraper(unittest.TestCase):
 
         s = RotoWorldDotComScraper()
         s.testmode = True
+        #s.debug = True
 
         s.scrape(playerName="Eli Manning", league="nfl")
         self.assertNotEquals(s.data, None)
@@ -107,6 +118,14 @@ class TestRotoWorldDotComScraper(unittest.TestCase):
         s.scrape(playerName="Javorius Allen", league="nfl")
         self.assertNotEquals(s.data, None)
         self.assertGreater(int(s.data['2015']['G']),0)
+
+        s.scrape(playerName="Cam Newton", league="nfl")
+        self.assertNotEquals(s.data, None)
+        self.assertEquals(int(s.data['2015']['G']),16)
+
+        s.scrape(playerName="David Johnson", league="nfl")
+        self.assertNotEquals(s.data, None)
+        self.assertEquals(int(s.data['2015']['G']),16)
 
         s.cache = None
         s.scrape(playerName="Austin Seferian-Jenkins", league="nfl")

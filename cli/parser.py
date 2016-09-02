@@ -5,27 +5,60 @@ Created on Sep 1, 2016
 '''
 import unittest
 
+from cli.cmd.command import ErrorCommand
+
 
 class StatTrackParser(object):
-    StatusExit = 0
-
+    StatusTrue = 0
+    StatusFalse = 1
+    StatusExit = -1
+    StatusError = 2
 
     def __init__(self, league):
         self.league = league
+
+        self.status = StatTrackParser.StatusTrue
+
         self.commands = []
+        self.defaultCommand = None
+        self.errorCommand = ErrorCommand()
 
-    def promptForCommand(self):
+        self.player_list = []
+        self.undo_stack = []
+        self.db_stack = []
+        self.autosave = True
+
+    def prompt(self):
         cmd = raw_input('% ')
-        return self.parse(cmd)
+        status = self.processCommandAndResponse(cmd)
+        return status
 
-    def promptForCommandLoop(self):
+    def promptLoop(self):
         while True:
-            status = self.promptForCommand()
+            status = self.prompt()
             if status == StatTrackParser.StatusExit:
                 break
 
-    def parse(self,cmd):
-        return StatTrackParser.StatusExit
+    def processCommand(self,cmd):
+        self.status = StatTrackParser.StatusTrue
+
+        for commandIter in self.commands:
+            if commandIter.matches(cmd):
+                return commandIter.apply(cmd, self)
+
+        if self.defaultCommand is not None:
+            return self.defaultCommand.apply(cmd)
+        else:
+            return self.errorCommand.apply("Invalid Command",self)
+
+    def processResponse(self, response, status):
+        print response
+        return status
+
+    def processCommandAndResponse(self,cmd):
+        response = self.processCommand(cmd)
+        status = self.processResponse(response, self.status)
+        return status
 
 
 
@@ -44,7 +77,13 @@ class TestStatTrackParser(unittest.TestCase):
         p.league.name = "jds.1"
         self.assertEquals(p.league.name, l.name)
         self.assertEquals(l.name,"jds.1")
+        pass
 
+
+    def testErrorCommand(self):
+        p = StatTrackParser(None)
+        status = p.processCommandAndResponse("invalid command")
+        self.assertEqual(status, StatTrackParser.StatusError)
         pass
 
 

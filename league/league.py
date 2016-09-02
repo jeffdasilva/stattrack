@@ -16,12 +16,6 @@ class League():
         self.rules = rules
         self.parser = StatTrackParser(self)
 
-        self.player_list = []
-        self.undo_stack = []
-        self.db_stack = []
-        self.autosave = True
-
-
 class LeagueTest(unittest.TestCase):
 
     def testConstruct(self):

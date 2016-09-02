@@ -73,8 +73,17 @@ tabs2space:
 remove-trailing-whitespace:
 	@find . -type f -name '*.py' -exec sed -i 's/[ \t]*$$//g' {} \;
 
+.PHONY: remove-windows-line-endings
+remove-windows-line-endings:
+ifeq ($(shell which dos2unix 2>/dev/null),)
+	$(error ERROR: dos2unix not installed)
+else 
+	@find . -type f \( -name '*.py' -o -name 'Makefile' -o -name '*.mk' -o -name '*.md' -o -name 'LICENSE' \) \
+		-exec dos2unix {} \;
+endif
+
 .PHONY: lint
-lint: remove-trailing-whitespace tabs2space
+lint: remove-trailing-whitespace remove-windows-line-endings tabs2space
 	$(MAKE) check
 	$(MAKE) clean
 #############################
