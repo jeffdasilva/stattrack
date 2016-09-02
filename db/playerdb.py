@@ -18,8 +18,6 @@ class PlayerDB(object):
         self.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/../data/playerdb.pickle"
 
 
-
-
     def add(self, player):
         if self.player.has_key(player.key()):
             playerKeyIn = player.key()
@@ -195,3 +193,7 @@ class TestPlayerDB(unittest.TestCase):
         self.assertEquals(june.property["losses"],22)
         self.assertEquals(june.property["ties"],4)
         self.assertEquals(june.property["saves"],124)
+
+
+if __name__ == "__main__":
+    unittest.main()

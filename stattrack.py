@@ -15,7 +15,6 @@ from sitescraper.nfl.footballdbdotcom import FootballDBDotComScraper
 
 #db = FootballPlayerDB(league="Oracle")
 db = FootballPlayerDB(league="O-League")
-
 db.load()
 #db.update()
 
