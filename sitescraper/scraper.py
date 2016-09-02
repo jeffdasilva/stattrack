@@ -132,6 +132,28 @@ class SiteScraper(object):
 
         return self.data
 
+    def scrapeTables(self, urlOffset=None, attrs={}):
+
+        SiteScraper.scrape(self,urlOffset=urlOffset)
+
+        self.link = {}
+
+        if self.data is not None:
+            tableList = self.data.find_all('table', attrs=attrs)
+
+        self.data = []
+
+        if tableList is not None:
+            for tbl in tableList:
+                tblEntry = []
+                for row in tbl.findAll("tr"):
+                    cols = row.find_all('td')
+                    cols = [ele.text.strip() for ele in cols]
+                    tblEntry.append([ele for ele in cols])
+                self.data.append(tblEntry)
+
+        return self.data
+
 
     def scrapeTable(self, urlOffset=None, attrs={}, index=None):
 

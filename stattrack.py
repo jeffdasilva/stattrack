@@ -298,7 +298,8 @@ while True:
                 "  " + '{0: <4}'.format("Age") + \
                 " " + '{0: <6}'.format("2013") + \
                 "  " + '{0: <6}'.format("2014") + \
-                "  " + '{0: <6}'.format("2015")
+                "  " + '{0: <6}'.format("2015") + \
+                "  " + '{0: <6}'.format("2016")
 
         print "---------------------------------------------------------------------"
         for i, player in enumerate(player_list):
@@ -309,6 +310,7 @@ while True:
                 " " + '{0: <6}'.format(str(player.points(year=2013))) + \
                 "  " + '{0: <6}'.format(str(player.points(year=2014))) + \
                 "  " + '{0: <6}'.format(str(player.points(year=2015))) + \
+                "  " + '{0: <6}'.format(str(player.points(year=2016))) + \
                 "  " + '{0: <6}'.format(str(round(player.pointsPerGame(year=2015),2)) \
                                          + "(" + str(player.gamesPlayed(year=2015)) + ")")
         print "---------------------------------------------------------------------"

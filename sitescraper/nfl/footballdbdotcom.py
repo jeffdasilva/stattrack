@@ -45,7 +45,6 @@ class FootballDBDotComScraper(SiteScraper):
 
         for position in [ "QB", "RB", "WR", "TE"]:
             urlOffset = "/players/current.html?pos=" + position
-            #playerList = self.scrapeTable(urlOffset=urlOffset,attrs={'class':'statistics scrollable'})
             playerList = self.scrapeTable(urlOffset=urlOffset,attrs={'class':'statistics'})
             playerLinks = self.link.copy()
 
@@ -61,14 +60,21 @@ class FootballDBDotComScraper(SiteScraper):
                     break
 
                 if player[0] in playerLinks:
-                    #print player[0] + " --- " + playerLinks[player[0]]
-                    #self.scrapeTable(urlOffset=playerLinks[player[0]], attrs={'class':'statistics scrollable'},index=-1)
-                    # -7 is not right here -- need to search for the correct table
-                    self.scrapeTable(urlOffset=playerLinks[player[0]], attrs={'class':'statistics'},index=-7)
-                    self.data = self.data[2:]
+                    self.scrapeTables(urlOffset=playerLinks[player[0]], attrs={'class':'statistics'})
+
+                    fantasyStatTbl = None
+                    for tbl in self.data:
+                        if len(tbl) > 2 and len(tbl[2:]) > 0 and \
+                            len(FootballDBDotComScraper.Stats) == len(tbl[2:][0])-1:
+                            fantasyStatTbl = tbl
+
+                    if fantasyStatTbl is None:
+                        continue
+
+                    fantasyStatTbl = fantasyStatTbl[2:]
                     name = str(player[0]).rsplit(',',1)[1].strip() + " " + str(player[0]).rsplit(',',1)[0].strip()
                     stats = {'name':name, 'position':position}
-                    for yearData in self.data:
+                    for yearData in fantasyStatTbl:
                         year = yearData[0]
                         stats[year] = {}
                         stats[year] = dict(zip(FootballDBDotComScraper.Stats,yearData[1:]))
@@ -90,6 +96,8 @@ class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
 
     def testFootballDBDotComScraper(self):
 
+        thisYear = str(datetime.datetime.now().year)
+
         s = FootballDBDotComScraper()
         s.testmode = True
         s.scrape()
@@ -106,10 +114,9 @@ class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
             print s.data[i]['team']
             print s.data[i]['position']
             self.assertEquals(s.data[i]['position'],'QB')
-            print s.data[i]['2016']['team']
-            print s.data[i]['2016']['PassingTD']
-            self.assertGreaterEqual(int(s.data[i]['2016']['PassingTD']),0)
-
+            print s.data[i][thisYear]['team']
+            print s.data[i][thisYear]['PassingTD']
+            self.assertGreaterEqual(int(s.data[i][thisYear]['PassingTD']),0)
 
 if __name__ == '__main__':
     unittest.main()
