@@ -87,6 +87,67 @@ class Command():
         parser.status = StatTrackParser.StatusExit
         return parser.status
 
+    def isCurrentStatusTrue(self, parser):
+        from cli.parser import StatTrackParser
+        return parser.status == StatTrackParser.StatusTrue
+
+    def getLeague(self, parser):
+        self.statusTrue(parser)
+        if parser.league is None:
+            return parser.error("Nothing to "+ self.name +". The League is not configured")
+        return parser.league
+
+    def getDB(self, parser):
+        self.statusTrue(parser)
+        leagueOrResponseError = self.getLeague(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = leagueOrResponseError
+            return response
+
+        league = leagueOrResponseError
+
+        if league.db is None:
+            return parser.error("Nothing to " + self.name + ". The League's database is not configured")
+
+        return league.db
+
+    def getPlayer(self, playerArg, parser,listDrafted=False,listIgnored=False):
+
+        dbOrResponse = self.getDB(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = dbOrResponse
+            return response
+
+        db = dbOrResponse
+
+        if playerArg == "":
+
+            if len(parser.player_list) == 0:
+                return parser.error("Can't " + self.name + "! No players in player queue")
+            player = parser.player_list.pop(0)
+
+        elif playerArg.isdigit():
+            index = int(playerArg)
+
+            if index >= len(parser.player_list):
+                return parser.error("Can't " + self.name + "! Player index argument exceeds number of players in player queue")
+
+            player = parser.player_list.pop(index)
+
+        else:
+            player_list = db.get(playerArg, listDrafted=listDrafted, listIgnored=listIgnored)
+
+            if len(player_list) != 1:
+                return parser.error("Can't " + self.name + " " + playerArg + "! Command ARGS are too ambiguous")
+
+            player = player_list.pop(0)
+
+            if player in parser.player_list:
+                parser.player_list.remove(player)
+
+        return player
+
+
 ##########################################################
 
 ##########################################################
@@ -148,7 +209,6 @@ class HelpCommand(Command):
 
         response += "\n" + parser.bold("AUTHOR") + "\n\tWritten by Jeff DaSilva.\n"
 
-
         self.statusTrue(parser)
         return response
 
@@ -167,12 +227,12 @@ class UndoCommand(Command):
     def apply(self, cmd, parser):
 
         if len(parser.undo_stack) == 0:
-            response = parser.error("Nothing to undo")
-        else:
-            parser.undoMode = True
-            cmd = parser.undo_stack.pop()
-            response = parser.processCommand(cmd)
-            parser.undoMode = False
+            return parser.error("Nothing to undo")
+
+        parser.undoMode = True
+        cmd = parser.undo_stack.pop()
+        response = parser.processCommand(cmd)
+        parser.undoMode = False
 
         return response
 
@@ -201,8 +261,7 @@ class AutoSaveCommand(Command):
         else:
             response = "autosave is off"
 
-        if not parser.undoMode:
-            parser.undo_stack.append("autosave")
+        parser.pushOnUndoStack("autosave")
 
         self.statusTrue(parser)
         return response
@@ -222,17 +281,21 @@ class PopCommand(Command):
     def apply(self, cmd, parser):
 
         if len(parser.db_stack) == 0:
-            response = parser.error("Nothing to pop")
-        elif parser.league is None:
-            response = parser.error("Can't perform pop because parser league is not set")
-        else:
-            parser.league.db = parser.db_stack.pop()
-            response = "Popping player database stack to restore old state"
+            return parser.error("Nothing to pop")
 
-            if not parser.undoMode:
-                parser.undo_stack.append("push")
+        leagueOrResponse = self.getLeague(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = leagueOrResponse
+            return response
 
-            self.statusTrue(parser)
+        league = leagueOrResponse
+
+        league.db = parser.db_stack.pop()
+        response = "Popping player database stack to restore old state"
+
+        parser.pushOnUndoStack("push")
+
+        self.statusTrue(parser)
 
         return response
 
@@ -250,18 +313,19 @@ class PushCommand(Command):
 
     def apply(self, cmd, parser):
 
-        if parser.league is None:
-            response = parser.error("Nothing to push. The League is not configured")
-        elif parser.league.db is None:
-            response = parser.error("Nothing to push. The League's database is not configured")
-        else:
-            parser.db_stack.append(copy.deepcopy(parser.league.db))
-            response = "Pushing current player database onto the stack to save current state"
+        dbOrResponse = self.getDB(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = dbOrResponse
+            return response
 
-            if not parser.undoMode:
-                parser.undo_stack.append("pop")
+        db = dbOrResponse
 
-            self.statusTrue(parser)
+        parser.db_stack.append(copy.deepcopy(db))
+        response = "Pushing current player database onto the stack to save current state"
+
+        parser.pushOnUndoStack("pop")
+
+        self.statusTrue(parser)
 
         return response
 
@@ -317,16 +381,17 @@ class UpdateCommand(Command):
 
     def apply(self, cmd, parser):
 
-        if parser.league is None:
-            response = parser.error("Nothing to update. The League is not configured")
-        elif parser.league.db is None:
-            response = parser.error("Nothing to update. The League's database is not configured")
-        else:
-            pushCmd = PushCommand()
-            pushCmd.apply("push", parser)
-            parser.league.db.wget()
-            response = "Player Database Updated"
-            self.statusTrue(parser)
+        dbOrResponse = self.getDB(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = dbOrResponse
+            return response
+
+        db = dbOrResponse
+
+        parser.pushState()
+        db.wget()
+        response = "Player Database Updated"
+        self.statusTrue(parser)
 
         return response
 
@@ -347,17 +412,18 @@ class SaveCommand(Command):
 
     def apply(self, cmd, parser):
 
-        if parser.league is None:
-            response = parser.error("Nothing to save. The League is not configured")
-        elif parser.league.db is None:
-            response = parser.error("Nothing to save. The League's database is not configured")
-        else:
-            parser.league.db.save()
-            response = "Player database saved"
-            self.statusTrue(parser)
+        dbOrResponse = self.getDB(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = dbOrResponse
+            return response
 
-            if not parser.undoMode:
-                parser.undo_stack.append("print Can't undo save operation")
+        db = dbOrResponse
+
+        db.save()
+        response = "Player database saved"
+        self.statusTrue(parser)
+
+        parser.pushOnUndoStack("print Can't undo save operation")
 
         return response
 
@@ -378,16 +444,17 @@ class LoadCommand(Command):
 
     def apply(self, cmd, parser):
 
-        if parser.league is None:
-            response = parser.error("Nothing to load. The League is not configured")
-        elif parser.league.db is None:
-            response = parser.error("Nothing to load. The League's database is not configured")
-        else:
-            pushCmd = PushCommand()
-            pushCmd.apply("push", parser)
-            parser.league.db.load()
-            response = "Player database loaded"
-            self.statusTrue(parser)
+        dbOrResponse = self.getDB(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = dbOrResponse
+            return response
+
+        db = dbOrResponse
+
+        parser.pushState()
+        db.load()
+        response = "Player database loaded"
+        self.statusTrue(parser)
 
         return response
 
@@ -415,7 +482,9 @@ class ListCommand(Command):
                 if i >= 25:
                     break
 
-                response += player.name + "\n"
+                response += '{0: >2}'.format(str(i)) + "  "
+                response += player.name
+                response += "\n"
 
             response += "---------------------------------------------------------------------\n"
 
@@ -436,23 +505,54 @@ class SearchCommand(Command):
 
     def apply(self, cmd, parser):
 
-        if parser.league is None:
-            response = parser.error("Nothing to search. The League is not configured")
-        elif parser.league.db is None:
-            response = parser.error("Nothing to search. The League's database is not configured")
-        else:
+        dbOrResponse = self.getDB(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = dbOrResponse
+            return response
 
-            player_list_query = parser.league.db.get(self.getCmdArgs(cmd))
-            if len(player_list_query) == 0:
-                response = "No Players Found for search string: " + self.getCmdArgs(cmd)
-                self.statusFalse(parser)
-            else:
-                parser.player_list = player_list_query
-                response = ListCommand().apply("list", parser)
+        db = dbOrResponse
+
+        player_list_query = db.get(self.getCmdArgs(cmd))
+        parser.player_list = player_list_query
+        if len(player_list_query) == 0:
+            response = "No Players Found for search string: " + self.getCmdArgs(cmd)
+            self.statusFalse(parser)
+        else:
+            response = ListCommand().apply("list", parser)
 
         return response
 
 Command.GenericCommands.append(SearchCommand())
+##########################################################
+
+##########################################################
+# draft
+class DraftCommand(Command):
+    def __init__(self):
+        super(DraftCommand, self).__init__('draft')
+        self.aliases.append("d")
+
+    def help(self, args, parser):
+        return "Draft player"
+
+    def apply(self, cmd, parser):
+
+        playerOrResponse = self.getPlayer(self.getCmdArgs(cmd), parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = playerOrResponse
+            return response
+
+        player = playerOrResponse
+
+        player.draft()
+
+        response = player.name + " has been " + self.name + "ed"
+
+        parser.pushOnUndoStack("undraft " + player.name)
+
+        return response
+
+Command.GenericCommands.append(DraftCommand())
 ##########################################################
 
 
@@ -488,7 +588,6 @@ class TestCommands(unittest.TestCase):
         self.assertEquals(pcmd.apply("echo foo bar",StatTrackParser(None)),"foo bar")
         self.assertEquals(pcmd.apply("foo bar",StatTrackParser(None)),"foo bar")
         self.assertEquals(pcmd.apply("echo echo foo bar",StatTrackParser(None)),"echo foo bar")
-
 
 
 if __name__ == "__main__":
