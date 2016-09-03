@@ -50,11 +50,14 @@ class PlayerDB(object):
         with open(self.saveFile, 'wb') as handle:
             pickle.dump(self.player, handle)
 
-    def load(self):
+    def load(self, update=False):
         if os.path.isfile(self.saveFile):
             with open(self.saveFile, 'rb') as handle:
                 playerData = pickle.load(handle)
-                self.update(playerData)
+                if update:
+                    self.update(playerData)
+                else:
+                    self.player = playerData
 
     def update(self, playerData):
         for key in playerData:

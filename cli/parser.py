@@ -17,24 +17,27 @@ class StatTrackParser(object):
 
     def __init__(self, league):
         self.league = league
-
         self.status = StatTrackParser.StatusTrue
-
-        self.commands = []
-        self.commands += Command.GenericCommands
-
+        self.commands = Command.GenericCommands
         self.player_list = []
         self.undo_stack = []
         self.undoMode = False
         self.db_stack = []
-        self.autosave = True
+        self.autosave = False
         self.debug = False
-
         self.defaultCommand = self.getCommand("search")
 
+    def recvInput(self, prompt):
+        return raw_input(prompt)
+
+    def sendOutput(self, output):
+        print output
+
+    def sendDebugOutput(self, output):
+        if self.debug: self.sendOutput("DEBUG: " + output)
 
     def prompt(self):
-        cmd = raw_input('% ')
+        cmd = self.recvInput('% ')
         status = self.processCommandAndResponse(cmd)
         return status
 
@@ -57,7 +60,7 @@ class StatTrackParser(object):
 
         if command is not None:
             if command.preApplyMessage(cmd, self) is not None:
-                print command.preApplyMessage(cmd, self)
+                self.sendOutput(command.preApplyMessage(cmd, self))
             return command.apply(cmd, self)
 
         if self.defaultCommand is not None:
@@ -66,7 +69,7 @@ class StatTrackParser(object):
             return self.error("Invalid Command")
 
     def processResponse(self, response, status):
-        print response
+        self.sendOutput(response)
         return status
 
     def processCommandAndResponse(self,cmd):
@@ -79,7 +82,7 @@ class StatTrackParser(object):
                     self.undoMode = True
                     self.save()
                     self.undoMode = False
-                    if self.debug: print "[autosave]"
+                    self.sendDebugOutput("[autosave]")
 
         return status
 
@@ -218,20 +221,85 @@ class TestStatTrackParser(unittest.TestCase):
         self.assertEquals(len(league.parser.player_list),3)
 
         script = []
+        script.append(("save",StatTrackParser.StatusTrue))
         script.append(("ls",StatTrackParser.StatusTrue))
         script.append(("draft",StatTrackParser.StatusTrue))
         script.append(("ls",StatTrackParser.StatusTrue))
         script.append(("draft",StatTrackParser.StatusTrue))
         script.append(("ls",StatTrackParser.StatusTrue))
         script.append(("draft Frank",StatTrackParser.StatusTrue))
+        script.append(("draft Frank",StatTrackParser.StatusError))
         script.append(("ls",StatTrackParser.StatusFalse))
-        script.append(("autosave",StatTrackParser.StatusTrue))
+        script.append(("undo",StatTrackParser.StatusTrue))
+        script.append(("search",StatTrackParser.StatusTrue))
 
+        script.append(("draft 1",StatTrackParser.StatusError))
+        script.append(("draft 0",StatTrackParser.StatusTrue))
+        script.append(("undo",StatTrackParser.StatusTrue))
 
-        #script.append(("undo",StatTrackParser.StatusTrue))
+        script.append(("undraft Rudy",StatTrackParser.StatusTrue))
+        script.append(("search",StatTrackParser.StatusTrue))
+        script.append(("draft 2",StatTrackParser.StatusError))
+        script.append(("draft 1",StatTrackParser.StatusTrue))
+        script.append(("draft",StatTrackParser.StatusTrue))
+        script.append(("undraft Frankie",StatTrackParser.StatusTrue))
+        script.append(("undraft Frankie",StatTrackParser.StatusTrue))
+
+        script.append(("help",StatTrackParser.StatusTrue))
+
+        script.append(("search",StatTrackParser.StatusTrue))
+        self.executeTestScript(script,league.parser)
+        self.assertEquals(len(league.parser.player_list),1)
+
+        script = []
+        script.append(("load",StatTrackParser.StatusTrue))
+        script.append(("search",StatTrackParser.StatusTrue))
+        self.executeTestScript(script,league.parser)
+        self.assertEquals(len(league.parser.player_list),3)
+
+        script = []
+        script.append(("search",StatTrackParser.StatusTrue))
+        script.append(("push",StatTrackParser.StatusTrue))
+        script.append(("draft Rudy",StatTrackParser.StatusTrue))
+        script.append(("draft June",StatTrackParser.StatusTrue))
+        script.append(("search",StatTrackParser.StatusTrue))
+        script.append(("pop",StatTrackParser.StatusTrue))
+        script.append(("search",StatTrackParser.StatusTrue))
+        self.executeTestScript(script,league.parser)
+        self.assertEquals(len(league.parser.player_list),3)
+
+        script = []
+        script.append(("search",StatTrackParser.StatusTrue))
+        script.append(("draft Rudy",StatTrackParser.StatusTrue))
+        script.append(("draft June",StatTrackParser.StatusTrue))
+        script.append(("save",StatTrackParser.StatusTrue))
+        script.append(("undo",StatTrackParser.StatusTrue))
+        script.append(("undo",StatTrackParser.StatusTrue))
+        script.append(("undo",StatTrackParser.StatusTrue))
+        script.append(("search",StatTrackParser.StatusTrue))
+        script.append(("load",StatTrackParser.StatusTrue))
+        script.append(("search",StatTrackParser.StatusTrue))
+        self.executeTestScript(script,league.parser)
+        self.assertEquals(len(league.parser.player_list),1)
+
+        script = []
+        script.append(("search",StatTrackParser.StatusTrue))
+        script.append(("undraft Rudy DaSilva",StatTrackParser.StatusTrue))
+        script.append(("undraft June",StatTrackParser.StatusTrue))
+        script.append(("search",StatTrackParser.StatusTrue))
+        script.append(("ignore 2",StatTrackParser.StatusTrue))
+        script.append(("undo",StatTrackParser.StatusTrue))
+        script.append(("search",StatTrackParser.StatusTrue))
+        script.append(("ignore",StatTrackParser.StatusTrue))
+        script.append(("undo",StatTrackParser.StatusTrue))
+
+        script.append(("ignore Frank",StatTrackParser.StatusTrue))
+        script.append(("ignore Frank",StatTrackParser.StatusError))
+
+        script.append(("search",StatTrackParser.StatusTrue))
 
         self.executeTestScript(script,league.parser)
-        self.assertEquals(len(league.parser.player_list),0)
+        self.assertEquals(len(league.parser.player_list),2)
 
 
 

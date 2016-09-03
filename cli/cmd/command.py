@@ -453,6 +453,7 @@ class LoadCommand(Command):
 
         parser.pushState()
         db.load()
+
         response = "Player database loaded"
         self.statusTrue(parser)
 
@@ -469,7 +470,7 @@ class ListCommand(Command):
         self.aliases.append("ls")
 
     def help(self, args, parser):
-        return "List all players in the player queue"
+        return "List all players currently in your player queue"
 
     def apply(self, cmd, parser):
 
@@ -501,7 +502,7 @@ class SearchCommand(Command):
         super(SearchCommand, self).__init__('search')
 
     def help(self, args, parser):
-        return "Search for player"
+        return "Search player database with a player name and add results to player queue"
 
     def apply(self, cmd, parser):
 
@@ -515,7 +516,7 @@ class SearchCommand(Command):
         player_list_query = db.get(self.getCmdArgs(cmd))
         parser.player_list = player_list_query
         if len(player_list_query) == 0:
-            response = "No Players Found for search string: " + self.getCmdArgs(cmd)
+            response = "No players found for search string: " + self.getCmdArgs(cmd)
             self.statusFalse(parser)
         else:
             response = ListCommand().apply("list", parser)
@@ -533,7 +534,7 @@ class DraftCommand(Command):
         self.aliases.append("d")
 
     def help(self, args, parser):
-        return "Draft player"
+        return "Draft a player"
 
     def apply(self, cmd, parser):
 
@@ -545,9 +546,7 @@ class DraftCommand(Command):
         player = playerOrResponse
 
         player.draft()
-
         response = player.name + " has been " + self.name + "ed"
-
         parser.pushOnUndoStack("undraft " + player.name)
 
         return response
@@ -555,6 +554,87 @@ class DraftCommand(Command):
 Command.GenericCommands.append(DraftCommand())
 ##########################################################
 
+##########################################################
+# undraft
+class UndraftCommand(Command):
+    def __init__(self):
+        super(UndraftCommand, self).__init__('undraft')
+
+    def help(self, args, parser):
+        return "Undraft a player"
+
+    def apply(self, cmd, parser):
+
+        playerOrResponse = self.getPlayer(self.getCmdArgs(cmd), parser, listDrafted=True)
+        if not self.isCurrentStatusTrue(parser):
+            response = playerOrResponse
+            return response
+
+        player = playerOrResponse
+
+        player.undraft()
+        response = player.name + " has been " + self.name + "ed"
+        parser.pushOnUndoStack("undraft " + player.name)
+
+        return response
+
+Command.GenericCommands.append(UndraftCommand())
+##########################################################
+
+##########################################################
+# ignore
+class IgnoreCommand(Command):
+    def __init__(self):
+        super(IgnoreCommand, self).__init__('ignore')
+
+    def help(self, args, parser):
+        return "Ignore a player so that they never appear in your player queue"
+
+    def apply(self, cmd, parser):
+
+        playerOrResponse = self.getPlayer(self.getCmdArgs(cmd), parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = playerOrResponse
+            return response
+
+        player = playerOrResponse
+
+        player.ignore()
+        response = player.name + " has been " + self.name + "ed"
+        parser.pushOnUndoStack("unignore " + player.name)
+
+        return response
+
+Command.GenericCommands.append(IgnoreCommand())
+##########################################################
+
+
+##########################################################
+# unignore
+class UnignoreCommand(Command):
+    def __init__(self):
+        super(UnignoreCommand, self).__init__('unignore')
+
+    def help(self, args, parser):
+        return "Stop ignoring a player you've previously ignored using the ignore command"
+
+    def apply(self, cmd, parser):
+
+        playerOrResponse = self.getPlayer(self.getCmdArgs(cmd), parser, listIgnored=True)
+        if not self.isCurrentStatusTrue(parser):
+            response = playerOrResponse
+            return response
+
+        player = playerOrResponse
+
+        player.unignore()
+        response = player.name + " has been " + self.name + "ed"
+        parser.pushOnUndoStack("ignore " + player.name)
+
+        return response
+
+Command.GenericCommands.append(UnignoreCommand())
+##########################################################
 
 
 
