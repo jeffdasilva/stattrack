@@ -5,11 +5,11 @@ Created on Sep 1, 2016
 '''
 import unittest
 
-from cli.parser import StatTrackParser
 
-class League():
+class League(object):
 
     def __init__(self, name, db=None, rules=None):
+        from cli.parser import StatTrackParser
 
         self.name = name
         self.db = db
