@@ -10,8 +10,8 @@ from league.custom.oleague import OLeagueFootballLeague
 
 class StatTrack():
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 5
-    StatTrackBuildNumber = 9
+    StatTrackMinorVersion = 6
+    StatTrackBuildNumber = 11
 
     def __init__(self):
         pass

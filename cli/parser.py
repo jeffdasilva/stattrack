@@ -26,6 +26,7 @@ class StatTrackParser(object):
         self.autosave = False
         self.debug = False
         self.defaultCommand = self.getCommand("search")
+        self.db_requires_save = False
 
     def recvInput(self, prompt):
         return raw_input(prompt)
@@ -61,9 +62,15 @@ class StatTrackParser(object):
         if command is not None:
             if command.preApplyMessage(cmd, self) is not None:
                 self.sendOutput(command.preApplyMessage(cmd, self))
+
+            if command.updatesDB:
+                self.db_requires_save = True
+
             return command.apply(cmd, self)
 
         if self.defaultCommand is not None:
+            if self.defaultCommand.updatesDB:
+                self.db_requires_save = True
             return self.defaultCommand.apply(cmd, self)
         else:
             return self.error("Invalid Command")
@@ -76,7 +83,7 @@ class StatTrackParser(object):
         response = self.processCommand(cmd)
         status = self.processResponse(response, self.status)
 
-        if self.autosave:
+        if self.autosave and self.db_requires_save:
             if status != StatTrackParser.StatusError:
                 if self.league is not None and self.league.db is not None:
                     self.undoMode = True

@@ -20,6 +20,9 @@ class League(object):
     def draftmode(self):
         self.parser.promptLoop()
 
+    def factoryReset(self):
+        raise ValueError('factoryReset is not implemented')
+
 class LeagueTest(unittest.TestCase):
 
     def testConstruct(self):

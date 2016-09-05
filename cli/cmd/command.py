@@ -7,7 +7,6 @@ from abc import ABCMeta, abstractmethod
 import copy
 import unittest
 
-
 ##########################################################
 # command (abstract base class)
 class Command():
@@ -19,6 +18,7 @@ class Command():
         self.name = name
         self.aliases = []
         self.hidden = False
+        self.updatesDB = True
 
     @abstractmethod
     def help(self, args, parser): pass
@@ -162,6 +162,7 @@ class ErrorCommand(Command):
     def __init__(self):
         super(ErrorCommand, self).__init__('error')
         self.hidden = True
+        self.updatesDB = False
 
     def help(self, args, parser):
         return "Assert an error"
@@ -182,6 +183,7 @@ class BlankCommand(Command):
         super(BlankCommand, self).__init__('blank')
         self.hidden = True
         self.aliases.append('')
+        self.updatesDB = False
 
     def help(self, args, parser):
         return "Do nothing"
@@ -198,6 +200,7 @@ Command.GenericCommands.append(BlankCommand())
 class HelpCommand(Command):
     def __init__(self):
         super(HelpCommand, self).__init__('help')
+        self.updatesDB = False
 
     def help(self, args, parser):
         return "Display this help message"
@@ -249,6 +252,7 @@ Command.GenericCommands.append(UndoCommand())
 class AutoSaveCommand(Command):
     def __init__(self):
         super(AutoSaveCommand, self).__init__('autosave')
+        self.updatesDB = False
 
     def help(self, args, parser):
         helpText = "Toggle autosave "
@@ -343,6 +347,7 @@ class PrintCommand(Command):
     def __init__(self):
         super(PrintCommand, self).__init__('print')
         self.aliases.append("echo")
+        self.updatesDB = False
 
     def help(self, args, parser):
         return "Echo a line of text"
@@ -360,6 +365,7 @@ class PromptCommand(Command):
     def __init__(self):
         super(PromptCommand, self).__init__('prompt')
         self.hidden = True
+        self.updatesDB = False
 
     def help(self, args, parser):
         return "Prompt for input"
@@ -422,10 +428,44 @@ Command.GenericCommands.append(UpdateCommand())
 ##########################################################
 
 ##########################################################
+# factory-reset
+class FactoryResetCommand(Command):
+    def __init__(self):
+        super(FactoryResetCommand, self).__init__('factory-reset')
+
+    def help(self, args, parser):
+        return "Initialize the player database back to the original default state"
+
+    def preApplyMessage(self, cmd, parser):
+        return "[FACTORY RESET]\nUpdating Player Database from Web. Please Wait..."
+
+    def apply(self, cmd, parser):
+
+
+        leagueOrResponse = self.getLeague(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = leagueOrResponse
+            return response
+
+        parser.pushState()
+
+        league = leagueOrResponse
+        league.factoryReset()
+
+        response = "Player Database Updated"
+        self.statusTrue(parser)
+
+        return response
+
+Command.GenericCommands.append(FactoryResetCommand())
+##########################################################
+
+##########################################################
 # save
 class SaveCommand(Command):
     def __init__(self):
         super(SaveCommand, self).__init__('save')
+        self.updatesDB = False
 
     def help(self, args, parser):
         return "Save player database to disk"
@@ -446,6 +486,7 @@ class SaveCommand(Command):
         response = "Player database saved"
         self.statusTrue(parser)
 
+        parser.db_requires_save = False
         parser.pushOnUndoStack("print Can't undo save operation")
 
         return response
@@ -491,6 +532,7 @@ class ListCommand(Command):
     def __init__(self):
         super(ListCommand, self).__init__('list')
         self.aliases.append("ls")
+        self.updatesDB = False
 
     def help(self, args, parser):
         return "List all players currently in your player queue"
@@ -523,6 +565,7 @@ Command.GenericCommands.append(ListCommand())
 class SearchCommand(Command):
     def __init__(self):
         super(SearchCommand, self).__init__('search')
+        self.updatesDB = False
 
     def help(self, args, parser):
         return "Search player database with a player name and add results to player queue"
@@ -548,6 +591,43 @@ class SearchCommand(Command):
 
 Command.GenericCommands.append(SearchCommand())
 ##########################################################
+
+##########################################################
+# qb, rb, wr, te, def, rw, lw, forward, etc
+class SearchByPositionCommand(Command):
+    def __init__(self,position="all"):
+        super(SearchByPositionCommand, self).__init__(name=position)
+        self.updatesDB = False
+
+    def help(self, args, parser):
+
+        if self.name is "all":
+            return "Search player database for best players available"
+        else:
+            return "Search player database for best players available of type '" + self.name + "'"
+
+    def apply(self, cmd, parser):
+
+        dbOrResponse = self.getDB(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = dbOrResponse
+            return response
+
+        db = dbOrResponse
+
+        player_list_query = db.get(position=self.name)
+        parser.player_list = player_list_query
+        if len(player_list_query) == 0:
+            response = "No players found with position: " + self.name
+            self.statusFalse(parser)
+        else:
+            response = parser.getCommand("list").apply("list", parser)
+
+        return response
+
+# Don't add these to generic commands. Leagues add these
+##########################################################
+
 
 ##########################################################
 # draft
