@@ -13,7 +13,6 @@ from league.football import FootballLeague
 class OLeagueFootballLeague(FootballLeague):
 
     def __init__(self):
-
         name = "O-League"
         rules = None
         db = FootballPlayerDB(name)

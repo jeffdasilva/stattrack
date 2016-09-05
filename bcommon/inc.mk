@@ -18,7 +18,7 @@ pull sync: git-update
 diff: git-diff
 
 .PHONY: push submit
-push submit:
+push submit: $(GIT_PUSH_DEPS)
 	$(MAKE) git-add-commit
 	$(MAKE) git-push
 

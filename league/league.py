@@ -17,6 +17,9 @@ class League(object):
         self.parser = StatTrackParser(self)
         self.property = {"isAuctionDraft":"false"}
 
+    def draftmode(self):
+        self.parser.promptLoop()
+
 class LeagueTest(unittest.TestCase):
 
     def testConstruct(self):

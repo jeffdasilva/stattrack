@@ -37,6 +37,8 @@ PYTHON_MAIN := stattrack.py
 #############################
 
 
+GIT_PUSH_DEPS = increment-minor-version
+
 #############################
 # boilerplate build infra
 include bcommon/inc.mk
@@ -83,10 +85,32 @@ else
 endif
 
 .PHONY: lint
-lint: remove-trailing-whitespace remove-windows-line-endings tabs2space
+lint: increment-build-number remove-trailing-whitespace remove-windows-line-endings tabs2space
 	$(MAKE) check
 	$(MAKE) clean
 #############################
+
+
+#############################
+CURRENT_BUILD_NUMBER = $(shell grep "BuildNumber = [0-9]*$$" $(PYTHON_MAIN) | head -n1 | sed -e 's,.*=[ \t]*,,g')
+NEXT_BUILD_NUMBER = $(shell echo $$[$(CURRENT_BUILD_NUMBER)+1])
+
+.PHONY: increment-build-number
+increment-build-number:
+	@echo "Incrementing build number to: $(NEXT_BUILD_NUMBER)"
+	@sed -i -e 's,\(BuildNumber = \)\([0-9]*\)$$,\1$(NEXT_BUILD_NUMBER),g' $(PYTHON_MAIN)
+
+CURRENT_MINOR_VERSION_NUMBER = $(shell grep "MinorVersion = [0-9]*$$" $(PYTHON_MAIN) | head -n1 | sed -e 's,.*=[ \t]*,,g')
+NEXT_MINOR_VERSION_NUMBER = $(shell echo $$[$(CURRENT_MINOR_VERSION_NUMBER)+1])
+
+.PHONY: increment-minor-version
+increment-minor-version:
+	@echo "Incrementing minor version number to: $(NEXT_MINOR_VERSION_NUMBER)"
+	@sed -i -e 's,\(MinorVersion = \)\([0-9]*\)$$,\1$(NEXT_MINOR_VERSION_NUMBER),g' $(PYTHON_MAIN)
+
+
+#############################
+
 
 
 #############################

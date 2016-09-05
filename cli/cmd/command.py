@@ -636,6 +636,16 @@ class UnignoreCommand(Command):
 Command.GenericCommands.append(UnignoreCommand())
 ##########################################################
 
+##########################################################
+# ToDo Commands:
+# position (example: qb,rb,wr,def,k,etc)
+# info
+# factor-reset
+# draft specific stuff for auction draft
+# mfl specific scraper stuff for update command
+# stats
+# list commands needs custom formatting
+##########################################################
 
 
 class TestCommands(unittest.TestCase):
