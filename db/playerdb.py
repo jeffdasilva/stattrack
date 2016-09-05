@@ -11,11 +11,17 @@ from db.player.player import Player
 
 class PlayerDB(object):
 
-    def __init__(self, positionMap={}):
+    def __init__(self, positionMap={}, name=None):
         self.player = {}
         self.positionMap = {"all":["all"]}
         self.positionMap.update(positionMap)
-        self.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/../data/playerdb.pickle"
+
+        if name is not None and name == "":
+            saveFileName = name + "_playerdb.pickle"
+        else:
+            saveFileName = "playerdb.pickle"
+
+        self.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/../data/" + saveFileName
 
 
     def add(self, player):

@@ -15,6 +15,7 @@ class League(object):
         self.db = db
         self.rules = rules
         self.parser = StatTrackParser(self)
+        self.property = {"isAuctionDraft":"false"}
 
 class LeagueTest(unittest.TestCase):
 
@@ -23,6 +24,8 @@ class LeagueTest(unittest.TestCase):
         l = League("foo")
         self.assertEquals(l.name,"foo")
         self.assertEquals(l.db, None)
+        self.assertEquals(l.property['isAuctionDraft'], 'false')
+
         pass
 
 

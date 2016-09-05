@@ -9,21 +9,22 @@ from db.footballdb import FootballPlayerDB
 from league import League
 
 
-class FantasyFootballLeague(League):
-    
+class FootballLeague(League):
+
     def __init__(self, name, db=None, rules=None):
-            
+
         if db is None:
             db = FootballPlayerDB()
-        super(FantasyFootballLeague, self).__init__(name, db, rules)
+        super(FootballLeague, self).__init__(name, db, rules)
 
-class FantasyFootballLeagueTest(unittest.TestCase):
+class FootballLeagueTest(unittest.TestCase):
 
     def testConstructor(self):
-        
-        ffl = FantasyFootballLeague("test")
+
+        ffl = FootballLeague("test")
         self.assertNotEquals(ffl, None)
-        
+        self.assertEquals(ffl.property['isAuctionDraft'], 'false')
+
         pass
 
 

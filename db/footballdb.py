@@ -4,6 +4,7 @@ Created on April 12, 2016
 @author: jdasilva
 '''
 
+import os
 import unittest
 
 from db.player.football import FootballPlayer
@@ -32,12 +33,11 @@ class FootballPlayerDB(PlayerDB):
         pmap["defense"] = [ "DEF" ]
 
 
-        super(FootballPlayerDB, self).__init__(positionMap=pmap)
+        super(FootballPlayerDB, self).__init__(positionMap=pmap,name=league)
         self.league = league
 
         if self.league is None:
             self.league = "Oracle"
-
 
         if self.league == "O-League":
             #2016 settings
@@ -187,6 +187,11 @@ class TestFootballPlayerDB(unittest.TestCase):
         p = fdb.player["julio jones - atl"]
         print p
         self.assertEquals(p.position,["WR"])
+
+    def testSaveFile(self):
+        fdb = FootballPlayerDB("O-League")
+
+        self.assertEquals(fdb.saveFile, os.path.dirname(os.path.abspath(__file__)) + "/../data/playerdb.pickle")
 
 if __name__ == '__main__':
     unittest.main()
