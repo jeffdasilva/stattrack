@@ -29,7 +29,7 @@ class Command():
     def getCmdKeyWord(self, cmd):
         return cmd.split(' ',1)[0].lower()
 
-    def getCmdArgs(self, cmd):
+    def getCmdArgs(self, cmd, caseSensitive=False):
         cmdKeyWord = self.getCmdKeyWord(cmd)
 
         cmdHasKeyWord = False
@@ -40,10 +40,15 @@ class Command():
                 if cmdKeyWord == alias.lower():
                     cmdHasKeyWord = True
 
-        if cmdHasKeyWord and cmd.lower().startswith(cmdKeyWord):
-            return cmd.lower()[len(cmdKeyWord):].lstrip()
+        if not caseSensitive:
+            caseNormalizeCmd = cmd.lower()
         else:
-            return cmd
+            caseNormalizeCmd = cmd
+
+        if cmdHasKeyWord and cmd.lower().startswith(cmdKeyWord):
+            return caseNormalizeCmd[len(cmdKeyWord):].lstrip()
+        else:
+            return caseNormalizeCmd
 
     def matches(self, cmd):
 
@@ -350,6 +355,24 @@ Command.GenericCommands.append(PrintCommand())
 ##########################################################
 
 ##########################################################
+# prompt
+class PromptCommand(Command):
+    def __init__(self):
+        super(PromptCommand, self).__init__('prompt')
+        self.hidden = True
+
+    def help(self, args, parser):
+        return "Prompt for input"
+
+    def apply(self, cmd, parser):
+        self.statusTrue(parser)
+        response = parser.recvInput(self.getCmdArgs(cmd, caseSensitive=True))
+        return response
+
+Command.GenericCommands.append(PromptCommand())
+##########################################################
+
+##########################################################
 # quit
 class QuitCommand(Command):
     def __init__(self):
@@ -519,7 +542,7 @@ class SearchCommand(Command):
             response = "No players found for search string: " + self.getCmdArgs(cmd)
             self.statusFalse(parser)
         else:
-            response = ListCommand().apply("list", parser)
+            response = parser.getCommand("list").apply("list", parser)
 
         return response
 
@@ -545,8 +568,27 @@ class DraftCommand(Command):
 
         player = playerOrResponse
 
-        player.draft()
+
+        l = self.getLeague(parser)
+        if "isAuctionDraft" in l.property and l.property['isAuctionDraft'] == 'true':
+            cost = parser.getCommand("prompt").apply("prompt Draft " + player.name + ". For how much? ", parser)
+            if not self.isCurrentStatusTrue(parser):
+                return cost
+            if cost.isdigit():
+                cost = int(cost)
+            else:
+                return parser.error("Invalid Cost Amount!")
+
+        else:
+            cost = 0
+
+        player.draft(cost=cost)
         response = player.name + " has been " + self.name + "ed"
+
+        if cost != 0:
+            response += " for $" + str(cost)
+
+
         parser.pushOnUndoStack("undraft " + player.name)
 
         return response

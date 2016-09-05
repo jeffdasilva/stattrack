@@ -8,6 +8,7 @@ import unittest
 
 from db.footballdb import FootballPlayerDB
 from league.football import FootballLeague
+from sitescraper.nfl.footballdbdotcom import FootballDBDotComScraper
 
 
 class OLeagueFootballLeague(FootballLeague):
@@ -18,7 +19,10 @@ class OLeagueFootballLeague(FootballLeague):
         db = FootballPlayerDB(name)
         super(OLeagueFootballLeague, self).__init__(name, db, rules)
         self.property['isAuctionDraft'] = 'true'
+        db.load()
 
+    def factoryReset(self):
+        self.db.wget(scrapers=[FootballDBDotComScraper()])
 
 class OLeagueFootballLeagueTest(unittest.TestCase):
 
