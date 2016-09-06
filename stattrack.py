@@ -7,7 +7,7 @@ import unittest
 
 class StatTrack(object):
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 13
+    StatTrackMinorVersion = 14
     StatTrackBuildNumber = 33
 
     def __init__(self):

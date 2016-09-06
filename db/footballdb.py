@@ -32,9 +32,10 @@ class FootballPlayerDB(PlayerDB):
         pmap["defence"] = [ "DEF" ]
         pmap["defense"] = [ "DEF" ]
 
-
         super(FootballPlayerDB, self).__init__(positionMap=pmap,name=league)
         self.leagueName = league
+        
+        self.playerCache = {}
 
         if self.leagueName is None:
             self.leagueName = "Oracle"
@@ -85,15 +86,21 @@ class FootballPlayerDB(PlayerDB):
         num_players_remaining = self.numberOfStarting[position]*self.numberOfTeams - self.numberOfPlayersDrafted(position=position)
         return self.get(position=position)[:num_players_remaining]
 
+    def updatePlayerCache(self):
+        total_num_players_remaining = self.totalNumberOfPlayers*self.numberOfTeams - self.numberOfPlayersDrafted()
+        self.playerCache['all'] = self.get()[:total_num_players_remaining]
+        self.playerCache['wr'] = self.remainingGoodPlayersByPosition(position="wr")
+        self.playerCache['rb'] = self.remainingGoodPlayersByPosition(position="rb")
+        self.playerCache['qb'] = self.remainingGoodPlayersByPosition(position="qb")
+        self.playerCache['bench'] = None
+
     def remainingStarters(self):
-        return self.remainingGoodPlayersByPosition(position="wr") + \
-            self.remainingGoodPlayersByPosition(position="qb") + \
-            self.remainingGoodPlayersByPosition(position="rb")
+        return self.playerCache['wr'] + self.playerCache['qb'] + self.playerCache['rb']
 
     def remainingGoodBenchPlayers(self):
         total_num_players_remaining = self.totalNumberOfPlayers*self.numberOfTeams - self.numberOfPlayersDrafted()
 
-        remainingDraftEligiblePlayers = self.get()[:total_num_players_remaining]
+        remainingDraftEligiblePlayers = self.playerCache['all'] 
         remainingDraftEligibleStarters = self.remainingStarters()
 
         for p in remainingDraftEligibleStarters:
@@ -106,6 +113,7 @@ class FootballPlayerDB(PlayerDB):
         return self.remainingStarters() + self.remainingGoodBenchPlayers()
 
     def valueRemaining(self):
+        self.updatePlayerCache()
         value = 0.0
         for p in self.remainingStarters():
             #print p
