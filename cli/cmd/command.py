@@ -540,7 +540,7 @@ class ListCommand(Command):
         super(ListCommand, self).__init__('list')
         self.aliases.append("ls")
         self.updatesDB = False
-        self.maxPlayersToList = 60
+        self.maxPlayersToList = 30
 
     def help(self, args, parser):
         return "List all players currently in your player queue"
@@ -552,6 +552,7 @@ class ListCommand(Command):
             self.statusFalse(parser)
         else:
             response = "---------------------------------------------------------------------\n"
+            cpvu = None
             for i, player in enumerate(parser.player_list):
                 if i >= self.maxPlayersToList:
                     break
@@ -561,6 +562,17 @@ class ListCommand(Command):
                 response += str(player)
                 response += " "
                 response += '{0: >4}'.format(str(player.age()))
+
+                try:
+                    if parser.league is not None:
+                        # HACK ALERT!!!
+                        if cpvu is None:
+                            cpvu = parser.league.db.costPerValueUnit()
+                        playerMarketPrice = player.value() * cpvu
+                        response += '{0: >10}'.format('$' + str(round(playerMarketPrice,1)))
+                except:
+                    pass
+
                 response += "\n"
 
             response += "---------------------------------------------------------------------\n"

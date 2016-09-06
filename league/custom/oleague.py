@@ -6,6 +6,7 @@ Created on Sep 5, 2016
 
 import unittest
 
+from cli.cmd.command import Command
 from db.footballdb import FootballPlayerDB
 from league.football import FootballLeague
 from league.rules import FootballRules
@@ -70,6 +71,9 @@ class OLeagueFootballLeague(FootballLeague):
         self.parser.commands.append(SearchByPositionCommand('wr'))
         self.parser.commands.append(SearchByPositionCommand('te'))
         self.parser.commands.append(SearchByPositionCommand('rb'))
+
+        self.parser.commands.append(StatsCommand())
+
         self.parser.autosave = True
 
 
@@ -85,28 +89,63 @@ class OLeagueFootballLeague(FootballLeague):
         for p in self.db.player:
             if 'DEF' in self.db.player[p].position:
                 continue
-            print "RotoWorld: Learning about " + self.db.player[p].name + "..."
+            #print "RotoWorld: Learning about " + self.db.player[p].name + "..."
             pStats = rotoScrape.scrape(playerName=self.db.player[p].name, league="nfl")
             if pStats is not None:
                 self.db.player[p].update(pStats)
 
 
+##########################################################
+# stats
+class StatsCommand(Command):
+    def __init__(self):
+        super(StatsCommand, self).__init__('stats')
+        self.updatesDB = False
+
+    def help(self, args, parser):
+        return "Print out the current O-League statistics"
+
+    def apply(self, cmd, parser):
+        self.statusTrue(parser)
+
+
+        leagueOrResponse = self.getLeague(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = leagueOrResponse
+            return response
+
+        league = leagueOrResponse
+
+        response = ""
+        response += "Money Remaining: $" + str(league.db.moneyRemaining()) + "\n"
+        response += "Points Remaining: " + str(round(league.db.valueRemaining(),2)) + "\n"
+        response += "Cost Per Value Unit: " + str(round(league.db.costPerValueUnit(),2)) + "\n"
+
+        return response
+
+##########################################################
+
 
 class OLeagueFootballLeagueTest(unittest.TestCase):
 
     def testConstructor(self):
-
         ffl = OLeagueFootballLeague()
         self.assertNotEquals(ffl, None)
         self.assertEquals(ffl.property['isAuctionDraft'], 'true')
         self.assertEquals(ffl.name,"O-League")
         self.assertEquals(ffl.db.leagueName,"O-League")
-
         self.assertNotEquals(ffl.rules,None)
-
         print str(ffl.rules.pointsPerPassingYards)
-
         pass
+
+    def testLeagueDB(self):
+        ffl = OLeagueFootballLeague()
+
+        p = ffl.db.player["aaron rodgers - gb"]
+        self.assertEqual(p.passingTwoPointers(year=2015),4)
+        print p
+        print "Passing Attempts: " + str(p.passingAttempts())
+        print "Passing TDs: " + str(p.projectedPassingTDs())
 
 
 if __name__ == "__main__":

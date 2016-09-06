@@ -114,7 +114,7 @@ class TestFootballPlayerDB(unittest.TestCase):
     def testNewFootballPlayerDB(self):
         fdb = FootballPlayerDB()
         self.assertTrue(len(fdb.positionMap.keys()) > 5)
-        #self.assertEquals(fdb.positionMap["kicker"],["K"])
+        self.assertEquals(fdb.positionMap["kicker"],["K"])
         pass
 
     def testRemainingPlayer(self):
@@ -122,7 +122,6 @@ class TestFootballPlayerDB(unittest.TestCase):
         fdb.load()
 
         cpv_mult = fdb.costPerValueUnit()
-
         for p in fdb.remainingGoodPlayers():
             print str(p) + " $" + str(cpv_mult * p.value())
 
@@ -145,31 +144,20 @@ class TestFootballPlayerDB(unittest.TestCase):
         fdb = FootballPlayerDB()
         fdb.wget()
 
-        #print fdb.player
+        print fdb.player
 
         p = fdb.player["tom brady - ne"]
         print p
-        #self.assertEquals(p.position,["QB"])
-        #self.assertTrue(float(p.property["fantasyPoints"]) > 200)
-        #self.assertTrue(float(p.property["passingAttempts"]) > 500)
-        #self.assertTrue(float(p.property["passingYards"]) > 3000)
-
+        self.assertEquals(p.position,["QB"])
+        self.assertTrue(float(p.property["fantasyPoints"]) > 200)
+        self.assertTrue(float(p.property["passingAttempts"]) > 300)
+        self.assertTrue(p.passingYards() > 3000)
         print p.value()
 
         p = fdb.player["rob gronkowski - ne"]
         self.assertEquals(p.position,["TE"])
-        #self.assertTrue(p.property["fantasyPoints"] > 100)
-        #self.assertTrue(p.property["receivingYards"] > 400)
-
-        #p = fdb.player["Garrett Hartley - PIT"]
-        #self.assertEquals(p.position,["K"])
-        #self.assertTrue(p.property["fantasyPoints"] > 100)
-        #self.assertTrue(p.property["extraPoints"] > 10)
-
-        #p = fdb.player["Calvin Johnson - unknown"]
-        #self.assertEquals(p.position,["WR"])
-        #self.assertTrue(p.property["fantasyPoints"] > 180)
-        #self.assertTrue(p.property["receivingYards"] > 400)
+        self.assertTrue(p.property["fantasyPoints"] > 100)
+        self.assertTrue(p.property["receivingYards"] > 400)
 
         pass
 
@@ -190,8 +178,19 @@ class TestFootballPlayerDB(unittest.TestCase):
 
     def testSaveFile(self):
         fdb = FootballPlayerDB("O-League")
-
         self.assertEquals(fdb.saveFile, os.path.dirname(os.path.abspath(__file__)) + "/../data/O-League_playerdb.pickle")
+
+    def testProjectionMethods(self):
+        fdb = FootballPlayerDB()
+        fdb.wget()
+
+        for pKey in ["cam newton - car", "drew brees - no", "russell wilson - sea", "aaron rodgers - gb"]:
+            p = fdb.player[pKey]
+            print p
+            print "Projected Interceptions: " + str(p.projectedPassingInterceptionsThrown())
+            print "Projected 2Pt conv: " + str(p.projectedPassingTwoPointers())
+            self.assertEqual(p.projectedPassingTwoPointers(), p.passingTwoPointers(year=2015))
+
 
 if __name__ == '__main__':
     unittest.main()
