@@ -29,7 +29,11 @@ class StatTrackParser(object):
         self.db_requires_save = False
 
     def recvInput(self, prompt):
-        return raw_input(prompt)
+        try:
+            return raw_input(prompt)
+        except:
+            print "Oops!  Something messed up occurred"
+            return ""
 
     def sendOutput(self, output):
         print output
@@ -44,9 +48,13 @@ class StatTrackParser(object):
 
     def promptLoop(self):
         while True:
-            status = self.prompt()
-            if status == StatTrackParser.StatusExit:
-                break
+            try:
+                status = self.prompt()
+                if status == StatTrackParser.StatusExit:
+                    break
+            except:
+                print "Oops!  Something really messed up occurred. Trying to Recover"
+                continue
 
     def getCommand(self,cmd):
         for commandIter in self.commands:

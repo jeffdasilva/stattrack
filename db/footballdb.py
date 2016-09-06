@@ -34,12 +34,12 @@ class FootballPlayerDB(PlayerDB):
 
 
         super(FootballPlayerDB, self).__init__(positionMap=pmap,name=league)
-        self.league = league
+        self.leagueName = league
 
-        if self.league is None:
-            self.league = "Oracle"
+        if self.leagueName is None:
+            self.leagueName = "Oracle"
 
-        if self.league == "O-League":
+        if self.leagueName == "O-League":
             #2016 settings
             #https://football.fantasysports.yahoo.com/f1/66542/6/settings
             self.numberOfTeams = 10
@@ -49,7 +49,7 @@ class FootballPlayerDB(PlayerDB):
             self.numberOfStarting['wr'] = 4
             self.numberOfScrubs = 14 - self.numberOfStarting['qb'] - self.numberOfStarting['rb'] - self.numberOfStarting['wr']
             self.moneyPerTeam = 333
-        elif self.league == "Oracle":
+        elif self.leagueName == "Oracle":
             self.numberOfTeams = 16
             self.numberOfStarting = {}
             self.numberOfStarting['qb'] = 1
@@ -191,7 +191,7 @@ class TestFootballPlayerDB(unittest.TestCase):
     def testSaveFile(self):
         fdb = FootballPlayerDB("O-League")
 
-        self.assertEquals(fdb.saveFile, os.path.dirname(os.path.abspath(__file__)) + "/../data/playerdb.pickle")
+        self.assertEquals(fdb.saveFile, os.path.dirname(os.path.abspath(__file__)) + "/../data/O-League_playerdb.pickle")
 
 if __name__ == '__main__':
     unittest.main()

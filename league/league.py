@@ -23,6 +23,7 @@ class League(object):
     def factoryReset(self):
         raise ValueError('factoryReset is not implemented')
 
+
 class LeagueTest(unittest.TestCase):
 
     def testConstruct(self):

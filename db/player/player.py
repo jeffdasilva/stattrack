@@ -2,9 +2,11 @@
 @author: jdasilva
 '''
 
+import datetime
 import unittest
 
 from db.player.hdict import HierarchicalDict
+
 
 class Player(object):
 
@@ -25,7 +27,7 @@ class Player(object):
 
     def __str__(self):
 
-        player_str = '{0: <20}'.format(self.name)
+        player_str = '{0: <25}'.format(self.name)
 
         if self.team is None:
             team_str = "???"
@@ -36,29 +38,42 @@ class Player(object):
 
         player_str += " " + '{0: <6}'.format('/'.join(self.position))
 
-        player_str += " " + '{0: <7}'.format(str(self.value()))
+        player_str += " " + '{0: <5}'.format(str(round(self.value(),2)))
 
         return player_str
 
-    def printAll(self):
+    def printAllToString(self):
+        playerStr = ""
         if self.name is not None:
-            print "Name: " + self.name
+            playerStr += "Name: " + self.name + "\n"
 
         if self.nameAliases is not None and len(self.nameAliases) > 0:
-            print "Aliases: " + self.nameAliases
+            playerStr += "Aliases: " + self.nameAliases + "\n"
 
         if self.team is not None:
-            print "Team: " + self.team
+            playerStr += "Team: " + self.team + "\n"
         else:
-            print "Team: None"
+            playerStr += "Team: None" + "\n"
 
         if self.property is not None:
-            print "Properties: "
+            playerStr += "Properties: " + "\n"
             for prop in self.property:
-                print "  " + prop + ": " + str(self.property[prop])
+                playerStr += "  " + prop + ": " + str(self.property[prop]) + "\n"
+
+        return playerStr
+
+    def printAll(self):
+        print self.printAllToString()
 
     def value(self):
         return 0
+
+    def age(self, year=datetime.datetime.now().year):
+        if 'rotoworld' in self.property:
+            age = str(self.property['rotoworld'][1][1]).split(' / ')[0].lstrip('(').rstrip(')')
+            return int(age)
+        else:
+            return '?'
 
     def draft(self, cost=0):
         self.isDrafted = True

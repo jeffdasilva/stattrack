@@ -5,13 +5,10 @@
 '''
 import unittest
 
-from league.custom.oleague import OLeagueFootballLeague
-
-
-class StatTrack():
+class StatTrack(object):
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 6
-    StatTrackBuildNumber = 11
+    StatTrackMinorVersion = 7
+    StatTrackBuildNumber = 19
 
     def __init__(self):
         pass
@@ -29,6 +26,8 @@ class StatTrack():
         print
 
     def run(self):
+        from league.custom.oleague import OLeagueFootballLeague
+
         self.printBanner()
         l = OLeagueFootballLeague()
         l.draftmode()

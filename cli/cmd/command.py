@@ -9,7 +9,7 @@ import unittest
 
 ##########################################################
 # command (abstract base class)
-class Command():
+class Command(object):
     __metaclass__ = ABCMeta
 
     GenericCommands = []
@@ -116,7 +116,7 @@ class Command():
 
         return league.db
 
-    def getPlayer(self, playerArg, parser,listDrafted=False,listIgnored=False):
+    def getPlayer(self, playerArg, parser, listDrafted=False, listIgnored=False, removePlayerFromPlayerQueue=True):
 
         dbOrResponse = self.getDB(parser)
         if not self.isCurrentStatusTrue(parser):
@@ -129,7 +129,11 @@ class Command():
 
             if len(parser.player_list) == 0:
                 return parser.error("Can't " + self.name + "! No players in player queue")
-            player = parser.player_list.pop(0)
+
+            if removePlayerFromPlayerQueue:
+                player = parser.player_list.pop(0)
+            else:
+                player = parser.player_list[0]
 
         elif playerArg.isdigit():
             index = int(playerArg)
@@ -137,7 +141,10 @@ class Command():
             if index >= len(parser.player_list):
                 return parser.error("Can't " + self.name + "! Player index argument exceeds number of players in player queue")
 
-            player = parser.player_list.pop(index)
+            if removePlayerFromPlayerQueue:
+                player = parser.player_list.pop(index)
+            else:
+                player = parser.player_list[index]
 
         else:
             player_list = db.get(playerArg, listDrafted=listDrafted, listIgnored=listIgnored)
@@ -147,7 +154,7 @@ class Command():
 
             player = player_list.pop(0)
 
-            if player in parser.player_list:
+            if removePlayerFromPlayerQueue and player in parser.player_list:
                 parser.player_list.remove(player)
 
         return player
@@ -533,6 +540,7 @@ class ListCommand(Command):
         super(ListCommand, self).__init__('list')
         self.aliases.append("ls")
         self.updatesDB = False
+        self.maxPlayersToList = 60
 
     def help(self, args, parser):
         return "List all players currently in your player queue"
@@ -545,11 +553,14 @@ class ListCommand(Command):
         else:
             response = "---------------------------------------------------------------------\n"
             for i, player in enumerate(parser.player_list):
-                if i >= 25:
+                if i >= self.maxPlayersToList:
                     break
 
-                response += '{0: >2}'.format(str(i)) + "  "
-                response += player.name
+                response += '{0: >2}'.format(str(i))
+                response += " "
+                response += str(player)
+                response += " "
+                response += '{0: >4}'.format(str(player.age()))
                 response += "\n"
 
             response += "---------------------------------------------------------------------\n"
@@ -648,7 +659,6 @@ class DraftCommand(Command):
 
         player = playerOrResponse
 
-
         l = self.getLeague(parser)
         if "isAuctionDraft" in l.property and l.property['isAuctionDraft'] == 'true':
             cost = parser.getCommand("prompt").apply("prompt Draft " + player.name + ". For how much? ", parser)
@@ -730,7 +740,6 @@ class IgnoreCommand(Command):
 Command.GenericCommands.append(IgnoreCommand())
 ##########################################################
 
-
 ##########################################################
 # unignore
 class UnignoreCommand(Command):
@@ -756,6 +765,32 @@ class UnignoreCommand(Command):
         return response
 
 Command.GenericCommands.append(UnignoreCommand())
+##########################################################
+
+##########################################################
+# info
+class InfoCommand(Command):
+    def __init__(self):
+        super(InfoCommand, self).__init__('info')
+        self.updatesDB = False
+
+    def help(self, args, parser):
+        return "Print all raw data about a specified player"
+
+    def apply(self, cmd, parser):
+
+        playerOrResponse = self.getPlayer(self.getCmdArgs(cmd), parser, listDrafted=True, listIgnored=True, removePlayerFromPlayerQueue=False)
+        if not self.isCurrentStatusTrue(parser):
+            response = playerOrResponse
+            return response
+
+        player = playerOrResponse
+
+        response = player.printAllToString()
+
+        return response
+
+Command.GenericCommands.append(InfoCommand())
 ##########################################################
 
 ##########################################################

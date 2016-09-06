@@ -25,10 +25,36 @@ class RotoWorldDotComScraper(SiteScraper):
             playerSearchString = "Allen,Buck"
         elif playerName == "Austin Seferian-Jenkins":
             playerSearchString = "Seferian-Jenkins"
+        elif playerName == "Ben Roethlisberger":
+            playerSearchString = "Roethlisberger"
         elif playerName == "Cam Newton":
             urlOffset = "/player/nfl/6491/cam-newton"
         elif playerName == "David Johnson":
             urlOffset = "/player/nfl/10404/david-johnson"
+        elif playerName == "Alex Smith":
+            urlOffset = "/player/nfl/3119/alex-smith"
+        elif playerName == "Adrian Peterson":
+            urlOffset = "/player/nfl/2491/adrian-peterson"
+        elif playerName == "Brandon Marshall":
+            urlOffset = "/player/nfl/3653/brandon-marshall"
+        elif playerName == "Marvin Jones":
+            urlOffset = "/player/nfl/7503/marvin-jones"
+        elif playerName == "Jonathan Stewart":
+            urlOffset = "/player/nfl/4650/jonathan-stewart"
+        elif playerName == "Matt Jones":
+            urlOffset = "/player/nfl/10493/matt-jones/1"
+        elif playerName == "Zach Miller":
+            urlOffset = "/player/nfl/5394/zach-miller"
+        elif playerName == "Charles Clay":
+            urlOffset = "/player/nfl/6681/charles-clay"
+        elif playerName == "Ryan Griffin":
+            urlOffset = "/player/nfl/8600/ryan-griffin"
+        elif playerName == "Chris Thompson":
+            urlOffset = "/player/nfl/8563/chris-thompson"
+        elif playerName == "Josh Hill":
+            urlOffset = "/player/nfl/8764/josh-hill"
+        elif playerName == "Kevin White":
+            urlOffset = "/player/nfl/10427/kevin-white"
         else:
             playerSearchString = playerName
             for suffix in [" Sr.", " Jr.", " III"]:
@@ -52,6 +78,7 @@ class RotoWorldDotComScraper(SiteScraper):
         # I think this only works in the offseason. When in season, the "this season" statstabe table shows up first
         self.scrapeTable(urlOffset=urlOffset, attrs={'class':'statstable'})
         if self.data is None:
+            print "No Rotoworld data found for " + playerName
             return self.data
 
         statsTable = self.data
@@ -63,6 +90,7 @@ class RotoWorldDotComScraper(SiteScraper):
             statCategories = statsTable[0]
             statsTable = statsTable[1:]
         else:
+            print "No Rotoworld data found for " + playerName
             self.data = None
             return self.data
 
@@ -127,10 +155,18 @@ class TestRotoWorldDotComScraper(unittest.TestCase):
         self.assertNotEquals(s.data, None)
         self.assertEquals(int(s.data['2015']['G']),16)
 
-        s.cache = None
         s.scrape(playerName="Austin Seferian-Jenkins", league="nfl")
         print s.data
         self.assertNotEquals(s.data, None)
+
+        s.cache = None
+        for name in ["Ben Roethlisberger", "Adrian Peterson", "Alex Smith", "Brandon Marshall", \
+                     "Marvin Jones", "Jonathan Stewart", "Matt Jones", "Zach Miller", "Charles Clay", \
+                     "Ryan Griffin",  "Chris Thompson", "Josh Hill", "Kevin White"]:
+            s.scrape(playerName=name, league="nfl")
+            print s.data
+            self.assertNotEquals(s.data, None)
+
 
 
 
