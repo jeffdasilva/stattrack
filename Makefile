@@ -78,7 +78,8 @@ remove-trailing-whitespace:
 .PHONY: remove-windows-line-endings
 remove-windows-line-endings:
 ifeq ($(shell which dos2unix 2>/dev/null),)
-	$(error ERROR: dos2unix not installed)
+	$(warning WARNING: dos2unix not installed)
+	@sleep 2
 else 
 	@find . -type f \( -name '*.py' -o -name 'Makefile' -o -name '*.mk' -o -name '*.md' -o -name 'LICENSE' \) \
 		-exec dos2unix {} \;
