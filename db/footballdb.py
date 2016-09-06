@@ -105,16 +105,6 @@ class FootballPlayerDB(PlayerDB):
     def remainingDraftEligiblePlayers(self):
         return self.remainingStarters() + self.remainingGoodBenchPlayers()
 
-#    def remainingGoodPlayers(self):
-#        return max(self.remainingGoodPlayersByPosition(position="wr"),3) \
-#            + max(self.remainingGoodPlayersByPosition(position="qb"),3) \
-#            + max(self.remainingGoodPlayersByPosition(position="rb"),3)
-#
-#        return self.remainingGoodPlayersByPosition(position="wr") \
-#            + self.remainingGoodPlayersByPosition(position="qb") \
-#            + self.remainingGoodPlayersByPosition(position="rb")
-
-
     def valueRemaining(self):
         value = 0.0
         for p in self.remainingStarters():
