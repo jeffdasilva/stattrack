@@ -286,6 +286,41 @@ Command.GenericCommands.append(AutoSaveCommand())
 ##########################################################
 
 ##########################################################
+# debugmode
+class DebugModeCommand(Command):
+    def __init__(self):
+        super(DebugModeCommand, self).__init__('debugmode')
+        self.updatesDB = False
+        self.hidden = True
+
+    def help(self, args, parser):
+        helpText = "Toggle debug mode "
+        if parser.debug:
+            helpText += "off [debug is currently enabled]"
+        else:
+            helpText += "on [debug is currently disabled]"
+        return helpText
+
+    def apply(self, cmd, parser):
+
+        self.hidden = False
+
+        parser.debug = not parser.debug
+
+        if parser.debug:
+            response = "debug is on"
+        else:
+            response = "debug is off"
+
+        parser.pushOnUndoStack("debug")
+
+        self.statusTrue(parser)
+        return response
+
+Command.GenericCommands.append(DebugModeCommand())
+##########################################################
+
+##########################################################
 # pop
 class PopCommand(Command):
     def __init__(self):
@@ -540,7 +575,7 @@ class ListCommand(Command):
         super(ListCommand, self).__init__('list')
         self.aliases.append("ls")
         self.updatesDB = False
-        self.maxPlayersToList = 30
+        self.maxPlayersToList = 35
 
     def help(self, args, parser):
         return "List all players currently in your player queue"
@@ -568,9 +603,15 @@ class ListCommand(Command):
                         # HACK ALERT!!!
                         if cpvu is None:
                             cpvu = parser.league.db.costPerValueUnit()
-                        playerMarketPrice = player.value() * cpvu
-                        response += '{0: >10}'.format('$' + str(round(playerMarketPrice,1)))
+                            draftEligiblePlayers = parser.league.db.remainingDraftEligiblePlayers()
+
+                        if player in draftEligiblePlayers:
+                            playerMarketPrice = player.value() * cpvu
+                        else:
+                            playerMarketPrice = 0.0
+                        response += parser.bold('{0: >10}'.format('$' + str(round(playerMarketPrice,1))))
                 except:
+                    #if parser.debug: raise
                     pass
 
                 response += "\n"

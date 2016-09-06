@@ -72,7 +72,13 @@ class Player(object):
     def age(self, year=datetime.datetime.now().year):
         if 'rotoworld' in self.property:
             age = str(self.property['rotoworld'][1][1]).split(' / ')[0].lstrip('(').rstrip(')')
-            return int(age)
+
+            try:
+                age = int(age)
+            except ValueError:
+                age = '-'
+
+            return age
         else:
             return '?'
 

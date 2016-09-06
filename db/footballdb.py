@@ -47,7 +47,8 @@ class FootballPlayerDB(PlayerDB):
             self.numberOfStarting['qb'] = 2
             self.numberOfStarting['rb'] = 3
             self.numberOfStarting['wr'] = 4
-            self.numberOfScrubs = 14 - self.numberOfStarting['qb'] - self.numberOfStarting['rb'] - self.numberOfStarting['wr']
+            self.totalNumberOfPlayers = 14
+            self.numberOfScrubs = self.totalNumberOfPlayers - self.numberOfStarting['qb'] - self.numberOfStarting['rb'] - self.numberOfStarting['wr']
             self.moneyPerTeam = 333
         elif self.leagueName == "Oracle":
             self.numberOfTeams = 16
@@ -57,6 +58,7 @@ class FootballPlayerDB(PlayerDB):
             self.numberOfStarting['wr'] = 4
             self.numberOfScrubs = 0
             self.moneyPerTeam = 0
+            self.totalNumberOfPlayers = 16
         else:
             raise ValueError("unknown league type")
 
@@ -83,15 +85,47 @@ class FootballPlayerDB(PlayerDB):
         num_players_remaining = self.numberOfStarting[position]*self.numberOfTeams - self.numberOfPlayersDrafted(position=position)
         return self.get(position=position)[:num_players_remaining]
 
-    def remainingGoodPlayers(self):
-        return max(self.remainingGoodPlayersByPosition(position="wr"),3) \
-            + max(self.remainingGoodPlayersByPosition(position="qb"),3) \
-            + max(self.remainingGoodPlayersByPosition(position="rb"),3)
+    def remainingStarters(self):
+        return self.remainingGoodPlayersByPosition(position="wr") + \
+            self.remainingGoodPlayersByPosition(position="qb") + \
+            self.remainingGoodPlayersByPosition(position="rb")
+
+    def remainingGoodBenchPlayers(self):
+        total_num_players_remaining = self.totalNumberOfPlayers*self.numberOfTeams - self.numberOfPlayersDrafted()
+
+        remainingDraftEligiblePlayers = self.get()[:total_num_players_remaining]
+        remainingDraftEligibleStarters = self.remainingStarters()
+
+        for p in remainingDraftEligibleStarters:
+            if p in remainingDraftEligiblePlayers:
+                remainingDraftEligiblePlayers.remove(p)
+
+        return remainingDraftEligiblePlayers
+
+    def remainingDraftEligiblePlayers(self):
+        return self.remainingStarters() + self.remainingGoodBenchPlayers()
+
+#    def remainingGoodPlayers(self):
+#        return max(self.remainingGoodPlayersByPosition(position="wr"),3) \
+#            + max(self.remainingGoodPlayersByPosition(position="qb"),3) \
+#            + max(self.remainingGoodPlayersByPosition(position="rb"),3)
+#
+#        return self.remainingGoodPlayersByPosition(position="wr") \
+#            + self.remainingGoodPlayersByPosition(position="qb") \
+#            + self.remainingGoodPlayersByPosition(position="rb")
+
 
     def valueRemaining(self):
-        value = 0
-        for p in self.remainingGoodPlayers():
+        value = 0.0
+        for p in self.remainingStarters():
+            #print p
             value += p.value()
+
+        # bench players are worth a lot less (0.2x compared to a starter
+        for p in self.remainingGoodBenchPlayers():
+            #print p
+            value += (p.value() * 0.2)
+
         return value
 
     def costPerValueUnit(self):
@@ -122,7 +156,7 @@ class TestFootballPlayerDB(unittest.TestCase):
         fdb.load()
 
         cpv_mult = fdb.costPerValueUnit()
-        for p in fdb.remainingGoodPlayers():
+        for p in fdb.remainingStarters():
             print str(p) + " $" + str(cpv_mult * p.value())
 
         print fdb.valueRemaining(), fdb.moneyRemaining(), fdb.costPerValueUnit()

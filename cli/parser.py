@@ -33,6 +33,7 @@ class StatTrackParser(object):
             return raw_input(prompt)
         except:
             print "Oops!  Something messed up occurred"
+            if self.debug: raise
             return ""
 
     def sendOutput(self, output):
@@ -54,6 +55,7 @@ class StatTrackParser(object):
                     break
             except:
                 print "Oops!  Something really messed up occurred. Trying to Recover"
+                if self.debug: raise
                 continue
 
     def getCommand(self,cmd):
