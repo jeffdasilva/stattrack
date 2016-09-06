@@ -72,7 +72,8 @@ class PlayerDB(object):
         for key in playerData:
             self.add(playerData[key])
 
-    def getWithRegularExpression(self, playerNameREString, position="all", team="all", listDrafted=False, listIgnored=False):
+    def getWithRegularExpression(self, playerNameREString, position="all", team="all", \
+                                listDrafted=False, listIgnored=False, scoringRules=None):
         reObj = re.compile(playerNameREString, re.IGNORECASE)
         player_list = []
         for playerObj in self.player.itervalues():
@@ -104,17 +105,26 @@ class PlayerDB(object):
             if reObj.match(playerObj.name):
                 player_list.append(playerObj)
 
-        player_list.sort(reverse=True)
+        if scoringRules is None:
+            player_list.sort(reverse=True)
+        else:
+            # ToDo: Look into apply the rules obj here and sorting with that
+            player_list.sort(reverse=True)
+            # something like this???
+            #player_list.sort(reverse=True, key=lambda p: scoringRules.getPlayerValue(p))
+
         return player_list
 
-    def get(self, searchString="", position="all", team="all", listDrafted=False, listIgnored=False):
+    def get(self, searchString="", position="all", team="all", listDrafted=False, listIgnored=False, \
+            scoringRules=None):
 
         if searchString == "":
             searchString = '.*'
         else:
             searchString = '.*' + searchString + '.*'
 
-        return self.getWithRegularExpression(searchString, position=position, team=team, listDrafted=listDrafted, listIgnored=listIgnored)
+        return self.getWithRegularExpression(searchString, position=position, team=team, listDrafted=listDrafted, \
+                                             listIgnored=listIgnored, scoringRules=scoringRules)
 
     def numberOfPlayersDrafted(self, position="all"):
         plist = self.get(position=position, listDrafted=True)

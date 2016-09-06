@@ -144,7 +144,7 @@ class TestFootballPlayerDB(unittest.TestCase):
         fdb = FootballPlayerDB()
         fdb.wget()
 
-        print fdb.player
+        #print fdb.player
 
         p = fdb.player["tom brady - ne"]
         print p

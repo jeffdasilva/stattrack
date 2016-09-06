@@ -23,6 +23,7 @@ class Player(object):
         self.isIgnored = False
         self.cost = 0
         self.update(properties)
+        self.db = None
         assert(self.name != None)
 
     def __str__(self):
