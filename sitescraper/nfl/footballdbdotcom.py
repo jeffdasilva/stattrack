@@ -111,7 +111,8 @@ class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
             self.assertGreater(len(s.data[i]),3)
 
             print s.data[i]['name']
-            print s.data[i]['team']
+            if 'team' in s.data[i]:
+                print s.data[i]['team']
             print s.data[i]['position']
             self.assertEquals(s.data[i]['position'],'QB')
             print s.data[i][thisYear]['team']
