@@ -98,16 +98,20 @@ NEXT_BUILD_NUMBER = $(shell echo $$[$(CURRENT_BUILD_NUMBER)+1])
 
 .PHONY: increment-build-number
 increment-build-number:
+ifeq ($(shell whoami),jdasilva)
 	@echo "Incrementing build number to: $(NEXT_BUILD_NUMBER)"
 	@sed -i -e 's,\(BuildNumber = \)\([0-9]*\)$$,\1$(NEXT_BUILD_NUMBER),g' $(PYTHON_MAIN)
+endif
 
 CURRENT_MINOR_VERSION_NUMBER = $(shell grep "MinorVersion = [0-9]*$$" $(PYTHON_MAIN) | head -n1 | sed -e 's,.*=[ \t]*,,g')
 NEXT_MINOR_VERSION_NUMBER = $(shell echo $$[$(CURRENT_MINOR_VERSION_NUMBER)+1])
 
 .PHONY: increment-minor-version
 increment-minor-version:
+ifeq ($(shell whoami),jdasilva)
 	@echo "Incrementing minor version number to: $(NEXT_MINOR_VERSION_NUMBER)"
 	@sed -i -e 's,\(MinorVersion = \)\([0-9]*\)$$,\1$(NEXT_MINOR_VERSION_NUMBER),g' $(PYTHON_MAIN)
+endif
 
 
 #############################

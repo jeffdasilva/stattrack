@@ -93,6 +93,13 @@ class StatTrackParser(object):
         response = self.processCommand(cmd)
         status = self.processResponse(response, self.status)
 
+        try:
+            if self.db_requires_save:
+                if self.league is not None and self.league.db is not None:
+                    self.league.db.updatePlayerCache()
+        except AttributeError:
+                print "Update Player Cache Failed. Continuing..."
+
         if self.autosave and self.db_requires_save:
             if status != StatTrackParser.StatusError:
                 if self.league is not None and self.league.db is not None:

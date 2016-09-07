@@ -34,7 +34,7 @@ class FootballPlayerDB(PlayerDB):
 
         super(FootballPlayerDB, self).__init__(positionMap=pmap,name=league)
         self.leagueName = league
-        
+
         self.playerCache = {}
 
         if self.leagueName is None:
@@ -100,7 +100,7 @@ class FootballPlayerDB(PlayerDB):
     def remainingGoodBenchPlayers(self):
         total_num_players_remaining = self.totalNumberOfPlayers*self.numberOfTeams - self.numberOfPlayersDrafted()
 
-        remainingDraftEligiblePlayers = self.playerCache['all'] 
+        remainingDraftEligiblePlayers = self.playerCache['all']
         remainingDraftEligibleStarters = self.remainingStarters()
 
         for p in remainingDraftEligibleStarters:
@@ -113,7 +113,10 @@ class FootballPlayerDB(PlayerDB):
         return self.remainingStarters() + self.remainingGoodBenchPlayers()
 
     def valueRemaining(self):
-        self.updatePlayerCache()
+
+        if len(self.playerCache) == 0:
+            self.updatePlayerCache()
+
         value = 0.0
         for p in self.remainingStarters():
             #print p
