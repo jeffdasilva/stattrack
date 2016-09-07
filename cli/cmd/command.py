@@ -6,6 +6,8 @@ Created on Sep 2, 2016
 from abc import ABCMeta, abstractmethod
 import copy
 import unittest
+from curses.ascii import isdigit
+from pbkdf2 import isinteger
 
 ##########################################################
 # command (abstract base class)
@@ -586,10 +588,19 @@ class ListCommand(Command):
             response = "Player Queue is Empty"
             self.statusFalse(parser)
         else:
+
+            if self.getCmdArgs(cmd) == "":
+                    playersToList = self.maxPlayersToList
+            else:
+                try:
+                    playersToList = int(self.getCmdArgs(cmd))
+                except ValueError:
+                    playersToList = self.maxPlayersToList
+
             response = "---------------------------------------------------------------------\n"
-            cpvu = None
+            #cpvu = None
             for i, player in enumerate(parser.player_list):
-                if i >= self.maxPlayersToList:
+                if i >= playersToList:
                     break
 
                 response += '{0: >2}'.format(str(i))
@@ -598,6 +609,8 @@ class ListCommand(Command):
                 response += " "
                 response += '{0: >4}'.format(str(player.age()))
 
+                '''
+                # This is super slow!!! and should not be here anyway
                 try:
                     if parser.league is not None:
                         # HACK ALERT!!!
@@ -613,6 +626,7 @@ class ListCommand(Command):
                 except:
                     #if parser.debug: raise
                     pass
+                '''
 
                 response += "\n"
 
