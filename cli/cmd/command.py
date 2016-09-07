@@ -699,7 +699,7 @@ class SearchByPositionCommand(Command):
             response = "No players found with position: " + self.name
             self.statusFalse(parser)
         else:
-            response = parser.getCommand("list").apply("list", parser)
+            response = parser.getCommand("list").apply("list " + self.getCmdArgs(cmd), parser)
 
         return response
 
