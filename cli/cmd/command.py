@@ -6,8 +6,6 @@ Created on Sep 2, 2016
 from abc import ABCMeta, abstractmethod
 import copy
 import unittest
-from curses.ascii import isdigit
-from pbkdf2 import isinteger
 
 ##########################################################
 # command (abstract base class)

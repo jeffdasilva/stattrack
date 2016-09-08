@@ -52,8 +52,8 @@ all: check
 
 PYTHON_UNITTEST_STAMPS := $(strip \
 	$(patsubst %.py,stamps/%.unittest,\
-	$(filter-out %/__init__.py,\
-	$(filter-out $(PYTHON_MAIN),$(PYTHON_SRC))\
+	$(filter-out %__init__.py,\
+	$(PYTHON_SRC)\
 	)))
 
 .PHONY: check
@@ -63,6 +63,28 @@ $(PYTHON_UNITTEST_STAMPS): stamps/%.unittest: %.py
 	python -m unittest $(subst /,.,$*)
 	@mkdir -p $(@D)
 	@touch $@
+
+
+PYTHON_PYLINT_STAMPS := $(strip \
+	$(patsubst %.py,stamps/%.pylint,\
+	$(filter-out %__init__.py,\
+	$(PYTHON_SRC)\
+	)))
+
+.PHONY: pylint
+pylint: $(PYTHON_PYLINT_STAMPS)
+
+$(PYTHON_PYLINT_STAMPS): stamps/%.pylint: %.py
+	@mkdir -p $(@D)
+	-pylint $< > $@
+	cat $@
+	
+	
+.PHONY: uml
+uml:
+	pyreverse -ASmy -k -o png $(PYTHON_SRC) -p stattrack
+
+
 #############################
 
 
@@ -132,7 +154,7 @@ dev:
 #############################
 
 #############################
-CLEAN_FILES_RE += *.pyc *.class stamps test*.pickle *.orig *~
+CLEAN_FILES_RE += *.pyc *.class stamps test*.pickle *.orig *~ *.png
 CLEAN_FILES += $(sort $(wildcard $(strip \
 	$(foreach dir,. $(PYTHON_PACKAGES),\
 	$(foreach clean_re,$(CLEAN_FILES_RE), \
