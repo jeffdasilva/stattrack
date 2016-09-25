@@ -164,8 +164,20 @@ class SiteScraper(object):
         if self.data is not None:
             if index is None:
                 table = self.data.find('table', attrs=attrs)
+            elif isinstance(index, int):
+                tableList = self.data.find_all('table', attrs=attrs)
+                table = tableList[index]
+            elif isinstance(index, str):
+                tableList = self.data.find_all('table', attrs=attrs)
+                for t in tableList:
+                    firstRow = t.find("tr")
+                    if index in str(firstRow):
+                        table = t
+                        break
             else:
-                table = self.data.find_all('table', attrs=attrs)[index]
+                raise ValueError('index value is invalid: ' + index)
+
+        #print table
 
         self.data = None
 

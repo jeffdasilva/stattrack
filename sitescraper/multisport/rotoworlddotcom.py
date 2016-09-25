@@ -71,12 +71,8 @@ class RotoWorldDotComScraper(SiteScraper):
 
         self.scrapeTable(urlOffset=urlOffset, attrs={'id':'cp1_ctl00_tblPlayerDetails'})
         playerDetails = self.data
-        #print playerDetails
 
-        # ToDo: Need to improve this
-        # There are lots of statstable classes in this page so we're really getting luck if this works
-        # I think this only works in the offseason. When in season, the "this season" statstabe table shows up first
-        self.scrapeTable(urlOffset=urlOffset, attrs={'class':'statstable'})
+        self.scrapeTable(urlOffset=urlOffset, attrs={'class':'statstable'},index="Career Stats")
         if self.data is None:
             print "No Rotoworld data found for " + playerName
             return self.data
@@ -122,7 +118,6 @@ class TestRotoWorldDotComScraper(unittest.TestCase):
 
         s = RotoWorldDotComScraper()
         s.testmode = True
-        #s.debug = True
 
         s.scrape(playerName="Eli Manning", league="nfl")
         self.assertNotEquals(s.data, None)
