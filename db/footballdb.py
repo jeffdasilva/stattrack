@@ -1,8 +1,3 @@
-'''
-Created on April 12, 2016
-
-@author: jdasilva
-'''
 
 import os
 import unittest
@@ -98,7 +93,7 @@ class FootballPlayerDB(PlayerDB):
         return self.playerCache['wr'] + self.playerCache['qb'] + self.playerCache['rb']
 
     def remainingGoodBenchPlayers(self):
-        total_num_players_remaining = self.totalNumberOfPlayers*self.numberOfTeams - self.numberOfPlayersDrafted()
+        #total_num_players_remaining = self.totalNumberOfPlayers*self.numberOfTeams - self.numberOfPlayersDrafted()
 
         remainingDraftEligiblePlayers = self.playerCache['all']
         remainingDraftEligibleStarters = self.remainingStarters()
