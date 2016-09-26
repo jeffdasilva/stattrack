@@ -32,7 +32,7 @@ class StatTrackParser(object):
         try:
             return raw_input(prompt)
         except:
-            print "Oops!  Something messed up occurred"
+            print "Oops!  Something messed up occurred. Enable debugmode if you want to debug this."
             if self.debug: raise
             return ""
 

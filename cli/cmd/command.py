@@ -291,7 +291,7 @@ class DebugModeCommand(Command):
     def __init__(self):
         super(DebugModeCommand, self).__init__('debugmode')
         self.updatesDB = False
-        self.hidden = True
+        #self.hidden = True
 
     def help(self, args, parser):
         helpText = "Toggle debug mode "

@@ -1,15 +1,4 @@
 
-import unittest
-import httplib
-import socket
-import urllib2
-import time
-import sys
-import datetime
-import os
-import pickle
-from bs4 import BeautifulSoup
-
 '''
 # [Note to my future self]
 # You can scrape an entire site for offline scraping with
@@ -17,6 +6,18 @@ from bs4 import BeautifulSoup
  % wget --mirror --convert-links
     --adjust-extension --page-requisites --no-parent <site>
 '''
+
+from bs4 import BeautifulSoup
+import datetime
+import httplib
+import os
+import pickle
+import socket
+import sys
+import time
+import unittest
+import urllib2
+
 
 class SiteScraper(object):
 
@@ -105,7 +106,7 @@ class SiteScraper(object):
                 request = urllib2.Request(url,headers=hdr)
                 htmlFP = urllib2.urlopen(request)
                 html = htmlFP.read()
-            except (socket.error, httplib.BadStatusLine):
+            except (socket.error, httplib.BadStatusLine, urllib2.HTTPError, httplib.IncompleteRead):
                 time.sleep(0.4)
                 error = True
 
@@ -161,6 +162,7 @@ class SiteScraper(object):
 
         self.link = {}
 
+        table = None
         if self.data is not None:
             if index is None:
                 table = self.data.find('table', attrs=attrs)
@@ -176,8 +178,6 @@ class SiteScraper(object):
                         break
             else:
                 raise ValueError('index value is invalid: ' + index)
-
-        #print table
 
         self.data = None
 
