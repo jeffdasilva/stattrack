@@ -8,12 +8,14 @@
 '''
 
 from bs4 import BeautifulSoup
+import cookielib
 import datetime
 import httplib
 import os
 import pickle
 import socket
 import sys
+from threading import Lock
 import time
 import unittest
 import urllib2
@@ -35,8 +37,9 @@ class SiteScraper(object):
         self.cache = {}
         self.link = {}
         self.maxCacheTime = datetime.timedelta(days=1)
-        #self.maxCacheTime = datetime.timedelta(seconds=1)
+        self.cookiefile = None
 
+        self.cacheLock = Lock()
         self.saveCacheDir = os.path.dirname(os.path.abspath(__file__)) + "/../data/cache/sites"
         self.cacheLoad()
 
@@ -47,27 +50,36 @@ class SiteScraper(object):
         if self.cache is None:
             return
 
-        if not os.path.exists(os.path.dirname(self.cacheFileName())):
-            os.makedirs(os.path.dirname(self.cacheFileName()))
+        self.cacheLock.acquire()
+        try:
+            if not os.path.exists(os.path.dirname(self.cacheFileName())):
+                os.makedirs(os.path.dirname(self.cacheFileName()))
 
-        with open(self.cacheFileName(), 'wb') as handle:
-            pickle.dump(self.cache, handle)
+            with open(self.cacheFileName(), 'wb') as handle:
+                pickle.dump(self.cache, handle)
+        finally:
+            self.cacheLock.release()
 
     def cacheLoad(self):
         if self.cache is None:
             return
 
-        if os.path.isfile(self.cacheFileName()):
-            with open(self.cacheFileName(), 'rb') as handle:
-                siteCache = pickle.load(handle)
-                self.cache.update(siteCache)
+        self.cacheLock.acquire()
+        try:
+            if os.path.isfile(self.cacheFileName()):
+                with open(self.cacheFileName(), 'rb') as handle:
+                    siteCache = pickle.load(handle)
+                    self.cache.update(siteCache)
+        finally:
+            self.cacheLock.release()
+
 
     def scrape(self, urlOffset=None):
 
         if self.url is None:
             return None
 
-        self.data = None
+        data = None
 
         url = self.url
         if urlOffset is not None:
@@ -82,8 +94,8 @@ class SiteScraper(object):
                         if self.debug: print " [Cache Hit] " + url
                         html = self.cache[url]['html']
                         soup = BeautifulSoup(html, "lxml")
-                        self.data = soup
-                        return self.data
+                        data = soup
+                        return data
                     else:
                         if self.debug:
                             print " [Cache Expired] " + url
@@ -103,6 +115,13 @@ class SiteScraper(object):
             try:
                 if self.debug or self.verbose: print " [SCRAPE] " + url
                 hdr = {'User-Agent':'Mozilla/5.0'}
+
+                if self.cookiefile is not None:
+                    cj = cookielib.MozillaCookieJar(self.cookiefile)
+                    cj.load()
+                    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+                    urllib2.install_opener(opener)
+
                 request = urllib2.Request(url,headers=hdr)
                 htmlFP = urllib2.urlopen(request)
                 html = htmlFP.read()
@@ -115,7 +134,7 @@ class SiteScraper(object):
 
             if not error and html is not None:
                 soup = BeautifulSoup(html, "lxml")
-                self.data = soup
+                data = soup
                 if self.cache is not None:
                     if self.debug: print " [Cache Updated] " + url
                     self.cache[url] = {'html':html, 'timestamp':datetime.datetime.now()}
@@ -131,18 +150,18 @@ class SiteScraper(object):
 
             retryCount = retryCount + 1
 
-        return self.data
+        return data
 
     def scrapeTables(self, urlOffset=None, attrs={}):
 
-        SiteScraper.scrape(self,urlOffset=urlOffset)
+        data = SiteScraper.scrape(self,urlOffset=urlOffset)
 
         self.link = {}
 
-        if self.data is not None:
-            tableList = self.data.find_all('table', attrs=attrs)
+        if data is not None:
+            tableList = data.find_all('table', attrs=attrs)
 
-        self.data = []
+        data = []
 
         if tableList is not None:
             for tbl in tableList:
@@ -151,26 +170,26 @@ class SiteScraper(object):
                     cols = row.find_all('td')
                     cols = [ele.text.strip() for ele in cols]
                     tblEntry.append([ele for ele in cols])
-                self.data.append(tblEntry)
+                data.append(tblEntry)
 
-        return self.data
+        return data
 
 
     def scrapeTable(self, urlOffset=None, attrs={}, index=None):
 
-        SiteScraper.scrape(self,urlOffset=urlOffset)
+        data = SiteScraper.scrape(self,urlOffset=urlOffset)
 
         self.link = {}
 
         table = None
-        if self.data is not None:
+        if data is not None:
             if index is None:
-                table = self.data.find('table', attrs=attrs)
+                table = data.find('table', attrs=attrs)
             elif isinstance(index, int):
-                tableList = self.data.find_all('table', attrs=attrs)
+                tableList = data.find_all('table', attrs=attrs)
                 table = tableList[index]
             elif isinstance(index, str):
-                tableList = self.data.find_all('table', attrs=attrs)
+                tableList = data.find_all('table', attrs=attrs)
                 for t in tableList:
                     firstRow = t.find("tr")
                     if index in str(firstRow):
@@ -179,38 +198,38 @@ class SiteScraper(object):
             else:
                 raise ValueError('index value is invalid: ' + index)
 
-        self.data = None
+        data = None
 
         if table is None:
-            return  self.data
+            return data
 
         for link in table.findAll("a"):
             if link.has_attr('href'):
                 self.link[link.text.strip()] = link['href']
 
-        self.data = []
+        data = []
 
         for row in table.findAll("tr"):
             cols = row.find_all('td')
             cols = [ele.text.strip() for ele in cols]
-            self.data.append([ele for ele in cols])
+            data.append([ele for ele in cols])
 
-        return self.data
+        return data
 
 class TestSiteScraper(unittest.TestCase):
 
     def testGoogle(self):
         s = SiteScraper("http://www.google.com")
         s.debug = True
-        s.scrape()
-        self.assertNotEquals(s.data,None)
+        data = s.scrape()
+        self.assertNotEquals(data,None)
 
-        table = s.data.find('table')
+        table = data.find('table')
         #print table
         self.assertNotEquals(table,None)
 
         linkList = []
-        for link in s.data.findAll('a'):
+        for link in data.findAll('a'):
             #print 'found an projectionsURL'
             if link.has_attr('href'):
                 if link['href'][0] == '/':
@@ -227,10 +246,10 @@ class TestSiteScraper(unittest.TestCase):
         s = SiteScraper("http://www.html.am/html-codes/tables/")
         s.debug = True
         s.scrape()
-        s.scrape()
-        self.assertNotEquals(s.data,None)
+        data = s.scrape()
+        self.assertNotEquals(data,None)
 
-        table = s.data.find('table', {'class': 'example'})
+        table = data.find('table', {'class': 'example'})
         #print table
         self.assertNotEquals(table,None)
 
@@ -238,9 +257,8 @@ class TestSiteScraper(unittest.TestCase):
         print s.data
 
         s.cache = None
-        s.data = None
-        s.scrape()
-        self.assertNotEquals(s.data,None)
+        data = s.scrape()
+        self.assertNotEquals(data,None)
 
 
 

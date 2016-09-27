@@ -60,10 +60,10 @@ class FootballDBDotComScraper(SiteScraper):
                     break
 
                 if player[0] in playerLinks:
-                    self.scrapeTables(urlOffset=playerLinks[player[0]], attrs={'class':'statistics'})
+                    data = self.scrapeTables(urlOffset=playerLinks[player[0]], attrs={'class':'statistics'})
 
                     fantasyStatTbl = None
-                    for tbl in self.data:
+                    for tbl in data:
                         if len(tbl) > 2 and len(tbl[2:]) > 0 and \
                             len(FootballDBDotComScraper.Stats) == len(tbl[2:][0])-1:
                             fantasyStatTbl = tbl
@@ -88,8 +88,7 @@ class FootballDBDotComScraper(SiteScraper):
                     #print stats
                     self.historicalStats.append(stats)
 
-        self.data = self.historicalStats
-        return self.data
+        return self.historicalStats
 
 
 class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
@@ -100,24 +99,24 @@ class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
 
         s = FootballDBDotComScraper()
         s.testmode = True
-        s.scrape()
+        data = s.scrape()
 
-        for d in s.data:
+        for d in data:
             print d
 
         for i in range(0,3):
-            print "--- s.data[" + str(i) + "] ---"
-            print s.data[i]
-            self.assertGreater(len(s.data[i]),3)
+            print "--- data[" + str(i) + "] ---"
+            print data[i]
+            self.assertGreater(len(data[i]),3)
 
-            print s.data[i]['name']
-            if 'team' in s.data[i]:
-                print s.data[i]['team']
-            print s.data[i]['position']
-            self.assertEquals(s.data[i]['position'],'QB')
-            print s.data[i][thisYear]['team']
-            print s.data[i][thisYear]['PassingTD']
-            self.assertGreaterEqual(int(s.data[i][thisYear]['PassingTD']),0)
+            print data[i]['name']
+            if 'team' in data[i]:
+                print data[i]['team']
+            print data[i]['position']
+            self.assertEquals(data[i]['position'],'QB')
+            print data[i][thisYear]['team']
+            print data[i][thisYear]['PassingTD']
+            self.assertGreaterEqual(int(data[i][thisYear]['PassingTD']),0)
 
 if __name__ == '__main__':
     unittest.main()

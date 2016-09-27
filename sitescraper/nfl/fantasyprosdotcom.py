@@ -9,8 +9,8 @@ class FantasyProsDotComScraper(SiteScraper):
 
     def __init__(self):
         #super(FantasyProsDotComScraper, self).__init__(url="http://www1.fantasypros.com/nfl")
-        super(FantasyProsDotComScraper, self).__init__(url="https://www.fantasypros.com/nfl")
-        self.maxCacheTime = datetime.timedelta(days=1)
+        super(FantasyProsDotComScraper, self).__init__(url="http://www.fantasypros.com/nfl")
+        self.maxCacheTime = datetime.timedelta(days=7)
         self.setProjectionURLs()
         self.setCheatSheetURLs()
         #self.debug = True
@@ -53,13 +53,13 @@ class FantasyProsDotComScraper(SiteScraper):
         self.cheatsheets = []
 
         for p in self.cheatsheetURL:
-            self.scrapeTable(urlOffset=self.cheatsheetURL[p], attrs={'id': 'data'})
+            data = self.scrapeTable(urlOffset=self.cheatsheetURL[p], attrs={'id': 'data'})
 
-            if self.data is None:
+            if data is None:
                 print "ERROR: table for " + p + " from " + self.cheatsheetURL[p] + " could not be extracted"
                 continue
 
-            self.data = self.data[1:]
+            data = data[1:]
 
             if p == "dst":
                 pos = "DEF"
@@ -75,13 +75,13 @@ class FantasyProsDotComScraper(SiteScraper):
             else:
                 dataKeys = ['position', 'positionRank', 'name', 'team', 'byeWeek', 'bestRank', 'worstRank', 'avgRank', 'stdDev']
 
-            for data in self.data:
-                if len(data) < 2:
+            for data_i in data:
+                if len(data_i) < 2:
                     continue
                 if p == "half-point-ppr" or p == "ppr" or p == "consensus":
-                    d = dict(zip(dataKeys,[data[0]] + self.splitNameTeamString(data[1]) + data[2:]))
+                    d = dict(zip(dataKeys,[data_i[0]] + self.splitNameTeamString(data_i[1]) + data_i[2:]))
                 else:
-                    d = dict(zip(dataKeys,[pos] + [data[0]] + self.splitNameTeamString(data[1]) + data[2:]))
+                    d = dict(zip(dataKeys,[pos] + [data_i[0]] + self.splitNameTeamString(data_i[1]) + data_i[2:]))
 
                 self.cheatsheets.append(d)
 
@@ -91,18 +91,18 @@ class FantasyProsDotComScraper(SiteScraper):
 
         for p in self.projectionsURL:
             #s = SiteScraper(self.projectionsURL[p])
-            self.scrapeTable(urlOffset=self.projectionsURL[p], attrs={'id': 'data'})
+            data = self.scrapeTable(urlOffset=self.projectionsURL[p], attrs={'id': 'data'})
 
-            if self.data is None:
+            if data is None:
                 continue
 
             if p == 'K':
-                self.data = self.data[1:]
+                data = data[1:]
             else:
-                self.data = self.data[2:]
+                data = data[2:]
 
-            for data in self.data:
-                d = dict(zip(self.keys[p],[p] + self.splitNameTeamString(data[0]) + data[1:]))
+            for data_i in data:
+                d = dict(zip(self.keys[p],[p] + self.splitNameTeamString(data_i[0]) + data_i[1:]))
                 self.projections.append(d)
 
     def scrape(self):
@@ -110,8 +110,8 @@ class FantasyProsDotComScraper(SiteScraper):
         self.projections = []
         self.scrapeProjections()
         self.scrapeCheatSheets()
-        self.data = self.cheatsheets + self.projections
-        return self.data
+        data = self.cheatsheets + self.projections
+        return data
 
     def splitNameTeamString(self, nameTeamStr):
 

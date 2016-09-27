@@ -63,8 +63,8 @@ class FootballPlayerDB(PlayerDB):
         allScrapers = scrapers + [FantasyProsDotComScraper()]
 
         for s in allScrapers:
-            s.scrape()
-            for player_prop in s.data:
+            data = s.scrape()
+            for player_prop in data:
                 player = FootballPlayer(properties=player_prop)
                 self.add(player)
 

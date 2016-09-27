@@ -17,15 +17,15 @@ class MyFantasyLeagueDotComScraper(SiteScraper):
     def scrape(self):
 
         urlOffset = "/" + str(self.year) + "/options?L=" + str(self.leagueID) + "&O=17"
-        self.scrapeTable(urlOffset=urlOffset, attrs={'class' : 'report nocaption'})
+        data = self.scrapeTable(urlOffset=urlOffset, attrs={'class' : 'report nocaption'})
 
-        if self.data is None:
+        if data is None:
             self.draftGrid = None
-            return
+            return None
 
         self.draftGrid = []
 
-        for row in self.data:
+        for row in data:
             if len(row) > 3:
                 nameTeamPosition = row[3]
 
@@ -52,7 +52,7 @@ class MyFantasyLeagueDotComScraper(SiteScraper):
                 #self.draftGrid.append( ( name, team, position, owner ) )
                 self.draftGrid.append( draftGridEntry )
 
-        self.data = self.draftGrid
+        return self.draftGrid
 
 
 class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
@@ -65,8 +65,8 @@ class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
         s = MyFantasyLeagueDotComScraper( TestMyFantasyLeagueDotComScraper.OracleLeagueID, \
                                           TestMyFantasyLeagueDotComScraper.OracleLeagueYear, \
                                           )
-        s.scrape()
-        self.assertNotEquals(s.data,None)
+        data = s.scrape()
+        self.assertNotEquals(data,None)
 
         #for p in s.draftGrid:
         #    print p

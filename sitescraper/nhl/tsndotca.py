@@ -55,7 +55,6 @@ class TsnDotCaScraper(SiteScraper):
             self.players.append(dict(zip(TsnDotCaScraper.ByPositionGoalieStats,goalie)))
             self.players[-1]['position'] = 'G'
 
-        self.data = self.players
         return self.players
 
 

@@ -7,8 +7,8 @@ import unittest
 
 class StatTrack(object):
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 21
-    StatTrackBuildNumber = 46
+    StatTrackMinorVersion = 22
+    StatTrackBuildNumber = 50
 
     def __init__(self):
         pass
@@ -17,8 +17,8 @@ class StatTrack(object):
         return str(StatTrack.StatTrackMajorVersion) + "." + str(StatTrack.StatTrackMinorVersion)
 
     def getFullVersionString(self):
-        return "[Version: " + self.getVersion() + ", \
-            Build: " + str(StatTrack.StatTrackBuildNumber) + "]"
+        return "[Version: " + self.getVersion() + ", " + \
+            "Build: " + str(StatTrack.StatTrackBuildNumber) + "]"
 
     def printBanner(self):
         print "StatTrack\t" + self.getFullVersionString()
