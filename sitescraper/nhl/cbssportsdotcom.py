@@ -4,13 +4,12 @@ import unittest
 
 from sitescraper.scraper import SiteScraper
 
-
 class ArrudaCupCbsSportsDotComSraper(SiteScraper):
 
 
     def __init__(self):
         super(ArrudaCupCbsSportsDotComSraper, self).__init__(url="http://arruda-cup.hockey.cbssports.com/")
-        #self.maxCacheTime = datetime.timedelta(seconds=1)
+        #self.maxCacheTime = datetime.timedelta(seconds=60)
         self.maxCacheTime = datetime.timedelta(days=1)
         self.cookiefile = '/tools/HockeyPool/arruda-cup-cbssports.cookie.txt'
 
@@ -43,7 +42,7 @@ class ArrudaCupCbsSportsDotComSraper(SiteScraper):
     def scrape(self):
 
         leagueData = []
-        numOfThreads = 0
+        numOfThreads = 6
 
         if numOfThreads == 0:
             for team_i in self.team:
@@ -58,7 +57,6 @@ class ArrudaCupCbsSportsDotComSraper(SiteScraper):
 
             for r in result:
                 if r is not None and len(r) > 3:
-                    print r
                     leagueData.append(r[3:])
 
         draftedPlayers = []
@@ -83,37 +81,48 @@ class ArrudaCupCbsSportsDotComSraper(SiteScraper):
                 #namePositon = playerNamePosTeam[0]
                 name,position = playerNamePosTeam[0].rsplit(' ',1)
 
-                print name + ", " + team + ", " + position + ", " + self.team[team_key]
+                #print name + ", " + team + ", " + position + ", " + self.team[team_key]
 
-                #team = playerNamePosTeam[1]
+                player_data = {}
+                player_data['name'] = name
+                player_data['team'] = team
+                player_data['position'] = position
+                player_data['isDrafted'] = True
+                player_data['owner'] = self.team[team_key]
 
-                # ToDo: still more work todo here...
-
-                draftedPlayers.append(playerNamePosTeam)
+                draftedPlayers.append(player_data)
 
         return draftedPlayers
 
 class TestArrudaCupCbsSportsDotComScraper(unittest.TestCase):
 
     def testArrudaCupCbsSportsDotComSraper(self):
+        from db.playerdb import PlayerDB
+        from db.player.player import Player
 
         s = ArrudaCupCbsSportsDotComSraper()
-        #s.testmode = True
-        #s.debug = True
         data = s.scrape()
         self.assertNotEqual(data, None)
         print data
 
+        db = PlayerDB(name="ArrudaCupTest", verbose=True)
+        for player_data in data:
+            self.assertNotEqual(player_data, None)
+            #print player_data
+            p = Player(properties=player_data)
+
+            self.assertEquals(p.isDrafted, True)
+            self.assertNotEqual(p, None)
+            #print p
+            #print p.key()
+            db.add(p)
+
+        self.assertEquals(db.numberOfPlayersDrafted(),len(data))
+
 
     def testNoTeamDuplicates(self):
-
         s = ArrudaCupCbsSportsDotComSraper()
-
         self.assertEquals(len(s.team), 18)
-
-        #for team in s.team:
-        #    print str(team) + " " + s.team[team]
-
         self.assertEquals(len(s.team.values()),len(set(s.team.values())),"Duplicate team name values exist!")
 
 

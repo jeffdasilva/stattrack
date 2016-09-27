@@ -11,10 +11,13 @@ from db.player.player import Player
 
 class PlayerDB(object):
 
-    def __init__(self, positionMap={}, name=None):
+    def __init__(self, positionMap={}, name=None, verbose=False, debug=False):
         self.player = {}
         self.positionMap = {"all":["all"]}
         self.positionMap.update(positionMap)
+
+        self.verbose = verbose
+        self.debug = debug
 
         if name is not None and name != "":
             saveFileName = name + "_playerdb.pickle"
@@ -22,7 +25,9 @@ class PlayerDB(object):
             saveFileName = "playerdb.pickle"
 
         self.saveFile = os.path.dirname(os.path.abspath(__file__)) + "/../data/" + saveFileName
-        #print "savefile is " + self.saveFile
+
+        if self.debug:
+            print "savefile is " + self.saveFile
 
 
     def add(self, player):
@@ -37,15 +42,18 @@ class PlayerDB(object):
 
         playerMatchByName = self.get(searchString=player.name, listDrafted=True, listIgnored=True)
         if len(playerMatchByName) == 1:
-            #print "Looking for (by name) " + player.name + " " + str(player.team)
-            #print "Found (by name) " + playerMatchByName[0].name + " " + str(playerMatchByName[0].team)
+
+            if self.debug:
+                print "Looking for (by name) " + player.name + " " + str(player.team)
+                print "Found (by name) " + playerMatchByName[0].name + " " + str(playerMatchByName[0].team)
 
             if self.player[playerMatchByName[0].key()].team is None or player.team is None:
                 playerKeyIn = playerMatchByName[0].key()
                 self.player[playerKeyIn].merge(player)
                 if self.player[playerKeyIn].key() != playerKeyIn:
                     player = self.player[playerKeyIn]
-                    print "  " + player.name + " Is Changing Teams!!! from: " + playerKeyIn + " to: " + player.key()
+                    if self.verbose:
+                        print "  " + player.name + " Is Changing Teams!!! from: " + playerKeyIn + " to: " + player.key()
                     del self.player[playerKeyIn]
                     self.player[player.key()] = player
                 return

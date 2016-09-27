@@ -96,6 +96,10 @@ class Player(object):
         self.isIgnored = False
 
     def __cmp__(self, other):
+
+        if other is None:
+            return 1
+
         if self.value() > other.value():
             return 1
         elif self.value() < other.value():
@@ -133,6 +137,14 @@ class Player(object):
         if self.property.has_key("team"):
             self.team = self.property["team"]
             del self.property["team"]
+
+        if self.property.has_key("isDrafted"):
+            self.isDrafted = self.property["isDrafted"]
+            del self.property["isDrafted"]
+
+        if self.property.has_key("isIgnored"):
+            self.isIgnored = self.property["isIgnored"]
+            del self.property["isIgnored"]
 
         if self.team is not None and (self.team.lower() == "unknown" or self.team.lower() == "fa" or self.team == "???"):
             self.team = None
