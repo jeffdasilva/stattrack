@@ -11,7 +11,7 @@ from db.player.player import Player
 
 class PlayerDB(object):
 
-    def __init__(self, positionMap={}, name=None, verbose=False, debug=False):
+    def __init__(self, name=None, positionMap={}, verbose=False, debug=False):
         self.player = {}
         self.positionMap = {"all":["all"]}
         self.positionMap.update(positionMap)

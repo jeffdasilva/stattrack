@@ -27,7 +27,7 @@ class FootballPlayerDB(PlayerDB):
         pmap["defence"] = [ "DEF" ]
         pmap["defense"] = [ "DEF" ]
 
-        super(FootballPlayerDB, self).__init__(positionMap=pmap,name=league)
+        super(FootballPlayerDB, self).__init__(name=league, positionMap=pmap)
         self.leagueName = league
 
         self.playerCache = {}

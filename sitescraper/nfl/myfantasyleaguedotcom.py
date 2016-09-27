@@ -48,6 +48,7 @@ class MyFantasyLeagueDotComScraper(SiteScraper):
                 draftGridEntry['team'] = nameTeamSplit[1]
                 draftGridEntry['position'] = nameTeamPositionSplit[1];
                 draftGridEntry['owner'] = row[2]
+                draftGridEntry['isDrafted'] = True
 
                 #self.draftGrid.append( ( name, team, position, owner ) )
                 self.draftGrid.append( draftGridEntry )

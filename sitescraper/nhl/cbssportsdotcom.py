@@ -78,10 +78,7 @@ class ArrudaCupCbsSportsDotComSraper(SiteScraper):
                 else:
                     team = "???"
 
-                #namePositon = playerNamePosTeam[0]
                 name,position = playerNamePosTeam[0].rsplit(' ',1)
-
-                #print name + ", " + team + ", " + position + ", " + self.team[team_key]
 
                 player_data = {}
                 player_data['name'] = name
