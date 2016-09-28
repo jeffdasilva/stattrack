@@ -25,13 +25,8 @@ class HockeyPlayerDB(PlayerDB):
 
         super(HockeyPlayerDB, self).__init__(name=name, positionMap=pmap)
 
-        self.scrapers = []
-
     def wget(self, scrapers=[]):
-
-        allScrapers = scrapers + []
-
-        for s in allScrapers:
+        for s in scrapers:
             data = s.scrape()
             for player_prop in data:
                 player = HockeyPlayer(properties=player_prop)

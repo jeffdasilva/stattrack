@@ -671,9 +671,15 @@ Command.GenericCommands.append(SearchCommand())
 ##########################################################
 # qb, rb, wr, te, def, rw, lw, forward, etc
 class SearchByPositionCommand(Command):
-    def __init__(self,position="all"):
+    def __init__(self, position="all", positionSearchString=None):
         super(SearchByPositionCommand, self).__init__(name=position)
         self.updatesDB = False
+
+        if positionSearchString is None:
+            self.positionSearchString = position
+        else:
+            self.positionSearchString = positionSearchString
+
 
     def help(self, args, parser):
 
@@ -691,7 +697,7 @@ class SearchByPositionCommand(Command):
 
         db = dbOrResponse
 
-        player_list_query = db.get(position=self.name)
+        player_list_query = db.get(position=self.positionSearchString)
         parser.player_list = player_list_query
         if len(player_list_query) == 0:
             response = "No players found with position: " + self.name

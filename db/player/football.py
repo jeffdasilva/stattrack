@@ -15,6 +15,11 @@ class FootballPlayer(Player):
         self.rushingSDMult = 2.4
         self.receivingSDMult = 2.0
 
+    def team_abbreviate(self,teamname):
+        if teamname == "JAC":
+            return "JAX"
+        return super(FootballPlayer,self).team_abbreviate(teamname)
+
     def getProperty(self,statName):
         if statName not in self.property:
             return None

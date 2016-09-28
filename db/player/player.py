@@ -123,6 +123,13 @@ class Player(object):
 
         return str(nameToKey) + " - " + str(teamToKey)
 
+    def team_abbreviate(self,teamname):
+        return teamname
+
+    def team_fullname(self,teamname):
+        return teamname
+
+
     def update(self, properties):
 
         # this dict update needs to get fancier!
@@ -150,11 +157,7 @@ class Player(object):
             self.team = None
 
         if self.team is not None:
-            self.team = self.team.upper()
-
-        # ToDo: Move this to Football Class
-        if self.team == "JAC":
-            self.team = "JAX"
+            self.team = self.team_abbreviate(self.team).upper()
 
         if self.property.has_key("position"):
             if self.property["position"] not in self.position:

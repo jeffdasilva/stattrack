@@ -5,13 +5,15 @@
 '''
 import unittest
 
+
 class StatTrack(object):
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 26
-    StatTrackBuildNumber = 60
+    StatTrackMinorVersion = 27
+    StatTrackBuildNumber = 63
 
     def __init__(self):
-        pass
+        self.league = "ArrudaCup"
+        #self.league = "OLeague"
 
     def getVersion(self):
         return str(StatTrack.StatTrackMajorVersion) + "." + str(StatTrack.StatTrackMinorVersion)
@@ -28,9 +30,18 @@ class StatTrack(object):
 
     def run(self):
         from league.custom.oleague import OLeagueFootballLeague
+        from league.custom.arrudacup import ArrudaCupHockeyLeague
 
-        self.printBanner()
-        l = OLeagueFootballLeague()
+        if self.league == "OLeague":
+            self.printBanner()
+            l = OLeagueFootballLeague()
+        elif self.league == "ArrudaCup":
+            self.printBanner()
+            l = ArrudaCupHockeyLeague()
+        else:
+            print "ERROR: Unknown League '" + self.league + "'"
+            return
+
         l.draftmode()
 
 class StatTrackTest(unittest.TestCase):
