@@ -22,7 +22,7 @@ class ArrudaCupHockeyRules(HockeyRules):
 
 class ArrudaCupHockeyLeague(HockeyLeague):
     def __init__(self):
-        from cli.cmd.command import SearchByPositionCommand
+        from cli.cmd.command import SearchByPositionCommand, DraftedByCommand
         from sitescraper.nhl.cbssportsdotcom import ArrudaCupCbsSportsDotComSraper
         from sitescraper.nhl.tsndotca import TsnDotCaScraper
 
@@ -41,12 +41,15 @@ class ArrudaCupHockeyLeague(HockeyLeague):
         self.parser.commands.append(forwardsCommand)
 
         defenseCommand = SearchByPositionCommand('defense', positionSearchString='D')
-        defenseCommand.aliases += ['defence','def']
+        defenseCommand.aliases += ['defence','def','defensemen','defencemen']
         self.parser.commands.append(defenseCommand)
 
         goaliesCommand = SearchByPositionCommand('goalies', positionSearchString='G')
-        goaliesCommand.aliases += ['goalie','g']
+        goaliesCommand.aliases += ['goalie','g','goaltenders','goaltender']
         self.parser.commands.append(goaliesCommand)
+
+        draftedByCommand = DraftedByCommand()
+        self.parser.commands.append(draftedByCommand)
 
         self.parser.autosave = False
 

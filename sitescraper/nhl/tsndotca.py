@@ -6,18 +6,21 @@ from sitescraper.scraper import SiteScraper
 
 class TsnDotCaScraper(SiteScraper):
 
-    Top300Stats = ["rank300", "name", "team", "position", "games", "goals", "assists", "points"]
-    ByPositionStats = ["rankPosition", "name", "team", "games", "goals", "assists", "points", "plus-minus", "ppp", "pim", "hits", "blocks", "shotsOnGoal"]
-    ByPositionGoalieStats = ["rankPosition", "name", "team", "games", "wins", "goalsAgainstAverage", "savePercentage", "shutouts"]
+    # don't trust tsn's listed team because it could be out of date
+    Top300Stats = ["rank300", "name", "tsnTeam", "position", "games", "goals", "assists", "points"]
+    ByPositionStats = ["rankPosition", "name", "tsnTeam", "games_positionList", "goals_positionList", "assists_positionList", "points_positionList", "plus-minus", "ppp", "pim", "hits", "blocks", "shotsOnGoal"]
+    ByPositionGoalieStats = ["rankPosition", "name", "tsnTeam", "games", "wins", "goalsAgainstAverage", "savePercentage", "shutouts"]
 
     def __init__(self):
         super(TsnDotCaScraper, self).__init__(url="http://www.tsn.ca")
         self.maxCacheTime = datetime.timedelta(days=1)
+        #self.maxCacheTime = datetime.timedelta(seconds=30)
 
     def scrape(self, year=datetime.datetime.now().year):
 
         if str(year) == "2016":
-            top300UrlOffset = "/crosby-no-1-in-the-top-300-projected-scorers-1.360216"
+            #top300UrlOffset = "/crosby-no-1-in-the-top-300-projected-scorers-1.360216"
+            top300UrlOffset = "/crosby-leads-list-of-top-300-projected-scorers-1.565371"
             byPositionOffset = "/fantasy-hockey-rankings-by-position-1.362639"
             tableAttrs={'class':'stats-table-scrollable article-table'}
         else:
@@ -71,8 +74,12 @@ class TestTsnDotCaScraper(unittest.TestCase):
         for player in data:
             if str(player['name']) == "Connor McDavid":
                 print player
-                self.assertEqual(player['team'], "Edmonton")
-                self.assertGreaterEqual(player['points'], 70)
+                self.assertEqual(player['tsnTeam'], "Edmonton")
+                if 'points' in player:
+                    self.assertGreaterEqual(player['points'], 70)
+                else:
+                    self.assertGreaterEqual(player['points_positionList'], 70)
+
                 self.assertEqual(player['position'], 'C')
                 McDavidFound += 1
 
@@ -83,7 +90,7 @@ class TestTsnDotCaScraper(unittest.TestCase):
         for player in data:
             if str(player['name']) == "Tuukka Rask":
                 print player
-                self.assertEqual(player['team'], "Boston")
+                self.assertEqual(player['tsnTeam'], "Boston")
                 self.assertGreaterEqual(player['wins'], 35)
                 self.assertGreaterEqual(player['savePercentage'], 0.925)
                 self.assertEqual(player['position'], 'G')

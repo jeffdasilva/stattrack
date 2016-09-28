@@ -452,15 +452,15 @@ class UpdateCommand(Command):
 
     def apply(self, cmd, parser):
 
-        dbOrResponse = self.getDB(parser)
+        leagueOrResponse = self.getLeague(parser)
         if not self.isCurrentStatusTrue(parser):
-            response = dbOrResponse
+            response = leagueOrResponse
             return response
 
-        db = dbOrResponse
+        league = leagueOrResponse
 
         parser.pushState()
-        db.wget()
+        league.update()
         response = "Player Database Updated"
         self.statusTrue(parser)
 
@@ -707,7 +707,7 @@ class SearchByPositionCommand(Command):
 
         return response
 
-# Don't add these to generic commands. Leagues add these
+# Don't add these to generic command set. Leagues add these if requested
 ##########################################################
 
 
@@ -758,6 +758,49 @@ Command.GenericCommands.append(DraftCommand())
 ##########################################################
 
 ##########################################################
+# DraftedBy
+class DraftedByCommand(Command):
+    def __init__(self):
+        super(DraftedByCommand, self).__init__('drafted-by')
+        self.aliases.append("owner")
+        self.aliases.append("team")
+        self.updatesDB = False
+
+    def help(self, args, parser):
+        return "Find out what players other owners have drafted"
+
+    def apply(self, cmd, parser):
+
+        dbOrResponse = self.getDB(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = dbOrResponse
+            return response
+
+        db = dbOrResponse
+
+        owner = self.getCmdArgs(cmd)
+
+        player_list_query = db.get(listDrafted=True)
+        parser.player_list = []
+        for player in player_list_query:
+            if player.getProperty("owner") is None:
+                continue
+            if owner == player.getProperty("owner").lower():
+                parser.player_list.append(player)
+
+        if len(parser.player_list) == 0:
+            response = "No players owned by " + owner + " were found."
+            self.statusFalse(parser)
+        else:
+            response = parser.getCommand("list").apply("list " + self.getCmdArgs(cmd), parser)
+
+        return response
+
+# Don't add drafted-by to generic command set. Leagues add these if they support owner property
+##########################################################
+
+
+##########################################################
 # undraft
 class UndraftCommand(Command):
     def __init__(self):
@@ -782,6 +825,37 @@ class UndraftCommand(Command):
         return response
 
 Command.GenericCommands.append(UndraftCommand())
+##########################################################
+
+##########################################################
+# undraft-all
+class UndraftAllCommand(Command):
+    def __init__(self):
+        super(UndraftAllCommand, self).__init__('undraft-all')
+
+    def help(self, args, parser):
+        return "Mark all players as undrafted"
+
+    def apply(self, cmd, parser):
+
+        dbOrResponse = self.getDB(parser)
+        if not self.isCurrentStatusTrue(parser):
+            response = dbOrResponse
+            return response
+
+        db = dbOrResponse
+        parser.pushState()
+
+        player_list_query = db.get(listDrafted=True)
+        for player in player_list_query:
+            if player.isDrafted:
+                player.undraft()
+
+        response = "All players have been marked as undrafted"
+
+        return response
+
+Command.GenericCommands.append(UndraftAllCommand())
 ##########################################################
 
 ##########################################################

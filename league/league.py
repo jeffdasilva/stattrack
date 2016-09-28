@@ -20,6 +20,10 @@ class League(object):
     def draftmode(self):
         self.parser.promptLoop()
 
+    def update(self):
+        if self.db is not None:
+            self.db.update()
+
     def factoryReset(self):
         raise ValueError('factoryReset is not implemented')
 

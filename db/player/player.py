@@ -66,6 +66,18 @@ class Player(object):
     def printAll(self):
         print self.printAllToString()
 
+    def getProperty(self,statName,return_value_if_none=None):
+        if statName not in self.property:
+            return return_value_if_none
+        return self.property[statName].replace(',','')
+
+    def getStat(self, statName, year=datetime.datetime.now().year):
+        if str(year) in self.property:
+            if statName in self.property[str(year)]:
+                stat = self.property[str(year)][statName].replace(',','')
+                return stat
+        return 0;
+
     def value(self):
         return 0
 
@@ -129,6 +141,11 @@ class Player(object):
     def team_fullname(self,teamname):
         return teamname
 
+    def normalize_playername(self,name):
+        return name
+
+    def is_duplicate_playername(self,name):
+        return False
 
     def update(self, properties):
 
@@ -152,6 +169,9 @@ class Player(object):
         if self.property.has_key("isIgnored"):
             self.isIgnored = self.property["isIgnored"]
             del self.property["isIgnored"]
+
+        if self.name is not None:
+            self.name = self.normalize_playername(self.name)
 
         if self.team is not None and (self.team.lower() == "unknown" or self.team.lower() == "fa" or self.team == "???"):
             self.team = None

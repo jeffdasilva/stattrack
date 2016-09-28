@@ -34,9 +34,14 @@ class ArrudaCupCbsSportsDotComSraper(SiteScraper):
         self.team[18] = "Fab"
 
     def scrapeIndividualTeam(self,team_number):
-        tableAttrs={'class':'data data3 pinHeader borderTop'}
         urlOffset = 'teams/' + str(team_number)
-        team_data = self.scrapeTable(urlOffset=urlOffset,attrs=tableAttrs)
+
+        playerTableAttrs={'class':'data data3 pinHeader borderTop'}
+        team_data = self.scrapeTable(urlOffset=urlOffset,attrs=playerTableAttrs)
+
+        goalieTableAttrs={'class':'data pinHeader'}
+        team_data += self.scrapeTable(urlOffset=urlOffset,attrs=goalieTableAttrs)
+
         return team_data
 
     def scrape(self):
@@ -87,6 +92,7 @@ class ArrudaCupCbsSportsDotComSraper(SiteScraper):
                 player_data['isDrafted'] = True
                 player_data['owner'] = self.team[team_key]
 
+                #print player_data
                 draftedPlayers.append(player_data)
 
         return draftedPlayers

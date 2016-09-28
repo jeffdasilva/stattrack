@@ -20,17 +20,6 @@ class FootballPlayer(Player):
             return "JAX"
         return super(FootballPlayer,self).team_abbreviate(teamname)
 
-    def getProperty(self,statName):
-        if statName not in self.property:
-            return None
-        return self.property[statName].replace(',','')
-
-    def getStat(self, statName, year=datetime.datetime.now().year):
-        if str(year) in self.property:
-            if statName in self.property[str(year)]:
-                stat = self.property[str(year)][statName].replace(',','')
-                return stat
-        return 0;
 
 ###################################################################
 #

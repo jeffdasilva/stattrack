@@ -9,6 +9,20 @@ class HockeyPlayer(Player):
     def __init__(self, name=None, team=None, properties={}):
         super(HockeyPlayer, self).__init__(name=name, team=team, properties=properties)
 
+
+    def normalize_playername(self,name):
+
+        nameNomalizeMap = { \
+            'Alex Ovechkin':'Alexander Ovechkin',
+            'Mike Cammalleri':'Michael Cammalleri'
+        }
+
+        if name in nameNomalizeMap:
+            return nameNomalizeMap[name]
+        else:
+            return super(HockeyPlayer,self).normalize_playername(name)
+
+
     def team_abbreviate(self,teamname):
 
         if teamname is None:
@@ -33,6 +47,8 @@ class HockeyPlayer(Player):
         abbreviated_teamnames = teamNameAbbreviateMap.values()
 
         for team in teamNameAbbreviateMap.keys():
+            # Toronto, Columbus, and Detroit are special cases because their team name
+            # has a space
             if team == 'toronto maple leafs' or team == 'columbus blue jackets' or \
                 team == 'detroit red wings':
                 city,name = team.split(' ',1)
@@ -55,8 +71,78 @@ class HockeyPlayer(Player):
 
         return teamNameAbbreviateMap[teamname]
 
+    def goals(self,year=datetime.datetime.now().year):
+        if year == datetime.datetime.now().year:
+            return self.projectedGoals()
+        else:
+            #return int(self.getStat(HockeyDBDotComScraper.Goals, year))
+            return 0
+
+    def projectedGoals(self):
+        if self.getProperty('goals') is None:
+            return 0.0
+        else:
+            return float(self.getProperty('goals'))
+
+    def assists(self,year=datetime.datetime.now().year):
+        if year == datetime.datetime.now().year:
+            return self.projectedAssists()
+        else:
+            #return int(self.getStat(HockeyDBDotComScraper.Assists, year))
+            return 0
+
+    def projectedAssists(self):
+        if self.getProperty('assists') is None:
+            return 0.0
+        else:
+            return float(self.getProperty('assists'))
+
+    def goaltenderWins(self,year=datetime.datetime.now().year):
+        if year == datetime.datetime.now().year:
+            return self.projectedGoaltenderWins()
+        else:
+            #return int(self.getStat(HockeyDBDotComScraper.Wins, year))
+            return 0
+
+    def projectedGoaltenderWins(self):
+        return float(self.getProperty('wins',0))
+
+    def goaltenderTies(self,year=datetime.datetime.now().year):
+        if year == datetime.datetime.now().year:
+            return self.projectedGoaltenderTies()
+        else:
+            #return int(self.getStat(HockeyDBDotComScraper.Ties, year))
+            return 0
+
+    def projectedGoaltenderTies(self):
+        return float(self.getProperty('ties',0))
+
+
+    def goaltenderShutOuts(self,year=datetime.datetime.now().year):
+        if year == datetime.datetime.now().year:
+            return self.projectedGoaltenderShutOuts()
+        else:
+            #return int(self.getStat(HockeyDBDotComScraper.ShutOuts, year))
+            return 0
+
+    def projectedGoaltenderShutOuts(self):
+        return float(self.getProperty('shutouts',0))
+
+    def gamesPlayed(self,year=datetime.datetime.now().year):
+        if year == datetime.datetime.now().year:
+            return self.projectedGamesPlayed()
+        else:
+            #return int(self.getStat(HockeyDBDotComScraper.Games, year))
+            return 0
+
+    def projectedGamesPlayed(self):
+        if self.getProperty('games') is None:
+            return 0.0
+        else:
+            return float(self.getProperty('games'))
+
     def points(self,year=datetime.datetime.now().year):
-        return 0.0
+        return self.goals(year) + self.assists(year) + self.goaltenderWins(year)*2 + self.goaltenderTies(year) + self.goaltenderShutOuts(year)*4
 
     def pointsPerGame(self,year=datetime.datetime.now().year):
         if self.gamesPlayed(year) == 0:
@@ -65,7 +151,11 @@ class HockeyPlayer(Player):
             return self.points(year)/self.gamesPlayed(year)
 
     def value(self):
-        return 0.0
+        if 'G' in self.position:
+            value = self.points() / 82
+        else:
+            value = self.pointsPerGame()
+        return value
 
 
 class TestHockeyPlayer(unittest.TestCase):
