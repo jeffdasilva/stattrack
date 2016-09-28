@@ -79,10 +79,7 @@ class HockeyPlayer(Player):
             return 0
 
     def projectedGoals(self):
-        if self.getProperty('goals') is None:
-            return 0.0
-        else:
-            return float(self.getProperty('goals'))
+        return float(self.getProperty('tsn.top300.goals',0))
 
     def assists(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -92,10 +89,7 @@ class HockeyPlayer(Player):
             return 0
 
     def projectedAssists(self):
-        if self.getProperty('assists') is None:
-            return 0.0
-        else:
-            return float(self.getProperty('assists'))
+        return float(self.getProperty('tsn.top300.assists',0))
 
     def goaltenderWins(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -105,7 +99,7 @@ class HockeyPlayer(Player):
             return 0
 
     def projectedGoaltenderWins(self):
-        return float(self.getProperty('wins',0))
+        return float(self.getProperty('tsn.by_pos.wins',0))
 
     def goaltenderTies(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -115,7 +109,7 @@ class HockeyPlayer(Player):
             return 0
 
     def projectedGoaltenderTies(self):
-        return float(self.getProperty('ties',0))
+        return float(self.getProperty('tsn.by_pos.ties',0))
 
 
     def goaltenderShutOuts(self,year=datetime.datetime.now().year):
@@ -126,7 +120,7 @@ class HockeyPlayer(Player):
             return 0
 
     def projectedGoaltenderShutOuts(self):
-        return float(self.getProperty('shutouts',0))
+        return float(self.getProperty('tsn.by_pos.shutouts',0))
 
     def gamesPlayed(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -136,10 +130,10 @@ class HockeyPlayer(Player):
             return 0
 
     def projectedGamesPlayed(self):
-        if self.getProperty('games') is None:
+        if self.getProperty('tsn.by_pos.games') is None:
             return 0.0
         else:
-            return float(self.getProperty('games'))
+            return float(self.getProperty('tsn.by_pos.games'))
 
     def points(self,year=datetime.datetime.now().year):
         return self.goals(year) + self.assists(year) + self.goaltenderWins(year)*2 + self.goaltenderTies(year) + self.goaltenderShutOuts(year)*4
