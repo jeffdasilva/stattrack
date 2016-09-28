@@ -128,17 +128,6 @@ class FootballPlayerDB(PlayerDB):
         return self.moneyRemaining() / max(self.valueRemaining(),0.1)
 
 
-class TestFootballPlayer(unittest.TestCase):
-
-    def testNewFootballPlayer(self):
-        fp = FootballPlayer(name="Jeff", team="SF", properties={"position":"WR","foo":"bar","name":"DaSilva"})
-
-        self.assertEquals(fp.name,"DaSilva")
-        self.assertEquals(fp.team,"SF")
-        self.assertEquals(fp.position,["WR"])
-        self.assertEquals(fp.property["foo"],"bar")
-
-
 class TestFootballPlayerDB(unittest.TestCase):
 
     def testNewFootballPlayerDB(self):

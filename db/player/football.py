@@ -435,5 +435,16 @@ class FootballPlayer(Player):
         return self.valuePassing() + self.valueRushing() + self.valueReceiveing() + self.valueMisc()
 
 
+class TestFootballPlayer(unittest.TestCase):
+
+    def testNewFootballPlayer(self):
+        fp = FootballPlayer(name="Jeff", team="SF", properties={"position":"WR","foo":"bar","name":"DaSilva"})
+
+        self.assertEquals(fp.name,"DaSilva")
+        self.assertEquals(fp.team,"SF")
+        self.assertEquals(fp.position,["WR"])
+        self.assertEquals(fp.property["foo"],"bar")
+
+
 if __name__ == '__main__':
     unittest.main()

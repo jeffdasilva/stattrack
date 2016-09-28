@@ -11,6 +11,23 @@ class Rules(object):
     def __init__(self):
         pass
 
+class HockeyRules(Rules):
+
+    def __init__(self):
+        super(HockeyRules, self).__init__()
+
+        self.numTeams = 16
+        self.numForwards = 8
+        self.numDefensmen = 5
+        self.numGoalies = 2
+        self.numReserves = 4
+
+        self.pointsPerGoal = 1
+        self.pointsPerAssist = 1
+        self.pointsPerGoalieWin = 2
+        self.pointsPerGoalieShutout = 4
+
+
 class FootballRules(Rules):
 
     def __init__(self):
