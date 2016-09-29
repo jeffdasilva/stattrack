@@ -5,6 +5,7 @@
 .nfs*
 .project
 .pydevproject
+*.cookie.txt
 /data/
 /db/data/
 /stamps/

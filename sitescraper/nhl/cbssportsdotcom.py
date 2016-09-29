@@ -1,17 +1,29 @@
 import datetime
 from multiprocessing.pool import ThreadPool
+import os
 import unittest
 
 from sitescraper.scraper import SiteScraper
+
 
 class ArrudaCupCbsSportsDotComSraper(SiteScraper):
 
 
     def __init__(self):
         super(ArrudaCupCbsSportsDotComSraper, self).__init__(url="http://arruda-cup.hockey.cbssports.com/")
-        #self.maxCacheTime = datetime.timedelta(seconds=60)
-        self.maxCacheTime = datetime.timedelta(days=1)
-        self.cookiefile = '/tools/HockeyPool/arruda-cup-cbssports.cookie.txt'
+        self.maxCacheTime = datetime.timedelta(seconds=60)
+        #self.maxCacheTime = datetime.timedelta(days=1)
+
+        ####
+        # Created zip file by doing this:
+        # % zip -e arruda-cup-cbssports.cookie.zip arruda-cup-cbssports.cookie.txt
+        # Enter pass_word: [ p@ss=word is my parent's postal code ]
+        #
+        # Unzip it by doing this:
+        # % unzip arruda-cup-cbssports.cookie.zip
+        # <enter password in all lower case>
+        self.cookiefile = os.path.dirname(os.path.abspath(__file__)) + '/../fantasy/arruda-cup-cbssports.cookie.txt'
+        ####
 
         self.team = {}
         self.team[1] = "Brian"
@@ -104,6 +116,8 @@ class TestArrudaCupCbsSportsDotComScraper(unittest.TestCase):
         from db.player.player import Player
 
         s = ArrudaCupCbsSportsDotComSraper()
+        s.maxCacheTime = datetime.timedelta(days=1)
+
         data = s.scrape()
         self.assertNotEqual(data, None)
         print data
@@ -125,6 +139,8 @@ class TestArrudaCupCbsSportsDotComScraper(unittest.TestCase):
 
     def testNoTeamDuplicates(self):
         s = ArrudaCupCbsSportsDotComSraper()
+        s.maxCacheTime = datetime.timedelta(days=1)
+
         self.assertEquals(len(s.team), 18)
         self.assertEquals(len(s.team.values()),len(set(s.team.values())),"Duplicate team name values exist!")
 
