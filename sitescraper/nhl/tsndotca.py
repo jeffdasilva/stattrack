@@ -22,6 +22,14 @@ class TsnDotCaScraper(SiteScraper):
                              "tsn.by_pos.games", "tsn.by_pos.wins", \
                              "tsn.by_pos.goalsAgainstAverage", \
                              "tsn.by_pos.savePercentage"]
+
+    ProjectedGamesPlayed = ['tsn.top300.games','tsn.by_pos.games']
+    ProjectedGoals = ['tsn.top300.goals','tsn.by_pos.goals']
+    ProjectedAssists = ['tsn.top300.assists','tsn.by_pos.assists']
+    ProjectedWins = ['tsn.by_pos.wins']
+    ProjectedTies = []
+    ProjectedShutouts = []
+
     def __init__(self):
         super(TsnDotCaScraper, self).__init__(url="http://www.tsn.ca")
         self.maxCacheTime = datetime.timedelta(days=1)

@@ -2,12 +2,20 @@ import datetime
 import unittest
 
 from db.player.player import Player
+from sitescraper.nhl.tsndotca import TsnDotCaScraper
 
 
 class HockeyPlayer(Player):
 
     def __init__(self, name=None, team=None, properties={}):
         super(HockeyPlayer, self).__init__(name=name, team=team, properties=properties)
+
+        self.projected_games_played_attr = TsnDotCaScraper.ProjectedGamesPlayed
+        self.projected_goals_attr = TsnDotCaScraper.ProjectedGoals
+        self.projected_assists_attr = TsnDotCaScraper.ProjectedAssists
+        self.projected_wins_attr = TsnDotCaScraper.ProjectedWins
+        self.projected_ties_attr = TsnDotCaScraper.ProjectedTies
+        self.projected_shutouts_attr = TsnDotCaScraper.ProjectedShutouts
 
 
     def normalize_playername(self,name):
@@ -75,65 +83,56 @@ class HockeyPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedGoals()
         else:
-            #return int(self.getStat(HockeyDBDotComScraper.Goals, year))
             return 0
 
     def projectedGoals(self):
-        return float(self.getProperty('tsn.top300.goals',0))
+        return float(self.getProperty(self.projected_goals_attr,0))
 
     def assists(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
             return self.projectedAssists()
         else:
-            #return int(self.getStat(HockeyDBDotComScraper.Assists, year))
             return 0
 
     def projectedAssists(self):
-        return float(self.getProperty('tsn.top300.assists',0))
+        return float(self.getProperty(self.projected_assists_attr,0))
 
     def goaltenderWins(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
             return self.projectedGoaltenderWins()
         else:
-            #return int(self.getStat(HockeyDBDotComScraper.Wins, year))
             return 0
 
     def projectedGoaltenderWins(self):
-        return float(self.getProperty('tsn.by_pos.wins',0))
+        return float(self.getProperty(self.projected_wins_attr,0))
 
     def goaltenderTies(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
             return self.projectedGoaltenderTies()
         else:
-            #return int(self.getStat(HockeyDBDotComScraper.Ties, year))
             return 0
 
     def projectedGoaltenderTies(self):
-        return float(self.getProperty('tsn.by_pos.ties',0))
+        return float(self.getProperty(self.projected_ties_attr,0))
 
 
     def goaltenderShutOuts(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
             return self.projectedGoaltenderShutOuts()
         else:
-            #return int(self.getStat(HockeyDBDotComScraper.ShutOuts, year))
             return 0
 
     def projectedGoaltenderShutOuts(self):
-        return float(self.getProperty('tsn.by_pos.shutouts',0))
+        return float(self.getProperty(self.projected_shutouts_attr,0))
 
     def gamesPlayed(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
             return self.projectedGamesPlayed()
         else:
-            #return int(self.getStat(HockeyDBDotComScraper.Games, year))
             return 0
 
     def projectedGamesPlayed(self):
-        if self.getProperty('tsn.by_pos.games') is None:
-            return 0.0
-        else:
-            return float(self.getProperty('tsn.by_pos.games'))
+        return float(self.getProperty(self.projected_games_played_attr,0))
 
     def points(self,year=datetime.datetime.now().year):
         return self.goals(year) + self.assists(year) + self.goaltenderWins(year)*2 + self.goaltenderTies(year) + self.goaltenderShutOuts(year)*4
@@ -157,6 +156,14 @@ class TestHockeyPlayer(unittest.TestCase):
     def testHockeyPlayer(self):
         p = HockeyPlayer(name="JDS")
         self.assertNotEqual(p, None)
+        self.assertEqual(p.pointsPerGame(),0)
+
+        p.property[p.projected_games_played_attr[-1]] = "10"
+        self.assertEqual(p.pointsPerGame(),0)
+
+        p.property[p.projected_assists_attr[0]] = "5"
+        self.assertEqual(p.pointsPerGame(),0.5)
+
 
     def testTeamAbbreviate(self):
         p = HockeyPlayer(name="noname")

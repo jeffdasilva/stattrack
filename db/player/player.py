@@ -67,8 +67,20 @@ class Player(object):
         print self.printAllToString()
 
     def getProperty(self,statName,return_value_if_none=None):
-        if statName not in self.property:
+
+        if statName is None:
             return return_value_if_none
+
+        elif isinstance(statName,list):
+            for stat_i in statName:
+                prop = self.getProperty(stat_i)
+                if prop is not None:
+                    return prop
+            return return_value_if_none
+
+        elif statName not in self.property:
+            return return_value_if_none
+
         return self.property[statName].replace(',','')
 
     def getStat(self, statName, year=datetime.datetime.now().year):
