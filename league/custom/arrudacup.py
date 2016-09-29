@@ -22,8 +22,8 @@ class ArrudaCupHockeyRules(HockeyRules):
 class ArrudaCupHockeyLeague(HockeyLeague):
     def __init__(self):
         from cli.cmd.command import SearchByPositionCommand, DraftedByCommand
-        from sitescraper.nhl.cbssportsdotcom import ArrudaCupCbsSportsDotComSraper
         from sitescraper.nhl.tsndotca import TsnDotCaScraper
+        from sitescraper.fantasy.arrudacupcbssportsdotcom import ArrudaCupCbsSportsDotComSraper
 
         name = "ArrudaCup"
         rules = ArrudaCupHockeyRules()

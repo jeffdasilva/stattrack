@@ -8,8 +8,8 @@ import unittest
 
 class StatTrack(object):
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 31
-    StatTrackBuildNumber = 75
+    StatTrackMinorVersion = 32
+    StatTrackBuildNumber = 77
 
     def __init__(self):
         self.league = "ArrudaCup"
