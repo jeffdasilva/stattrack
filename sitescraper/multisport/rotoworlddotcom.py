@@ -9,7 +9,9 @@ class RotoWorldDotComScraper(SiteScraper):
 
     def __init__(self):
         super(RotoWorldDotComScraper, self).__init__(url="http://www.rotoworld.com")
-        self.maxCacheTime = datetime.timedelta(days=4)
+
+        self.maxCacheTime = datetime.timedelta(days=15)
+        #self.maxCacheTime = datetime.timedelta(days=4)
         #self.maxCacheTime = datetime.timedelta(hours=1)
 
 

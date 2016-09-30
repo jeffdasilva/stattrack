@@ -2,6 +2,7 @@ import datetime
 import unittest
 
 from db.player.player import Player
+from sitescraper.nhl.cbssportsdotcom import NhlCbsSportsDotComSraper
 from sitescraper.nhl.tsndotca import TsnDotCaScraper
 
 
@@ -10,12 +11,13 @@ class HockeyPlayer(Player):
     def __init__(self, name=None, team=None, properties={}):
         super(HockeyPlayer, self).__init__(name=name, team=team, properties=properties)
 
-        self.projected_games_played_attr = TsnDotCaScraper.ProjectedGamesPlayed
-        self.projected_goals_attr = TsnDotCaScraper.ProjectedGoals
-        self.projected_assists_attr = TsnDotCaScraper.ProjectedAssists
-        self.projected_wins_attr = TsnDotCaScraper.ProjectedWins
-        self.projected_ties_attr = TsnDotCaScraper.ProjectedTies
-        self.projected_shutouts_attr = TsnDotCaScraper.ProjectedShutouts
+        #ToDo: a factory creator class should really add these
+        self.projected_games_played_attr = TsnDotCaScraper.ProjectedGamesPlayed + NhlCbsSportsDotComSraper.ProjectedGamesPlayed
+        self.projected_goals_attr = TsnDotCaScraper.ProjectedGoals + NhlCbsSportsDotComSraper.ProjectedGoals
+        self.projected_assists_attr = TsnDotCaScraper.ProjectedAssists + NhlCbsSportsDotComSraper.ProjectedAssists
+        self.projected_wins_attr = TsnDotCaScraper.ProjectedWins + NhlCbsSportsDotComSraper.ProjectedWins
+        self.projected_ties_attr = TsnDotCaScraper.ProjectedTies + NhlCbsSportsDotComSraper.ProjectedTies
+        self.projected_shutouts_attr = TsnDotCaScraper.ProjectedShutouts + NhlCbsSportsDotComSraper.ProjectedShutouts
 
 
     def normalize_playername(self,name):
@@ -154,6 +156,7 @@ class HockeyPlayer(Player):
 class TestHockeyPlayer(unittest.TestCase):
 
     def testHockeyPlayer(self):
+
         p = HockeyPlayer(name="JDS")
         self.assertNotEqual(p, None)
         self.assertEqual(p.pointsPerGame(),0)
@@ -164,11 +167,30 @@ class TestHockeyPlayer(unittest.TestCase):
         p.property[p.projected_assists_attr[0]] = "5"
         self.assertEqual(p.pointsPerGame(),0.5)
 
-
     def testTeamAbbreviate(self):
         p = HockeyPlayer(name="noname")
         self.assertEqual(p.team_abbreviate('Pittsburgh'),'pit')
         self.assertEqual(p.team_abbreviate('.P.I.T.'),'pit')
+
+    def testGoalieAbbreviate(self):
+
+        p = HockeyPlayer(name='goalburg')
+        print p.projected_shutouts_attr
+
+        self.assertEqual(p.pointsPerGame(),0)
+
+        p.property[p.projected_games_played_attr[-1]] = "10"
+        self.assertEqual(p.pointsPerGame(),0)
+
+        p.property[p.projected_wins_attr[-1]] = "5"
+        self.assertEqual(p.pointsPerGame(),1.0)
+
+        p.property[p.projected_shutouts_attr[-1]] = "10"
+        self.assertEqual(p.pointsPerGame(),5.0)
+
+
+
+
 
 
 if __name__ == '__main__':

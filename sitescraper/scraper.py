@@ -30,12 +30,10 @@ class SiteScraper(object):
 
         self.url = url
         self.retries = retries
-        self.data = None
         self.debug = False
         self.verbose = True
         self.testmode = False
         self.cache = {}
-        self.link = {}
         self.maxCacheTime = datetime.timedelta(days=1)
         self.cookiefile = None
 
@@ -156,8 +154,6 @@ class SiteScraper(object):
 
         data = SiteScraper.scrape(self,urlOffset=urlOffset)
 
-        self.link = {}
-
         if data is not None:
             tableList = data.find_all('table', attrs=attrs)
 
@@ -179,7 +175,7 @@ class SiteScraper(object):
 
         data = SiteScraper.scrape(self,urlOffset=urlOffset)
 
-        self.link = {}
+        link = {}
 
         table = None
         if data is not None:
@@ -203,9 +199,9 @@ class SiteScraper(object):
         if table is None:
             return data
 
-        for link in table.findAll("a"):
-            if link.has_attr('href'):
-                self.link[link.text.strip()] = link['href']
+        for link_found in table.findAll("a"):
+            if link_found.has_attr('href'):
+                link[link_found.text.strip()] = link_found['href']
 
         data = []
 
@@ -213,6 +209,9 @@ class SiteScraper(object):
             cols = row.find_all('td')
             cols = [ele.text.strip() for ele in cols]
             data.append([ele for ele in cols])
+
+        # ToDo: get rid of this -- it is not thread safe!!!
+        self.link = link
 
         return data
 
@@ -253,8 +252,8 @@ class TestSiteScraper(unittest.TestCase):
         #print table
         self.assertNotEquals(table,None)
 
-        s.scrapeTable(attrs={'class': 'example'})
-        print s.data
+        data = s.scrapeTable(attrs={'class': 'example'})
+        print data
 
         s.cache = None
         data = s.scrape()

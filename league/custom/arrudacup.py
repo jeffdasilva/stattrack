@@ -23,6 +23,7 @@ class ArrudaCupHockeyLeague(HockeyLeague):
     def __init__(self):
         from cli.cmd.command import SearchByPositionCommand, DraftedByCommand
         from sitescraper.nhl.tsndotca import TsnDotCaScraper
+        from sitescraper.nhl.cbssportsdotcom import NhlCbsSportsDotComSraper
         from sitescraper.fantasy.arrudacupcbssportsdotcom import ArrudaCupCbsSportsDotComSraper
 
         name = "ArrudaCup"
@@ -52,7 +53,7 @@ class ArrudaCupHockeyLeague(HockeyLeague):
 
         self.parser.autosave = False
 
-        self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper()]
+        self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper(),NhlCbsSportsDotComSraper()]
 
         self.enable_rotoworld_scraper = True
 
