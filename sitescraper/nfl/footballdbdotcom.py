@@ -46,7 +46,7 @@ class FootballDBDotComScraper(SiteScraper):
         for position in [ "QB", "RB", "WR", "TE"]:
             urlOffset = "/players/current.html?pos=" + position
             playerList = self.scrapeTable(urlOffset=urlOffset,attrs={'class':'statistics'})
-            playerLinks = self.link.copy()
+            playerLinks = self.scrapeLinks(urlOffset=urlOffset)
 
             playerCount = 0
 

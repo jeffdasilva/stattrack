@@ -170,12 +170,9 @@ class SiteScraper(object):
 
         return data
 
-
     def scrapeTable(self, urlOffset=None, attrs={}, index=None):
 
         data = SiteScraper.scrape(self,urlOffset=urlOffset)
-
-        link = {}
 
         table = None
         if data is not None:
@@ -199,10 +196,6 @@ class SiteScraper(object):
         if table is None:
             return data
 
-        for link_found in table.findAll("a"):
-            if link_found.has_attr('href'):
-                link[link_found.text.strip()] = link_found['href']
-
         data = []
 
         for row in table.findAll("tr"):
@@ -210,10 +203,18 @@ class SiteScraper(object):
             cols = [ele.text.strip() for ele in cols]
             data.append([ele for ele in cols])
 
-        # ToDo: get rid of this -- it is not thread safe!!!
-        self.link = link
-
         return data
+
+    def scrapeLinks(self, urlOffset=None, attrs={}):
+
+        data = SiteScraper.scrape(self,urlOffset=urlOffset)
+
+        link = {}
+        for link_found in data.findAll("a", attrs=attrs):
+            if link_found.has_attr('href'):
+                link[link_found.text.strip()] = link_found['href']
+
+        return link
 
 class TestSiteScraper(unittest.TestCase):
 
@@ -240,6 +241,9 @@ class TestSiteScraper(unittest.TestCase):
         #print len(linkList)
         self.assertGreaterEqual(len(linkList),10)
 
+        l = s.scrapeLinks()
+        self.assertGreaterEqual(len(l),10)
+        #print l
 
     def testTable(self):
         s = SiteScraper("http://www.html.am/html-codes/tables/")
@@ -258,8 +262,6 @@ class TestSiteScraper(unittest.TestCase):
         s.cache = None
         data = s.scrape()
         self.assertNotEquals(data,None)
-
-
 
 if __name__ == '__main__':
     unittest.main()

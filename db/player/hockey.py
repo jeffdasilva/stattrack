@@ -162,10 +162,10 @@ class HockeyPlayer(Player):
             #  - if a player is 18 years old (A_1 = 18), then use multiplier 1.2X (F_1 = 1.2)
             #  - if a player is 40 years old (A_2 = 40), then use multiplier 0.8X (F_2 = 0.8)
             # and now solve (for x & y) the generic linear solution to F = Ax + y
-            F_1 = 1.2
             A_1 = 18
-            F_2 = 0.8
+            F_1 = 1.2
             A_2 = 40
+            F_2 = 0.8
             x = (F_1 - F_2) / (A_1 - A_2)
             y = ((F_1 * A_2) - (F_2 * A_1)) / (A_2 - A_1)
             F = (self.age() * x) + y
