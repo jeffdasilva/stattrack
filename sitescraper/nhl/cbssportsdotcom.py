@@ -48,6 +48,9 @@ class NhlCbsSportsDotComSraper(SiteScraper):
                 data[-1]['name'],data[-1]['team'] = data[-1]['cbssports.proj.player'].replace(u'\xa0',u'').rsplit(',',1)
                 del data[-1]['cbssports.proj.player']
 
+                data[-1]['position'] = position
+
+
         return data
 
     def scrape(self):
@@ -94,6 +97,7 @@ class TestNhlCbsSportsDotComSraper(unittest.TestCase):
             if str(d['name']) == "Connor McDavid":
                 print d
                 McDavidFound += 1
+                self.assertEqual(d['position'], 'C')
 
             elif str(d['name']) == "Tuukka Rask":
                 print d
@@ -104,6 +108,8 @@ class TestNhlCbsSportsDotComSraper(unittest.TestCase):
                 self.assertGreater(p.projectedGoaltenderShutOuts(), 0)
                 self.assertGreater(p.projectedGoaltenderWins(),20)
                 self.assertGreater(p.pointsPerGame(),1.0)
+                self.assertTrue('G' in p.position)
+
 
         self.assertEquals(McDavidFound,1)
         self.assertEquals(RaskFound,1)
