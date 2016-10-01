@@ -150,6 +150,17 @@ class HockeyPlayer(Player):
             value = self.points() / 82
         else:
             value = self.pointsPerGame()
+
+        if 'G' in self.position:
+            value = value * 0.8
+        elif 'D' in self.position:
+            value = value * 1.4
+
+        if self.age() != '?':
+            # for keeper leagues
+            # this is a linear value function where an 18 year old gets 1.4X and a 40 year old gets 0.7X
+            value = value * (self.age()*(-0.0318) + 1.9727)
+
         return value
 
 
@@ -187,10 +198,6 @@ class TestHockeyPlayer(unittest.TestCase):
 
         p.property[p.projected_shutouts_attr[-1]] = "10"
         self.assertEqual(p.pointsPerGame(),5.0)
-
-
-
-
 
 
 if __name__ == '__main__':
