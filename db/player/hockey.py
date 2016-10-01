@@ -152,14 +152,24 @@ class HockeyPlayer(Player):
             value = self.pointsPerGame()
 
         if 'G' in self.position:
-            value = value * 0.8
+            value = value * 0.75
         elif 'D' in self.position:
-            value = value * 1.4
+            value = value * 1.2
 
         if self.age() != '?':
-            # for keeper leagues
-            # this is a linear value function where an 18 year old gets 1.4X and a 40 year old gets 0.7X
-            value = value * (self.age()*(-0.0318) + 1.9727)
+            # this if is is for keeper leagues (younger players are more valuable
+            # use a linear function given age (A) as input find multiplier (F)
+            #  - if a player is 18 years old (A_1 = 18), then use multiplier 1.2X (F_1 = 1.2)
+            #  - if a player is 40 years old (A_2 = 40), then use multiplier 0.8X (F_2 = 0.8)
+            # and now solve (for x & y) the generic linear solution to F = Ax + y
+            F_1 = 1.2
+            A_1 = 18
+            F_2 = 0.8
+            A_2 = 40
+            x = (F_1 - F_2) / (A_1 - A_2)
+            y = ((F_1 * A_2) - (F_2 * A_1)) / (A_2 - A_1)
+            F = (self.age() * x) + y
+            value = value * F
 
         return value
 
