@@ -1,5 +1,6 @@
 
 import copy
+from multiprocessing.pool import ThreadPool
 import unittest
 
 from db.hockeydb import HockeyPlayerDB
@@ -70,13 +71,23 @@ class ArrudaCupHockeyLeague(HockeyLeague):
         #self.enable_rotoworld_scraper = False
         if self.enable_rotoworld_scraper:
             from sitescraper.multisport.rotoworlddotcom import RotoWorldDotComScraper
-
             rotoScrape = RotoWorldDotComScraper(league='nhl')
+            #rotoScrape.debug = True
 
+            players = []
             for p in self.db.player:
-                pStats = rotoScrape.scrape(playerName=self.db.player[p].name)
-                if pStats is not None:
-                    self.db.player[p].update(pStats)
+                players.append(self.db.player[p].name)
+
+            numOfThreads = 16
+
+            pool = ThreadPool(numOfThreads)
+            statResults = pool.map(rotoScrape.scrape,players)
+            pool.close()
+            pool.join()
+
+            for p, pStat in zip(self.db.player,statResults):
+                if pStat is not None:
+                    self.db.player[p].update(pStat)
 
 
 class ArrudaCupHockeyLeagueTest(unittest.TestCase):
@@ -100,13 +111,6 @@ class ArrudaCupHockeyLeagueTest(unittest.TestCase):
         # test that deep copy operation works
         stack = []
         stack.append(copy.deepcopy(l.db))
-
-        #p = l.db.player["aaron rodgers - gb"]
-        #self.assertEqual(p.passingTwoPointers(year=2015),4)
-        #print p
-        #print "Passing Attempts: " + str(p.passingAttempts())
-        #print "Passing TDs: " + str(p.projectedPassingTDs())
-
 
 if __name__ == "__main__":
     unittest.main()
