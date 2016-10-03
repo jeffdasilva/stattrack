@@ -29,7 +29,7 @@ class NhlCbsSportsDotComSraper(SiteScraper):
         super(NhlCbsSportsDotComSraper, self).__init__(url="http://www.cbssports.com")
         self.maxCacheTime = datetime.timedelta(days=7)
         self.positions = ['C','RW','LW','D','G']
-        self.retries = 1
+        self.retries = 2
 
     def scrapeProjectionsByPosition(self,position):
 
