@@ -59,7 +59,7 @@ class ArrudaCupCbsSportsDotComSraper(SiteScraper):
     def scrape(self):
 
         leagueData = []
-        numOfThreads = 6
+        numOfThreads = max(8,len(self.team))
 
         if numOfThreads == 0:
             for team_i in self.team:

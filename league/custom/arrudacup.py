@@ -78,13 +78,15 @@ class ArrudaCupHockeyLeague(HockeyLeague):
             for p in self.db.player:
                 players.append(self.db.player[p].name)
 
-            numOfThreads = 16
+            numOfThreads = 10
+            statResults = rotoScrape.scrapeWithThreadPool(rotoScrape.scrape, players, numOfThreads)
 
-            pool = ThreadPool(numOfThreads)
-            statResults = pool.map(rotoScrape.scrape,players)
-            pool.close()
-            pool.join()
+            #pool = ThreadPool(numOfThreads)
+            #statResults = pool.map(rotoScrape.scrape,players)
+            #pool.close()
+            #pool.join()
 
+            assert(len(self.db.player) == len(statResults))
             for p, pStat in zip(self.db.player,statResults):
                 if pStat is not None:
                     self.db.player[p].update(pStat)

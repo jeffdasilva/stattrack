@@ -1,5 +1,4 @@
 import datetime
-from multiprocessing.pool import ThreadPool
 import unittest
 
 from db.player.strings import HockeyPlayerStrings
@@ -71,20 +70,11 @@ class NhlCbsSportsDotComSraper(SiteScraper):
     def scrape(self):
 
         numOfThreads = len(self.positions)
+        results = self.scrapeWithThreadPool(self.scrapeProjectionsByPosition,self.positions,numOfThreads)
 
         data = []
-
-        if numOfThreads == 0:
-            for p in self.positions:
-                data += self.scrapeProjectionsByPosition(p)
-        else:
-            pool = ThreadPool(numOfThreads)
-            result = pool.map(self.scrapeProjectionsByPosition,self.positions)
-            pool.close()
-            pool.join()
-
-            for r in result:
-                data += r
+        for r in results:
+            data += r
 
         return data
 

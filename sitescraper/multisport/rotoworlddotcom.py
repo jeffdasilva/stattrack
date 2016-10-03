@@ -73,17 +73,12 @@ class RotoWorldDotComScraper(SiteScraper):
             urlOffset = "/content/playersearch.aspx?searchname=" + playerSearchString + "&sport=" + self.league.lower()
 
 
-        data = self.scrapeTable(urlOffset=urlOffset, attrs={'id':'cp1_ctl00_tblPlayerDetails'})
-        playerDetails = data
+        playerDetails = self.scrapeTable(urlOffset=urlOffset, attrs={'id':'cp1_ctl00_tblPlayerDetails'})
 
-        #print playerDetails
-
-        data = self.scrapeTable(urlOffset=urlOffset, attrs={'class':'statstable'},index="Career Stats")
-        if data is None:
+        statsTable = self.scrapeTable(urlOffset=urlOffset, attrs={'class':'statstable'},index="Career Stats")
+        if statsTable is None:
             print "No Rotoworld data found for " + playerName
-            return data
-
-        statsTable = data
+            return None
 
         while len(statsTable) > 0 and len(statsTable[0]) == 0:
             statsTable = statsTable[1:]
@@ -94,8 +89,6 @@ class RotoWorldDotComScraper(SiteScraper):
         else:
             print "No Rotoworld data found for " + playerName
             return None
-
-        #print statsTable
 
         stats = []
         for data in statsTable:
@@ -161,7 +154,7 @@ class TestRotoWorldDotComScraper(unittest.TestCase):
         print data
         self.assertNotEquals(data, None)
 
-        #s.cache = None
+        s.cache = None
         for name in ["Ben Roethlisberger", "Adrian Peterson", "Alex Smith", "Brandon Marshall", \
                      "Marvin Jones", "Jonathan Stewart", "Matt Jones", "Zach Miller", "Charles Clay", \
                      "Ryan Griffin",  "Chris Thompson", "Josh Hill", "Kevin White"]:

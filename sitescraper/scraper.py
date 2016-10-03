@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 import cookielib
 import datetime
 import httplib
+from multiprocessing.pool import ThreadPool
 import os
 import pickle
 import socket
@@ -34,6 +35,7 @@ class SiteScraper(object):
         self.verbose = True
         self.testmode = False
         self.cache = {}
+        self.cacheSaveEnabled = True
         self.maxCacheTime = datetime.timedelta(days=1)
         self.cookiefile = None
 
@@ -45,10 +47,11 @@ class SiteScraper(object):
         return self.saveCacheDir + "/" + self.url.rsplit('://',1)[-1].strip('/').replace('/','_') + "_scrape.pickle"
 
     def cacheSave(self):
-        if self.cache is None:
+        if self.cache is None or not self.cacheSaveEnabled:
             return
 
-        self.cacheLock.acquire()
+        #lock is done by caller
+        #self.cacheLock.acquire()
         try:
             if not os.path.exists(os.path.dirname(self.cacheFileName())):
                 os.makedirs(os.path.dirname(self.cacheFileName()))
@@ -56,7 +59,8 @@ class SiteScraper(object):
             with open(self.cacheFileName(), 'wb') as handle:
                 pickle.dump(self.cache, handle)
         finally:
-            self.cacheLock.release()
+            pass
+            #self.cacheLock.release()
 
     def cacheLoad(self):
         if self.cache is None:
@@ -85,25 +89,29 @@ class SiteScraper(object):
         url = url.strip()
 
         if self.cache != None:
-            if url in self.cache and 'html' in self.cache[url]:
-                if 'timestamp' in self.cache[url]:
-                    elapsedTimeInCache = datetime.datetime.now() - self.cache[url]['timestamp']
-                    if elapsedTimeInCache < self.maxCacheTime:
-                        if self.debug: print " [Cache Hit] " + url
-                        html = self.cache[url]['html']
-                        soup = BeautifulSoup(html, "lxml")
-                        data = soup
-                        return data
+            self.cacheLock.acquire()
+            try:
+                if url in self.cache and 'html' in self.cache[url]:
+                    if 'timestamp' in self.cache[url]:
+                        elapsedTimeInCache = datetime.datetime.now() - self.cache[url]['timestamp']
+                        if elapsedTimeInCache < self.maxCacheTime:
+                            if self.debug: print " [Cache Hit] " + url
+                            html = self.cache[url]['html']
+                            soup = BeautifulSoup(html, "lxml")
+                            data = soup
+                            return data
+                        else:
+                            if self.debug:
+                                print " [Cache Expired] " + url
+                                print "   Timestamp is:           " + str(self.cache[url]['timestamp'])
+                                print "   Elapsed time in cache: " + str(elapsedTimeInCache)
+                                print "   Max time in cache:     " + str(self.maxCacheTime)
                     else:
-                        if self.debug:
-                            print " [Cache Expired] " + url
-                            print "   Timestamp is:           " + str(self.cache[url]['timestamp'])
-                            print "   Elapsed time in cache: " + str(elapsedTimeInCache)
-                            print "   Max time in cache:     " + str(self.maxCacheTime)
+                        if self.debug: print " [Cache Miss with No Timestamp] " + url
                 else:
-                    if self.debug: print " [Cache Miss with No Timestamp] " + url
-            else:
-                if self.debug: print " [Cache Miss] " + url
+                    if self.debug: print " [Cache Miss] " + url
+            finally:
+                self.cacheLock.release()
         else:
             if self.debug: print " [Cache Disabled] " + url
 
@@ -122,13 +130,13 @@ class SiteScraper(object):
 
                 proxy = os.environ.get('HTTP_PROXY')
                 if proxy is not None:
-                    if self.debug: print "HTTP_PROXY set to " + proxy
+                    if self.debug: print "   [DEBUG] HTTP_PROXY set to " + proxy
 
                 request = urllib2.Request(url,headers=hdr)
-                if self.debug: print "urllib2.Request() - Done"
+                if self.debug: print "   [DEBUG] urllib2.Request() - Done"
 
                 htmlFP = urllib2.urlopen(request, timeout=5)
-                if self.debug: print "urllib2.urlopen() - Done"
+                if self.debug: print "   [DEBUG] urllib2.urlopen() - Done"
 
                 html = htmlFP.read()
             except (socket.error, httplib.BadStatusLine, urllib2.HTTPError, httplib.IncompleteRead):
@@ -142,10 +150,14 @@ class SiteScraper(object):
                 soup = BeautifulSoup(html, "lxml")
                 data = soup
                 if self.cache is not None:
-                    if self.debug: print " [Cache Updated] " + url
-                    self.cache[url] = {'html':html, 'timestamp':datetime.datetime.now()}
-                    self.cacheSave()
-                    if self.debug: print "   Timestamp is:           " + str(self.cache[url]['timestamp'])
+                    self.cacheLock.acquire()
+                    try:
+                        if self.debug: print " [Cache Updated] " + url
+                        self.cache[url] = {'html':html, 'timestamp':datetime.datetime.now()}
+                        self.cacheSave()
+                        if self.debug: print "   Timestamp is:           " + str(self.cache[url]['timestamp'])
+                    finally:
+                        self.cacheLock.release()
                 break
             else:
                 if self.debug: print " [SCRAPE returned no html] " + url
@@ -223,6 +235,34 @@ class SiteScraper(object):
                 link[link_found.text.strip()] = link_found['href']
 
         return link
+
+    def scrapeWithThreadPool(self,func,iterable,numOfThreads):
+
+        if numOfThreads == 0:
+            result = []
+            for i in iterable:
+                result.append(func(i))
+        else:
+            self.cacheSaveEnabled = False
+            try:
+                pool = ThreadPool(numOfThreads)
+                result = pool.map(func,iterable)
+                pool.close()
+                pool.join()
+            finally:
+                self.cacheSaveEnabled = True
+
+            self.cacheLock.acquire()
+            try:
+                self.cacheSave()
+            finally:
+                self.cacheLock.release()
+
+
+
+        return result
+
+
 
 class TestSiteScraper(unittest.TestCase):
 
