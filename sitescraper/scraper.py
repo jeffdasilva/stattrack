@@ -135,7 +135,7 @@ class SiteScraper(object):
                 request = urllib2.Request(url,headers=hdr)
                 if self.debug: print "   [DEBUG] urllib2.Request() - Done"
 
-                htmlFP = urllib2.urlopen(request, timeout=5)
+                htmlFP = urllib2.urlopen(request, timeout=30)
                 if self.debug: print "   [DEBUG] urllib2.urlopen() - Done"
 
                 html = htmlFP.read()

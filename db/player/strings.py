@@ -7,6 +7,7 @@ class PlayerStrings(object):
     Position = 'position'
     Team = 'team'
     FantasyOwner = 'owner'
+    Link = 'link'
     GamesPlayed = 'GamesPlayed'
     ProjectedPrefix = 'Projected'
 
@@ -15,6 +16,8 @@ class PlayerStrings(object):
             self.prefix = ""
         else:
             self.prefix = prefix
+
+        self.map = {}
 
     def name(self):
         return PlayerStrings.Name
@@ -34,6 +37,9 @@ class PlayerStrings(object):
         else:
             return self.prefix + "."
 
+    def link(self):
+        return self.addprefix() + PlayerStrings.Link
+
     def statString(self,string):
             return self.addprefix() + string
 
@@ -45,6 +51,15 @@ class PlayerStrings(object):
 
     def projectedGamesPlayed(self):
         return self.projectedString(PlayerStrings.GamesPlayed)
+
+    def sanitize(self,stat_name):
+
+        stat_name = stat_name.lower()
+        if stat_name in self.map:
+            stat_name = self.map[stat_name]
+
+        return stat_name
+
 
 class HockeyPlayerStrings(PlayerStrings):
 

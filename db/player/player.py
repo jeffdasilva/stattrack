@@ -97,7 +97,9 @@ class Player(object):
         return 0
 
     def age(self, year=datetime.datetime.now().year):
-        if 'rotoworld' in self.property:
+        if 'age' in self.property:
+            return int(self.property['age'])
+        elif 'rotoworld' in self.property:
             age = str(self.property['rotoworld'][1][1]).split(' / ')[0].lstrip('(').rstrip(')')
 
             try:

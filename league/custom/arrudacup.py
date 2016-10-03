@@ -1,11 +1,11 @@
 
 import copy
-from multiprocessing.pool import ThreadPool
 import unittest
 
 from db.hockeydb import HockeyPlayerDB
 from league.hockey import HockeyLeague
 from league.rules import HockeyRules
+from sitescraper.nhl.cbssportsdotcom import NhlCbsSportsDotComSraper
 
 
 class ArrudaCupHockeyRules(HockeyRules):
@@ -24,7 +24,6 @@ class ArrudaCupHockeyLeague(HockeyLeague):
     def __init__(self):
         from cli.cmd.command import SearchByPositionCommand, DraftedByCommand
         from sitescraper.nhl.tsndotca import TsnDotCaScraper
-        from sitescraper.nhl.cbssportsdotcom import NhlCbsSportsDotComSraper
         from sitescraper.fantasy.arrudacupcbssportsdotcom import ArrudaCupCbsSportsDotComSraper
 
         name = "ArrudaCup"
@@ -56,7 +55,8 @@ class ArrudaCupHockeyLeague(HockeyLeague):
 
         self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper(),NhlCbsSportsDotComSraper()]
 
-        self.enable_rotoworld_scraper = True
+        self.enable_rotoworld_player_scraper = True
+        self.enable_cbssports_player_scraper = True
 
     def update(self):
 
@@ -68,8 +68,12 @@ class ArrudaCupHockeyLeague(HockeyLeague):
         self.db = HockeyPlayerDB(self.name)
         self.update()
 
-        #self.enable_rotoworld_scraper = False
-        if self.enable_rotoworld_scraper:
+        if self.enable_cbssports_player_scraper:
+            cbssportsScrape = NhlCbsSportsDotComSraper()
+            cbssportsScrape.scrapePlayerList(self.db.get(listDrafted=True, listIgnored=False))
+
+        #self.enable_rotoworld_player_scraper = False
+        if self.enable_rotoworld_player_scraper:
             from sitescraper.multisport.rotoworlddotcom import RotoWorldDotComScraper
             rotoScrape = RotoWorldDotComScraper(league='nhl')
             #rotoScrape.debug = True
@@ -80,11 +84,6 @@ class ArrudaCupHockeyLeague(HockeyLeague):
 
             numOfThreads = 10
             statResults = rotoScrape.scrapeWithThreadPool(rotoScrape.scrape, players, numOfThreads)
-
-            #pool = ThreadPool(numOfThreads)
-            #statResults = pool.map(rotoScrape.scrape,players)
-            #pool.close()
-            #pool.join()
 
             assert(len(self.db.player) == len(statResults))
             for p, pStat in zip(self.db.player,statResults):
@@ -104,7 +103,8 @@ class ArrudaCupHockeyLeagueTest(unittest.TestCase):
 
     def testLeagueDB(self):
         l = ArrudaCupHockeyLeague()
-        l.enable_rotoworld_scraper = False
+        l.enable_rotoworld_player_scraper = False
+        l.enable_cbssports_player_scraper = False
         l.factoryReset()
 
         for player in l.db.player:
