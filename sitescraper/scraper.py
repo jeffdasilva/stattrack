@@ -120,8 +120,16 @@ class SiteScraper(object):
                     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
                     urllib2.install_opener(opener)
 
+                proxy = os.environ.get('HTTP_PROXY')
+                if proxy is not None:
+                    if self.debug: print "HTTP_PROXY set to " + proxy
+
                 request = urllib2.Request(url,headers=hdr)
-                htmlFP = urllib2.urlopen(request)
+                if self.debug: print "urllib2.Request() - Done"
+
+                htmlFP = urllib2.urlopen(request, timeout=5)
+                if self.debug: print "urllib2.urlopen() - Done"
+
                 html = htmlFP.read()
             except (socket.error, httplib.BadStatusLine, urllib2.HTTPError, httplib.IncompleteRead):
                 time.sleep(0.4)

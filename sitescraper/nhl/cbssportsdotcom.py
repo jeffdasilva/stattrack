@@ -2,23 +2,35 @@ import datetime
 from multiprocessing.pool import ThreadPool
 import unittest
 
+from db.player.strings import HockeyPlayerStrings
 from sitescraper.scraper import SiteScraper
 
 
 class NhlCbsSportsDotComSraper(SiteScraper):
 
-    ProjectedGamesPlayed = ['cbssports.proj.gp']
-    ProjectedGoals = ['cbssports.proj.g']
-    ProjectedAssists = ['cbssports.proj.a']
-    ProjectedWins = ['cbssports.proj.w']
-    ProjectedTies = []
-    ProjectedShutouts = ['cbssports.proj.so']
+    es = HockeyPlayerStrings('cbssports')
+
+    ProjStatMap = {
+        'gp'     : es.projectedGamesPlayed(),
+        'ggp'    : es.projectedGamesPlayed(),
+        'g'      : es.projectedGoals(),
+        'a'      : es.projectedAssists(),
+        'w'      : es.projectedWins(),
+        'so'     : es.projectedShutouts(),
+    }
+
+    ProjectedGamesPlayed = [es.projectedGamesPlayed()]
+    ProjectedGoals = [es.projectedGoals()]
+    ProjectedAssists = [es.projectedAssists()]
+    ProjectedWins = [es.projectedWins()]
+    ProjectedTies = [es.projectedTies()]
+    ProjectedShutouts = [es.projectedShutouts()]
 
     def __init__(self):
         super(NhlCbsSportsDotComSraper, self).__init__(url="http://www.cbssports.com")
         self.maxCacheTime = datetime.timedelta(days=3)
-
         self.positions = ['C','RW','LW','D','G']
+
 
     def scrapeProjectionsByPosition(self,position):
 
@@ -32,11 +44,11 @@ class NhlCbsSportsDotComSraper(SiteScraper):
 
         stat_type = []
         for statname in table_header:
-            # special case gpp for goalies
-            if statname.lower() == "ggp":
-                statname = "GP"
+            if statname.lower() in NhlCbsSportsDotComSraper.ProjStatMap:
+                stat_type.append(NhlCbsSportsDotComSraper.ProjStatMap[statname.lower()])
+            else:
+                stat_type.append(NhlCbsSportsDotComSraper.es.projectedString(statname.lower()))
 
-            stat_type.append("cbssports.proj." + str(statname).lower())
         assert(len(stat_type) == len(table_header))
 
         data = []
@@ -44,20 +56,21 @@ class NhlCbsSportsDotComSraper(SiteScraper):
         for ele in table_data:
             if len(stat_type) == len(ele):
                 data.append(dict(zip(stat_type,ele)))
-                assert('cbssports.proj.player' in data[-1])
-                data[-1]['name'],data[-1]['team'] = data[-1]['cbssports.proj.player'].replace(u'\xa0',u'').rsplit(',',1)
-                del data[-1]['cbssports.proj.player']
+                assert(NhlCbsSportsDotComSraper.es.projectedString('player') in data[-1])
+                data[-1]['name'],data[-1]['team'] = data[-1][NhlCbsSportsDotComSraper.es.projectedString('player')].replace(u'\xa0',u'').rsplit(',',1)
+                del data[-1][NhlCbsSportsDotComSraper.es.projectedString('player')]
                 data[-1]['position'] = position
 
                 if data[-1]['name'] in links:
-                    data[-1]['cbssports.link'] = self.url + links[data[-1]['name']]
+                    data[-1][NhlCbsSportsDotComSraper.es.projectedString('link')] = self.url + links[data[-1]['name']]
+
+                data[-1]['scraper'] = [NhlCbsSportsDotComSraper.es.prefix]
 
         return data
 
     def scrape(self):
 
         numOfThreads = len(self.positions)
-        #numOfThreads = 0
 
         data = []
 

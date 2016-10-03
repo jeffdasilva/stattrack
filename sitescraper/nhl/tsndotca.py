@@ -1,32 +1,54 @@
 import datetime
 import unittest
 
+from db.player.strings import HockeyPlayerStrings
 from sitescraper.scraper import SiteScraper
 
 
 class TsnDotCaScraper(SiteScraper):
 
+    esByPos = HockeyPlayerStrings('tsn.by_pos')
+    esTop300 = HockeyPlayerStrings('tsn.top300')
+
     # FYI - don't trust tsn's listed team because it could be out of date
-    Top300Stats = ["tsn.top300.rank", "name", "tsn.top300.team",
-                   "position", "tsn.top300.games", "tsn.top300.goals", \
-                   "tsn.top300.assists", "tsn.top300.points"]
+    Top300Stats = [esTop300.projectedString('rank'),
+                   esTop300.name(),
+                   esTop300.statString('team'),
+                   esTop300.position(),
+                   esTop300.projectedGamesPlayed(),
+                   esTop300.projectedGoals(),
+                   esTop300.projectedAssists(),
+                   esTop300.projectedPoints()
+                   ]
 
-    ByPositionStats = ["tsn.by_pos.rank", "name", "tsn.by_pos.team", \
-                       "tsn.by_pos.games", "tsn.by_pos.goals", "tsn.by_pos.assists", \
-                       "tsn.by_pos.points", "tsn.by_pos.plus-minus", "tsn.by_pos.ppp", \
-                       "tsn.by_pos.pim", "tsn.by_pos.hits", "tsn.by_pos.blocks", \
-                       "tsn.by_pos.shotsOnGoal"]
+    ByPositionStats = [esByPos.projectedString('rank'),
+                       esByPos.name(),
+                       esByPos.statString('team'),
+                       esByPos.projectedGamesPlayed(),
+                       esByPos.projectedGoals(),
+                       esByPos.projectedAssists(),
+                       esByPos.projectedPoints(),
+                       esByPos.projectedString('plus-minus'),
+                       esByPos.projectedString('ppp'),
+                       esByPos.projectedString('pim'),
+                       esByPos.projectedString('hits'),
+                       esByPos.projectedString('blocks'),
+                       esByPos.projectedString('shotsOnGoal')
+                       ]
 
-    # FYI - older version included shutouts and new versions sadly do not :(
-    ByPositionGoalieStats = ["tsn.by_pos.rank", "name", "tsn.by_pos.team", \
-                             "tsn.by_pos.games", "tsn.by_pos.wins", \
-                             "tsn.by_pos.goalsAgainstAverage", \
-                             "tsn.by_pos.savePercentage"]
+    ByPositionGoalieStats = [esByPos.projectedString('rank'),
+                             esByPos.name(),
+                             esByPos.statString('team'),
+                             esByPos.projectedGamesPlayed(),
+                             esByPos.projectedWins(),
+                             esByPos.projectedString('goalsAgainstAverage'),
+                             esByPos.projectedString('savePercentage')
+                             ]
 
-    ProjectedGamesPlayed = ['tsn.top300.games','tsn.by_pos.games']
-    ProjectedGoals = ['tsn.top300.goals','tsn.by_pos.goals']
-    ProjectedAssists = ['tsn.top300.assists','tsn.by_pos.assists']
-    ProjectedWins = ['tsn.by_pos.wins']
+    ProjectedGamesPlayed = [esTop300.projectedGamesPlayed(), esByPos.projectedGamesPlayed()]
+    ProjectedGoals = [esTop300.projectedGoals(), esByPos.projectedGoals()]
+    ProjectedAssists = [esTop300.projectedAssists(), esByPos.projectedAssists()]
+    ProjectedWins = [ esByPos.projectedWins() ]
     ProjectedTies = []
     ProjectedShutouts = []
 
@@ -36,6 +58,8 @@ class TsnDotCaScraper(SiteScraper):
         #self.maxCacheTime = datetime.timedelta(seconds=5)
 
     def scrape(self, year=datetime.datetime.now().year):
+
+        # scrape Scott Cullen's projections
 
         if str(year) == "2016":
             #top_300_tsn_version_string = "1.360216"
@@ -115,14 +139,15 @@ class TestTsnDotCaScraper(unittest.TestCase):
         for player in data:
             #print player['name']
             if str(player['name']) == "Connor McDavid":
-                if 'tsn.top300.team' in player:
-                    self.assertEqual(player['tsn.top300.team'], "Edmonton")
-                    self.assertGreaterEqual(player['tsn.top300.points'], 70)
-                    self.assertEqual(player['position'], 'C')
+                if TsnDotCaScraper.esTop300.statString('team') in player:
+                    print player
+                    self.assertEqual(player[TsnDotCaScraper.esTop300.statString('team')], "Edmonton")
+                    self.assertGreaterEqual(player[TsnDotCaScraper.esTop300.projectedPoints()], 70)
+                    self.assertEqual(player[TsnDotCaScraper.esTop300.position()], 'C')
                 else:
-                    self.assertEqual(player['tsn.by_pos.team'], "Edmonton")
-                    self.assertGreaterEqual(player['tsn.by_pos.points'], 70)
-                    self.assertEqual(player['position'], 'C')
+                    self.assertEqual(player[TsnDotCaScraper.esByPos.statString('team')], "Edmonton")
+                    self.assertGreaterEqual(player[TsnDotCaScraper.esByPos.projectedPoints()], 70)
+                    self.assertEqual(player[TsnDotCaScraper.esByPos.position()], 'C')
 
                 McDavidFound += 1
 
@@ -132,10 +157,10 @@ class TestTsnDotCaScraper(unittest.TestCase):
 
         for player in data:
             if str(player['name']) == "Tuukka Rask":
-                self.assertEqual(player['tsn.by_pos.team'], "Boston")
-                self.assertGreaterEqual(player['tsn.by_pos.wins'], 35)
-                self.assertGreaterEqual(player['tsn.by_pos.savePercentage'], 0.925)
-                self.assertEqual(player['position'], 'G')
+                self.assertEqual(player[TsnDotCaScraper.esByPos.statString('team')], "Boston")
+                self.assertGreaterEqual(player[TsnDotCaScraper.esByPos.projectedWins()], 35)
+                self.assertGreaterEqual(player[TsnDotCaScraper.esByPos.projectedString('savePercentage')], 0.925)
+                self.assertEqual(player[TsnDotCaScraper.esByPos.position()], 'G')
                 raskFound += 1
 
         self.assertEquals(raskFound,1)

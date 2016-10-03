@@ -67,16 +67,16 @@ class ArrudaCupHockeyLeague(HockeyLeague):
         self.db = HockeyPlayerDB(self.name)
         self.update()
 
+        #self.enable_rotoworld_scraper = False
         if self.enable_rotoworld_scraper:
             from sitescraper.multisport.rotoworlddotcom import RotoWorldDotComScraper
 
-            rotoScrape = RotoWorldDotComScraper()
+            rotoScrape = RotoWorldDotComScraper(league='nhl')
+
             for p in self.db.player:
-                #print "RotoWorld: Learning about " + self.db.player[p].name + "..."
-                pStats = rotoScrape.scrape(playerName=self.db.player[p].name, league="nhl")
+                pStats = rotoScrape.scrape(playerName=self.db.player[p].name)
                 if pStats is not None:
                     self.db.player[p].update(pStats)
-
 
 
 class ArrudaCupHockeyLeagueTest(unittest.TestCase):

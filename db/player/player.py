@@ -6,9 +6,12 @@ import datetime
 import unittest
 
 from db.player.hdict import HierarchicalDict
+from db.player.strings import PlayerStrings
 
 
 class Player(object):
+
+    es = PlayerStrings()
 
     def __init__(self, name=None, team=None, properties={}):
         '''
@@ -106,12 +109,19 @@ class Player(object):
         else:
             return '?'
 
-    def draft(self, cost=0):
+    def draft(self, cost=0, owner=None):
         self.isDrafted = True
         self.cost = cost
 
+        if owner is not None:
+            self.property[Player.es.owner()] = owner
+
     def undraft(self):
         self.isDrafted = False
+        self.cost = 0
+
+        if Player.es.owner() in self.property:
+            del self.property[Player.es.owner()]
 
     def ignore(self):
         self.isIgnored = True

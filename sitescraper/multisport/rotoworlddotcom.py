@@ -7,15 +7,17 @@ class RotoWorldDotComScraper(SiteScraper):
 
     GamesPlayed = 'G'
 
-    def __init__(self):
+    def __init__(self, league=None):
         super(RotoWorldDotComScraper, self).__init__(url="http://www.rotoworld.com")
 
-        self.maxCacheTime = datetime.timedelta(days=15)
-        #self.maxCacheTime = datetime.timedelta(days=4)
+        self.maxCacheTime = datetime.timedelta(days=30)
+        #self.maxCacheTime = datetime.timedelta(days=4)0
         #self.maxCacheTime = datetime.timedelta(hours=1)
 
+        self.league = league
 
-    def scrape(self, playerName, league):
+
+    def scrape(self, playerName):
 
         # ToDo:
         # Steve johnson vs Stevie johnson (sd) vs steven johnson (pit) is an issue
@@ -68,7 +70,7 @@ class RotoWorldDotComScraper(SiteScraper):
 
         if urlOffset is None:
             playerSearchString = playerSearchString.replace(' ','%20')
-            urlOffset = "/content/playersearch.aspx?searchname=" + playerSearchString + "&sport=" + league.lower()
+            urlOffset = "/content/playersearch.aspx?searchname=" + playerSearchString + "&sport=" + self.league.lower()
 
 
         data = self.scrapeTable(urlOffset=urlOffset, attrs={'id':'cp1_ctl00_tblPlayerDetails'})
@@ -117,50 +119,53 @@ class TestRotoWorldDotComScraper(unittest.TestCase):
 
     def testRotoWorldDotComScraper(self):
 
-        s = RotoWorldDotComScraper()
+        s = RotoWorldDotComScraper(league="nfl")
         s.testmode = True
         s.debug = True
 
-        data = s.scrape(playerName="Eli Manning", league="nfl")
+        data = s.scrape(playerName="Eli Manning")
         self.assertNotEquals(data, None)
         self.assertGreater(int(data['2015']['G']),0)
 
-        data = s.scrape(playerName="Tom Brady", league="nfl")
+        data = s.scrape(playerName="Tom Brady")
         self.assertNotEquals(data, None)
         self.assertGreater(int(data['2015']['G']),0)
 
-        data = s.scrape(playerName="Joe Thornton", league="nhl")
+
+        s.league = "nhl"
+        data = s.scrape(playerName="Joe Thornton")
         self.assertNotEquals(data, None)
 
-        data = s.scrape(playerName="Odell Beckham Jr.", league="nfl")
-        self.assertNotEquals(data, None)
-        self.assertGreater(int(data['2015']['G']),0)
-
-        data = s.scrape(playerName="Steve Smith", league="nfl")
-        self.assertNotEquals(data, None)
-        self.assertGreater(int(data['2015']['G']),0)
-
-        data = s.scrape(playerName="Javorius Allen", league="nfl")
+        s.league = "nfl"
+        data = s.scrape(playerName="Odell Beckham Jr.")
         self.assertNotEquals(data, None)
         self.assertGreater(int(data['2015']['G']),0)
 
-        data = s.scrape(playerName="Cam Newton", league="nfl")
+        data = s.scrape(playerName="Steve Smith")
+        self.assertNotEquals(data, None)
+        self.assertGreater(int(data['2015']['G']),0)
+
+        data = s.scrape(playerName="Javorius Allen")
+        self.assertNotEquals(data, None)
+        self.assertGreater(int(data['2015']['G']),0)
+
+        data = s.scrape(playerName="Cam Newton")
         self.assertNotEquals(data, None)
         self.assertEquals(int(data['2015']['G']),16)
 
-        data = s.scrape(playerName="David Johnson", league="nfl")
+        data = s.scrape(playerName="David Johnson")
         self.assertNotEquals(data, None)
         self.assertEquals(int(data['2015']['G']),16)
 
-        data = s.scrape(playerName="Austin Seferian-Jenkins", league="nfl")
+        data = s.scrape(playerName="Austin Seferian-Jenkins")
         print data
         self.assertNotEquals(data, None)
 
-        s.cache = None
+        #s.cache = None
         for name in ["Ben Roethlisberger", "Adrian Peterson", "Alex Smith", "Brandon Marshall", \
                      "Marvin Jones", "Jonathan Stewart", "Matt Jones", "Zach Miller", "Charles Clay", \
                      "Ryan Griffin",  "Chris Thompson", "Josh Hill", "Kevin White"]:
-            data = s.scrape(playerName=name, league="nfl")
+            data = s.scrape(playerName=name)
             print data
             self.assertNotEquals(data, None)
 

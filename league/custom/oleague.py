@@ -85,12 +85,12 @@ class OLeagueFootballLeague(FootballLeague):
         self.db = FootballPlayerDB(self.name)
         self.db.wget(scrapers=[FootballDBDotComScraper()])
 
-        rotoScrape = RotoWorldDotComScraper()
+        rotoScrape = RotoWorldDotComScraper(league="nfl")
         for p in self.db.player:
             if 'DEF' in self.db.player[p].position:
                 continue
             #print "RotoWorld: Learning about " + self.db.player[p].name + "..."
-            pStats = rotoScrape.scrape(playerName=self.db.player[p].name, league="nfl")
+            pStats = rotoScrape.scrape(playerName=self.db.player[p].name)
             if pStats is not None:
                 self.db.player[p].update(pStats)
 
