@@ -1,6 +1,3 @@
-'''
-@author: jdasilva
-'''
 
 import unittest
 
@@ -10,8 +7,9 @@ class HierarchicalDict(dict):
 
     def update(self,dict2):
 
-        if dict2 is None or not isinstance(dict2, dict):
-            # then do whatever the parent dict() class does in this error case
+        if dict2 is None:
+            dict.update(self,dict2)
+        elif not isinstance(dict2, dict):
             dict.update(self,dict2)
 
         for key in dict2:
@@ -30,6 +28,19 @@ class HierarchicalDict(dict):
                     self[key] = HierarchicalDict(dict2[key])
                     if '' not in self[key]:
                         self[key][''] = oldKeyValue
+
+                elif isinstance(self[key], list) or isinstance(dict2[key], list):
+
+                    if not isinstance(self[key], list):
+                        self[key] = [ self[key] ]
+
+                    list_to_add = dict2[key]
+                    if not isinstance(list_to_add, list):
+                        list_to_add = [ list_to_add ]
+
+                    # list contains only unique values
+                    self[key] = self[key] + list(set(list_to_add) - set(self[key]))
+
                 else:
                     self[key] = dict2[key]
             else:
@@ -128,6 +139,14 @@ class TestHierarchicalDict(unittest.TestCase):
         self.assertEquals(hd['foo']['2015']['a']['this'],'deep')
         self.assertEquals(hd['foo']['2015']['a'][''],'x')
         self.assertEquals(len(hd['foo']['2015']['a']),2)
+
+    def testUpdateWithList(self):
+        hd = HierarchicalDict({})
+        hd.update({'a':'1','b':[2]})
+        hd.update({'a':['2'],'b':'1'})
+        print hd
+        self.assertEquals(len(hd['a']),2)
+        self.assertEquals(len(hd['b']),2)
 
 if __name__ == '__main__':
     unittest.main()

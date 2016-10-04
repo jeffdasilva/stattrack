@@ -37,8 +37,14 @@ class PlayerStrings(object):
         else:
             return self.prefix + "."
 
-    def link(self):
-        return self.addprefix() + PlayerStrings.Link
+    def link(self, sublink=None):
+
+        if sublink is not None and sublink != "":
+            sublink_string = str(sublink) + "."
+        else:
+            sublink_string = ""
+
+        return self.addprefix() + sublink_string + PlayerStrings.Link
 
     def statString(self,string):
             return self.addprefix() + string

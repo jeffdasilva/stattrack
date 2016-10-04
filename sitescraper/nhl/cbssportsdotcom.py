@@ -78,17 +78,21 @@ class NhlCbsSportsDotComSraper(SiteScraper):
 
         return data
 
+    def getUrlOffset(self,url):
+        if url.startswith(self.url):
+            urlOffset = url[len(self.url):]
+        else:
+            raise ValueError('Unexpected player link found in ' + self.url + ' scraper: ' + url )
+        return urlOffset
+
     def scrapePlayer(self,player):
 
         if NhlCbsSportsDotComSraper.es.link() not in player.property:
             return None
 
         url = player.property[NhlCbsSportsDotComSraper.es.link()]
-        if [ url.startswith(self.url) ]:
-            urlOffset = url[len(self.url):]
-        else:
-            raise ValueError('Unexpected player link found in ' + self.url + ' scraper: ' + url )
 
+        urlOffset = self.getUrlOffset(url)
         data = SiteScraper.scrape(self,urlOffset=urlOffset)
         if data is None:
             return None
@@ -104,11 +108,35 @@ class NhlCbsSportsDotComSraper(SiteScraper):
             stat_name = NhlCbsSportsDotComSraper.es.sanitize(stat_name)
             stat_properties[stat_name] = stat_data
 
+        links = SiteScraper.scrapeLinks(self,urlOffset=urlOffset)
+        if 'FULL CAREER STATS' in links:
+            stat_properties[NhlCbsSportsDotComSraper.es.link('CareerStats')] = self.url + links['FULL CAREER STATS']
+
         player.update(stat_properties)
+
+        self.scrapePlayerCareerStats(player)
+
         return stat_properties
 
+    def scrapePlayerCareerStats(self,player):
+
+        if NhlCbsSportsDotComSraper.es.link('CareerStats') not in player.property:
+            return None
+
+
+        url = player.property[NhlCbsSportsDotComSraper.es.link('CareerStats')]
+        urlOffset = self.getUrlOffset(url)
+        data = self.scrapeTable(urlOffset=urlOffset, attrs={'class':'data compact'},index="YEAR")
+
+        if data is None:
+            return None
+
+        #do something with the data
+        #print data
+
+
     def scrapePlayerList(self,playerList):
-        numOfThreads = min(len(playerList),8)
+        numOfThreads = min(len(playerList),6)
         results = self.scrapeWithThreadPool(self.scrapePlayer,playerList,numOfThreads)
         return results
 
@@ -154,6 +182,7 @@ class TestNhlCbsSportsDotComSraper(unittest.TestCase):
                 #print p.age()
                 self.assertNotEqual(p.age(),'?')
                 self.assertGreaterEqual(int(p.age()),29)
+                print p.property[NhlCbsSportsDotComSraper.es.link('CareerStats')]
 
 
         self.assertEquals(McDavidFound,1)

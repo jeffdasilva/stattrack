@@ -59,7 +59,7 @@ class SiteScraper(object):
             with open(self.cacheFileName(), 'wb') as handle:
                 pickle.dump(self.cache, handle)
         finally:
-            pass
+            if self.debug: print " [Cache Save] " + self.cacheFileName()
             #self.cacheLock.release()
 
     def cacheLoad(self):
@@ -238,22 +238,28 @@ class SiteScraper(object):
 
     def scrapeWithThreadPool(self,func,iterable,numOfThreads):
 
+        numOfThreads = min(numOfThreads,6)
+
         if numOfThreads == 0:
             result = []
             for i in iterable:
                 result.append(func(i))
         else:
+            assert(self.cacheSaveEnabled)
             self.cacheSaveEnabled = False
             try:
+                assert(numOfThreads <= 6)
                 pool = ThreadPool(numOfThreads)
                 result = pool.map(func,iterable)
                 pool.close()
                 pool.join()
+                assert(not self.cacheSaveEnabled)
             finally:
                 self.cacheSaveEnabled = True
 
             self.cacheLock.acquire()
             try:
+                assert(self.cacheSaveEnabled)
                 self.cacheSave()
             finally:
                 self.cacheLock.release()

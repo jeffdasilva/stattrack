@@ -1,5 +1,4 @@
 import datetime
-from multiprocessing.pool import ThreadPool
 import os
 import unittest
 
@@ -58,23 +57,14 @@ class ArrudaCupCbsSportsDotComSraper(SiteScraper):
 
     def scrape(self):
 
+        numOfThreads = min(6,len(self.team))
+        result = self.scrapeWithThreadPool(self.scrapeIndividualTeam, self.team.keys(), numOfThreads)
+
         leagueData = []
-        numOfThreads = max(8,len(self.team))
 
-        if numOfThreads == 0:
-            for team_i in self.team:
-                r = self.scrapeIndividualTeam(team_i)
-                if len(r) > 3:
-                    leagueData.append(r[3:])
-        else:
-            pool = ThreadPool(numOfThreads)
-            result = pool.map(self.scrapeIndividualTeam,self.team.keys())
-            pool.close()
-            pool.join()
-
-            for r in result:
-                if r is not None and len(r) > 3:
-                    leagueData.append(r[3:])
+        for r in result:
+            if r is not None and len(r) > 3:
+                leagueData.append(r[3:])
 
         draftedPlayers = []
         for team_payload,team_key in zip(leagueData,self.team):

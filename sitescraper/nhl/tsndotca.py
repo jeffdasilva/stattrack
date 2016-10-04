@@ -84,6 +84,8 @@ class TsnDotCaScraper(SiteScraper):
             if len(player) != len(TsnDotCaScraper.Top300Stats):
                 continue
             self.players.append(dict(zip(TsnDotCaScraper.Top300Stats,player)))
+            self.players[-1]['scraper'] = [TsnDotCaScraper.esTop300.prefix]
+
             #print self.players[-1]['name']
 
         if self.debug:
@@ -105,7 +107,7 @@ class TsnDotCaScraper(SiteScraper):
                     continue
                 self.players.append(dict(zip(TsnDotCaScraper.ByPositionStats,player)))
                 self.players[-1]['position'] = position
-
+                self.players[-1]['scraper'] = [TsnDotCaScraper.esByPos.prefix]
 
         playerList['G'] = self.scrapeTable(urlOffset=byPositionOffset,attrs=tableAttrs,index=4)
 
@@ -121,6 +123,7 @@ class TsnDotCaScraper(SiteScraper):
                 continue
             self.players.append(dict(zip(TsnDotCaScraper.ByPositionGoalieStats,goalie)))
             self.players[-1]['position'] = 'G'
+            self.players[-1]['scraper'] = [TsnDotCaScraper.esByPos.prefix]
 
         return self.players
 

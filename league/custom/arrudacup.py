@@ -51,6 +51,15 @@ class ArrudaCupHockeyLeague(HockeyLeague):
         draftedByCommand = DraftedByCommand()
         self.parser.commands.append(draftedByCommand)
 
+        # remove 'd' alias from draft for this league
+        # 'd' for the arruda cup meands defence
+        draftCommand = self.parser.getCommand("draft")
+        if draftCommand is not None and draftCommand.aliases is not None:
+            while 'd' in draftCommand.aliases:
+                draftCommand.aliases.remove('d')
+
+        defenseCommand.aliases += ['d']
+
         self.parser.autosave = False
 
         self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper(),NhlCbsSportsDotComSraper()]
@@ -82,7 +91,7 @@ class ArrudaCupHockeyLeague(HockeyLeague):
             for p in self.db.player:
                 players.append(self.db.player[p].name)
 
-            numOfThreads = 10
+            numOfThreads = 16
             statResults = rotoScrape.scrapeWithThreadPool(rotoScrape.scrape, players, numOfThreads)
 
             assert(len(self.db.player) == len(statResults))
