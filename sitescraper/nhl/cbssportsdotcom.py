@@ -33,7 +33,11 @@ class NhlCbsSportsDotComSraper(SiteScraper):
 
     def scrapeProjectionsByPosition(self,position):
 
+        if position not in self.positions:
+            raise ValueError("Error: Postition " + position + " is not a valid position")
+
         url_offset = '/fantasy/hockey/stats/sortable/points/' + position + '/advanced/projections?&print_rows=9999'
+
         table_attrs = {'class':'data'}
         table = self.scrapeTable(urlOffset=url_offset,attrs=table_attrs, index="Projections Advanced Stats")
         links = self.scrapeLinks(urlOffset=url_offset)
@@ -53,6 +57,7 @@ class NhlCbsSportsDotComSraper(SiteScraper):
         data = []
 
         for ele in table_data:
+
             if len(stat_type) == len(ele):
                 data.append(dict(zip(stat_type,ele)))
                 assert(NhlCbsSportsDotComSraper.es.projectedString('player') in data[-1])
@@ -123,21 +128,28 @@ class NhlCbsSportsDotComSraper(SiteScraper):
         if NhlCbsSportsDotComSraper.es.link('CareerStats') not in player.property:
             return None
 
-
         url = player.property[NhlCbsSportsDotComSraper.es.link('CareerStats')]
         urlOffset = self.getUrlOffset(url)
         data = self.scrapeTable(urlOffset=urlOffset, attrs={'class':'data compact'},index="YEAR")
 
-        if data is None:
+        if data is None or len(data) < 2:
             return None
 
-        #do something with the data
-        #print data
+        stat_categories = NhlCbsSportsDotComSraper.es.sanitize(data[0])
+        stats = data[1:]
+
+        career_stats_dict = {}
+
+        for stat in stats:
+            stat_dict_entry = dict(zip(stat_categories,stat))
+            assert('year' in stat_dict_entry)
+            career_stats_dict[stat_dict_entry['year']] = stat_dict_entry
+
+        player.update({NhlCbsSportsDotComSraper.es.stats():career_stats_dict})
 
 
     def scrapePlayerList(self,playerList):
-        numOfThreads = min(len(playerList),6)
-        results = self.scrapeWithThreadPool(self.scrapePlayer,playerList,numOfThreads)
+        results = self.scrapeWithThreadPool(self.scrapePlayer,playerList)
         return results
 
 

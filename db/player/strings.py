@@ -8,6 +8,7 @@ class PlayerStrings(object):
     Team = 'team'
     FantasyOwner = 'owner'
     Link = 'link'
+    Stats = 'stats'
     GamesPlayed = 'GamesPlayed'
     ProjectedPrefix = 'Projected'
 
@@ -18,6 +19,8 @@ class PlayerStrings(object):
             self.prefix = prefix
 
         self.map = {}
+        self.map['gp'] = PlayerStrings.GamesPlayed
+        self.map['ggp'] = PlayerStrings.GamesPlayed
 
     def name(self):
         return PlayerStrings.Name
@@ -46,6 +49,15 @@ class PlayerStrings(object):
 
         return self.addprefix() + sublink_string + PlayerStrings.Link
 
+    def stats(self, statstype=None):
+
+        if statstype is not None and statstype != "":
+            sublink_string = str(statstype) + "."
+        else:
+            sublink_string = ""
+
+        return self.addprefix() + sublink_string + PlayerStrings.Stats
+
     def statString(self,string):
             return self.addprefix() + string
 
@@ -60,11 +72,16 @@ class PlayerStrings(object):
 
     def sanitize(self,stat_name):
 
-        stat_name = stat_name.lower()
-        if stat_name in self.map:
-            stat_name = self.map[stat_name]
-
-        return stat_name
+        if isinstance(stat_name, list):
+            sanitized_list = []
+            for stat in stat_name:
+                sanitized_list.append(self.sanitize(stat))
+            return sanitized_list
+        else:
+            stat_name = stat_name.lower()
+            if stat_name in self.map:
+                stat_name = self.map[stat_name]
+            return stat_name
 
 
 class HockeyPlayerStrings(PlayerStrings):
@@ -74,6 +91,7 @@ class HockeyPlayerStrings(PlayerStrings):
     Points = "Points"
     Wins = "Wins"
     Ties = "Ties"
+    Ties = "Loses"
     Shutouts = "Shutouts"
 
     ProjectedGoals = PlayerStrings.ProjectedPrefix + Goals
@@ -84,7 +102,12 @@ class HockeyPlayerStrings(PlayerStrings):
 
     def __init__(self, prefix=None):
         super(HockeyPlayerStrings, self).__init__(prefix=prefix)
-        pass
+        self.map['g'] = HockeyPlayerStrings.Goals
+        self.map['a'] = HockeyPlayerStrings.Assists
+        self.map['pts'] = HockeyPlayerStrings.Points
+        self.map['w'] = HockeyPlayerStrings.Wins
+        self.map['so'] = HockeyPlayerStrings.Shutouts
+
 
     def goals(self):
         return self.statString(HockeyPlayerStrings.Goals)

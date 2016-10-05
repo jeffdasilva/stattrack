@@ -219,7 +219,10 @@ class SiteScraper(object):
         data = []
 
         for row in table.findAll("tr"):
-            cols = row.find_all('td')
+            cols = row.find_all('th')
+            if cols is None or len(cols) == 0:
+                cols = row.find_all('td')
+
             cols = [ele.text.strip() for ele in cols]
             data.append([ele for ele in cols])
 
@@ -236,8 +239,12 @@ class SiteScraper(object):
 
         return link
 
-    def scrapeWithThreadPool(self,func,iterable,numOfThreads):
+    def scrapeWithThreadPool(self,func,iterable,numOfThreads=None):
 
+        if numOfThreads is None:
+            numOfThreads = len(iterable)
+
+        # based on my thumb in the air estimate, set max threads at 6
         numOfThreads = min(numOfThreads,6)
 
         if numOfThreads == 0:

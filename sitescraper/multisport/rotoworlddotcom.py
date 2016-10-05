@@ -11,7 +11,7 @@ class RotoWorldDotComScraper(SiteScraper):
         super(RotoWorldDotComScraper, self).__init__(url="http://www.rotoworld.com")
 
         self.maxCacheTime = datetime.timedelta(days=30)
-        #self.maxCacheTime = datetime.timedelta(days=4)0
+        #self.maxCacheTime = datetime.timedelta(days=4)
         #self.maxCacheTime = datetime.timedelta(hours=1)
 
         self.league = league
@@ -84,8 +84,8 @@ class RotoWorldDotComScraper(SiteScraper):
             statsTable = statsTable[1:]
 
         if len(statsTable) > 0:
-            statCategories = statsTable[0]
-            statsTable = statsTable[1:]
+            statCategories = statsTable[2]
+            statsTable = statsTable[3:]
         else:
             print "No Rotoworld data found for " + playerName
             return None
@@ -117,6 +117,7 @@ class TestRotoWorldDotComScraper(unittest.TestCase):
         s.debug = True
 
         data = s.scrape(playerName="Eli Manning")
+        #print data
         self.assertNotEquals(data, None)
         self.assertGreater(int(data['2015']['G']),0)
 

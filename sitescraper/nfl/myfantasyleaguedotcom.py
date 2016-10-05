@@ -25,6 +25,8 @@ class MyFantasyLeagueDotComScraper(SiteScraper):
 
         self.draftGrid = []
 
+        data = data[1:]
+
         for row in data:
             if len(row) > 3:
                 nameTeamPosition = row[3]

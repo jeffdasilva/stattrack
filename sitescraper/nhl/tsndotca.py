@@ -78,6 +78,9 @@ class TsnDotCaScraper(SiteScraper):
 
         top300PlayerList = self.scrapeTable(urlOffset=top300UrlOffset,attrs=tableAttrs,index="RANK")
 
+        #top300PlayerListHeader = top300PlayerList[0]
+        top300PlayerList = top300PlayerList[1:]
+
         self.players = []
 
         for player in top300PlayerList:
@@ -85,7 +88,6 @@ class TsnDotCaScraper(SiteScraper):
                 continue
             self.players.append(dict(zip(TsnDotCaScraper.Top300Stats,player)))
             self.players[-1]['scraper'] = [TsnDotCaScraper.esTop300.prefix]
-
             #print self.players[-1]['name']
 
         if self.debug:
@@ -99,6 +101,9 @@ class TsnDotCaScraper(SiteScraper):
         playerList['D'] = self.scrapeTable(urlOffset=byPositionOffset,attrs=tableAttrs,index=3)
 
         for position in playerList:
+
+            playerList[position] = playerList[position][1:]
+
             for player in playerList[position]:
                 if len(player) != len(TsnDotCaScraper.ByPositionStats):
                     if self.debug and len(player) > 0:
@@ -110,6 +115,7 @@ class TsnDotCaScraper(SiteScraper):
                 self.players[-1]['scraper'] = [TsnDotCaScraper.esByPos.prefix]
 
         playerList['G'] = self.scrapeTable(urlOffset=byPositionOffset,attrs=tableAttrs,index=4)
+        playerList['G'] = playerList['G'][1:]
 
         if self.debug:
             for pos in playerList:

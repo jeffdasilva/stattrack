@@ -75,7 +75,8 @@ class ArrudaCupCbsSportsDotComSraper(SiteScraper):
                 if not isinstance(playerNamePosTeam, basestring):
                     continue
 
-                if playerNamePosTeam == "EMPTY":
+                if playerNamePosTeam == "EMPTY" or playerNamePosTeam == "Rankings" \
+                    or playerNamePosTeam == "Players":
                     continue
 
                 playerNamePosTeam = playerNamePosTeam.rsplit(' | ',1)
