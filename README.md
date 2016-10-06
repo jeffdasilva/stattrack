@@ -1,14 +1,18 @@
 # StatTrack
-  _________  __             __   ___________                         __ 
- /   _____/_/  |_ _____   _/  |_ \__    ___/_______ _____     ____  |  | __
- \_____  \ \   __\\__  \  \   __\  |    |   \_  __ \\__  \  _/ ___\ |  |/ /
- /        \ |  |   / __ \_ |  |    |    |    |  | \/ / __ \_\  \___ |    < 
-/_______  / |__|  (____  / |__|    |____|    |__|   (____  / \___  >|__|_ \
-        \/             \/                                \/      \/      \/
 
-StatTrack is an interactive tool to help give you an edge during Fantasy Sports Drafts.
 
-It currently supports NFL & NHL drafts.
+  _________ __          __ ___________                     __    
+ /   ______/  |______ _/  |\__    _______________    ____ |  | __
+ \_____  \\   __\__  \\   __\|    |  \_  __ \__  \ _/ ___\|  |/ /
+ /        \|  |  / __ \|  |  |    |   |  | \// __ \\  \___|    < 
+/_______  /|__| (____  |__|  |____|   |__|  (____  /\___  |__|_ \
+        \/           \/                          \/     \/     \/
+
+
+StatTrack is an interactive tool to help give you an edge with Fantasy Sports Drafts.
+
+It currently supports NFL & NHL style drafts.
+
 
 To get started do:
 
@@ -18,4 +22,4 @@ To get started do:
 % cd stattrack
 % make run
 
-[Currently only supports Ubuntu Linux and python v2.7]
+[Currently only supports Ubuntu Linux and Python v2.7]
