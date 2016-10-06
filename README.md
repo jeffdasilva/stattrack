@@ -16,10 +16,10 @@ It currently supports NFL & NHL style drafts.
 
 To get started do:
 
-% sudo apt-get install python python-bs4
-% sudo easy_install jsonpickle
-% git clone https://github.com/jeffdasilva/stattrack.git
-% cd stattrack
-% make run
+    % sudo apt-get install python python-bs4
+    % sudo easy_install jsonpickle
+    % git clone https://github.com/jeffdasilva/stattrack.git
+    % cd stattrack
+    % make run
 
 [Currently only supports Ubuntu Linux and Python v2.7]
