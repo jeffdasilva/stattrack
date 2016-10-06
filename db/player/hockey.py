@@ -19,6 +19,26 @@ class HockeyPlayer(Player):
         self.projected_ties_attr = TsnDotCaScraper.ProjectedTies + NhlCbsSportsDotComSraper.ProjectedTies
         self.projected_shutouts_attr = TsnDotCaScraper.ProjectedShutouts + NhlCbsSportsDotComSraper.ProjectedShutouts
 
+    def __str__(self):
+
+        player_str = Player.__str__(self)
+
+        player_str += "   | " + '{0: <9}'.format(str(round(self.projectedPointsPerGame(),2))
+                                    + "(" +  str(self.gamesPlayed()) + ") " ) + "|"
+
+        for year in ['2015','2014','2013']:
+            player_str += " " + '{0: <9}'.format(str(round(self.pointsPerGame(year=year),2)) \
+                                    + "(" +  str(self.gamesPlayed(year=year)) + ") " ) + "|"
+
+
+        #player_str += " " + '{0: <5}'.format(str(round(self.pointsPerGame(year='2014'),2))) + "|"
+        #player_str += " " + '{0: <5}'.format(str(round(self.pointsPerGame(year='2013'),2))) + "|"
+
+        #player_str += "  14:" + '{0: <5}'.format(str(round(self.pointsPerGame(year='2014'),2)))
+
+
+        return player_str
+
 
     def normalize_playername(self,name):
 
@@ -32,6 +52,16 @@ class HockeyPlayer(Player):
         else:
             return super(HockeyPlayer,self).normalize_playername(name)
 
+    def getStat(self, statName, year=datetime.datetime.now().year):
+
+        if not 'cbssports.stats' in self.property:
+            return 0
+
+        if str(year) in self.property['cbssports.stats']:
+            if statName in self.property['cbssports.stats'][str(year)]:
+                stat = self.property['cbssports.stats'][str(year)][statName].replace(',','')
+                return stat
+        return 0;
 
     def team_abbreviate(self,teamname):
 
@@ -85,7 +115,7 @@ class HockeyPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedGoals()
         else:
-            return 0
+            return float(self.getStat("Goals",year))
 
     def projectedGoals(self):
         return float(self.getProperty(self.projected_goals_attr,0))
@@ -94,7 +124,7 @@ class HockeyPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedAssists()
         else:
-            return 0
+            return float(self.getStat("Assists",year))
 
     def projectedAssists(self):
         return float(self.getProperty(self.projected_assists_attr,0))
@@ -103,7 +133,7 @@ class HockeyPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedGoaltenderWins()
         else:
-            return 0
+            return float(self.getStat("Wins",year))
 
     def projectedGoaltenderWins(self):
         return float(self.getProperty(self.projected_wins_attr,0))
@@ -112,17 +142,16 @@ class HockeyPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedGoaltenderTies()
         else:
-            return 0
+            return float(self.getStat("Ties",year))
 
     def projectedGoaltenderTies(self):
         return float(self.getProperty(self.projected_ties_attr,0))
-
 
     def goaltenderShutOuts(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
             return self.projectedGoaltenderShutOuts()
         else:
-            return 0
+            return float(self.getStat("Shutouts",year))
 
     def projectedGoaltenderShutOuts(self):
         return float(self.getProperty(self.projected_shutouts_attr,0))
@@ -131,19 +160,29 @@ class HockeyPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedGamesPlayed()
         else:
-            return 0
+            return int(self.getStat("GamesPlayed",year))
 
     def projectedGamesPlayed(self):
-        return float(self.getProperty(self.projected_games_played_attr,0))
+        return int(self.getProperty(self.projected_games_played_attr,0))
 
     def points(self,year=datetime.datetime.now().year):
         return self.goals(year) + self.assists(year) + self.goaltenderWins(year)*2 + self.goaltenderTies(year) + self.goaltenderShutOuts(year)*4
+
+    def projectedPoints(self,year=datetime.datetime.now().year):
+        return self.projectedGoals() + self.projectedAssists() + self.projectedGoaltenderWins()*2 + \
+            self.projectedGoaltenderTies() + self.projectedGoaltenderShutOuts()*4
 
     def pointsPerGame(self,year=datetime.datetime.now().year):
         if self.gamesPlayed(year) == 0:
             return 0.0
         else:
             return self.points(year)/self.gamesPlayed(year)
+
+    def projectedPointsPerGame(self):
+        if self.projectedGamesPlayed() == 0:
+            return 0.0
+        else:
+            return self.projectedPoints()/self.projectedGamesPlayed()
 
     def value(self):
         if 'G' in self.position:
