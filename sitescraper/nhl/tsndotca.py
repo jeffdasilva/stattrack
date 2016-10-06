@@ -78,11 +78,9 @@ class TsnDotCaScraper(SiteScraper):
 
         top300PlayerList = self.scrapeTable(urlOffset=top300UrlOffset,attrs=tableAttrs,index="RANK")
 
-        #top300PlayerListHeader = top300PlayerList[0]
         top300PlayerList = top300PlayerList[1:]
 
         self.players = []
-
         for player in top300PlayerList:
             if len(player) != len(TsnDotCaScraper.Top300Stats):
                 continue
@@ -92,7 +90,11 @@ class TsnDotCaScraper(SiteScraper):
 
         if self.debug:
             print "Number of players found: " + str(len(self.players))
-            assert(len(self.players)==300)
+            # Oct 5, 2016 -- there are two players ranked 140 -- strange...
+            assert(len(self.players) == 300 or len(self.players) == 301)
+
+        oldMaxCacheTime = self.maxCacheTime
+        self.maxCacheTime = datetime.timedelta(weeks=1000)
 
         playerList = {}
         playerList['C'] = self.scrapeTable(urlOffset=byPositionOffset,attrs=tableAttrs,index=0)
@@ -101,6 +103,10 @@ class TsnDotCaScraper(SiteScraper):
         playerList['D'] = self.scrapeTable(urlOffset=byPositionOffset,attrs=tableAttrs,index=3)
 
         for position in playerList:
+
+            if playerList[position] is None:
+                if self.debug: print "No " + position + " stats found in " + self.url + byPositionOffset
+                continue
 
             playerList[position] = playerList[position][1:]
 
@@ -115,21 +121,31 @@ class TsnDotCaScraper(SiteScraper):
                 self.players[-1]['scraper'] = [TsnDotCaScraper.esByPos.prefix]
 
         playerList['G'] = self.scrapeTable(urlOffset=byPositionOffset,attrs=tableAttrs,index=4)
-        playerList['G'] = playerList['G'][1:]
+        self.maxCacheTime = oldMaxCacheTime
+
+
+        if playerList['G'] is None:
+            if self.debug: print "No " + position + " stats found in " + self.url + byPositionOffset
+        else:
+            playerList['G'] = playerList['G'][1:]
+
 
         if self.debug:
             for pos in playerList:
+                if playerList[pos] is None:
+                    continue
                 assert(len(playerList[pos])>=50)
 
-        for goalie in playerList['G']:
-            if len(goalie) != len(TsnDotCaScraper.ByPositionGoalieStats):
-                if self.debug and len(goalie) > 0:
-                    print goalie
-                    raise ValueError("Something is wrong here with Goalie Stats!")
-                continue
-            self.players.append(dict(zip(TsnDotCaScraper.ByPositionGoalieStats,goalie)))
-            self.players[-1]['position'] = 'G'
-            self.players[-1]['scraper'] = [TsnDotCaScraper.esByPos.prefix]
+        if playerList['G'] is not None:
+            for goalie in playerList['G']:
+                if len(goalie) != len(TsnDotCaScraper.ByPositionGoalieStats):
+                    if self.debug and len(goalie) > 0:
+                        print goalie
+                        raise ValueError("Something is wrong here with Goalie Stats!")
+                    continue
+                self.players.append(dict(zip(TsnDotCaScraper.ByPositionGoalieStats,goalie)))
+                self.players[-1]['position'] = 'G'
+                self.players[-1]['scraper'] = [TsnDotCaScraper.esByPos.prefix]
 
         return self.players
 

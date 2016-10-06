@@ -45,6 +45,8 @@ class NhlCbsSportsDotComSraper(SiteScraper):
         table_header = table[1]
         table_data = table[2:]
 
+        #stat_type = NhlCbsSportsDotComSraper.es.sanitize(table_header)
+
         stat_type = []
         for statname in table_header:
             if statname.lower() in NhlCbsSportsDotComSraper.ProjStatMap:

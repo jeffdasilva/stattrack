@@ -200,6 +200,8 @@ class SiteScraper(object):
                 table = data.find('table', attrs=attrs)
             elif isinstance(index, int):
                 tableList = data.find_all('table', attrs=attrs)
+                if index >= len(tableList):
+                    return None
                 table = tableList[index]
             elif isinstance(index, str):
                 tableList = data.find_all('table', attrs=attrs)
