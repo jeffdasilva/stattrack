@@ -12,12 +12,23 @@ class HockeyPlayer(Player):
         super(HockeyPlayer, self).__init__(name=name, team=team, properties=properties)
 
         #ToDo: a factory creator class should really add these
+        '''
+        # DON'T TRUST CBS PROJECTIONS! THEY'RE PRETTY BAD AND THOSE ARE PROJECTIONS MOST GM'S WILL USE
+        # [SHUTOUTS ARE THE EXCEPTION]
         self.projected_games_played_attr = TsnDotCaScraper.ProjectedGamesPlayed + NhlCbsSportsDotComSraper.ProjectedGamesPlayed
         self.projected_goals_attr = TsnDotCaScraper.ProjectedGoals + NhlCbsSportsDotComSraper.ProjectedGoals
         self.projected_assists_attr = TsnDotCaScraper.ProjectedAssists + NhlCbsSportsDotComSraper.ProjectedAssists
         self.projected_wins_attr = TsnDotCaScraper.ProjectedWins + NhlCbsSportsDotComSraper.ProjectedWins
         self.projected_ties_attr = TsnDotCaScraper.ProjectedTies + NhlCbsSportsDotComSraper.ProjectedTies
         self.projected_shutouts_attr = TsnDotCaScraper.ProjectedShutouts + NhlCbsSportsDotComSraper.ProjectedShutouts
+        '''
+        self.projected_games_played_attr = TsnDotCaScraper.ProjectedGamesPlayed
+        self.projected_goals_attr = TsnDotCaScraper.ProjectedGoals
+        self.projected_assists_attr = TsnDotCaScraper.ProjectedAssists
+        self.projected_wins_attr = TsnDotCaScraper.ProjectedWins
+        self.projected_ties_attr = TsnDotCaScraper.ProjectedTies
+        self.projected_shutouts_attr = TsnDotCaScraper.ProjectedShutouts + NhlCbsSportsDotComSraper.ProjectedShutouts
+
 
     def __str__(self):
 
@@ -30,13 +41,6 @@ class HockeyPlayer(Player):
             player_str += " " + '{0: <9}'.format(str(round(self.pointsPerGame(year=year),2)) \
                                     + "(" +  str(self.gamesPlayed(year=year)) + ") " ) + "|"
 
-
-        #player_str += " " + '{0: <5}'.format(str(round(self.pointsPerGame(year='2014'),2))) + "|"
-        #player_str += " " + '{0: <5}'.format(str(round(self.pointsPerGame(year='2013'),2))) + "|"
-
-        #player_str += "  14:" + '{0: <5}'.format(str(round(self.pointsPerGame(year='2014'),2)))
-
-
         return player_str
 
 
@@ -44,7 +48,9 @@ class HockeyPlayer(Player):
 
         nameNomalizeMap = { \
             'Alex Ovechkin':'Alexander Ovechkin',
-            'Mike Cammalleri':'Michael Cammalleri'
+            'Mike Cammalleri':'Michael Cammalleri',
+            'Mitch Marner':'Mitchell Marner',
+            'Oskar Klefbom':'Oscar Klefbom'
         }
 
         if name in nameNomalizeMap:
@@ -191,9 +197,9 @@ class HockeyPlayer(Player):
             value = self.pointsPerGame()
 
         if 'G' in self.position:
-            value = value * 0.75
+            value = value * 0.85
         elif 'D' in self.position:
-            value = value * 1.2
+            value = value * 1.4
 
         if self.age() != '?':
             # this if is is for keeper leagues (younger players are more valuable
@@ -201,10 +207,10 @@ class HockeyPlayer(Player):
             #  - if a player is 18 years old (A_1 = 18), then use multiplier 1.2X (F_1 = 1.2)
             #  - if a player is 40 years old (A_2 = 40), then use multiplier 0.8X (F_2 = 0.8)
             # and now solve (for x & y) the generic linear solution to F = Ax + y
-            A_1 = 18
-            F_1 = 1.2
-            A_2 = 40
-            F_2 = 0.8
+            A_1 = 20
+            F_1 = 1.1
+            A_2 = 37
+            F_2 = 0.9
             x = (F_1 - F_2) / (A_1 - A_2)
             y = ((F_1 * A_2) - (F_2 * A_1)) / (A_2 - A_1)
             F = (self.age() * x) + y

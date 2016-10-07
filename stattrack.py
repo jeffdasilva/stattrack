@@ -8,8 +8,8 @@ import unittest
 
 class StatTrack(object):
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 48
-    StatTrackBuildNumber = 128
+    StatTrackMinorVersion = 49
+    StatTrackBuildNumber = 132
 
     def __init__(self):
         self.league = "ArrudaCup"
@@ -26,7 +26,9 @@ class StatTrack(object):
         print "StatTrack\t" + self.getFullVersionString()
         print " https://github.com/jeffdasilva/stattrack"
         print
+        print "Type 'help' to list available commands"
         print
+
 
     def run(self):
         from league.custom.oleague import OLeagueFootballLeague

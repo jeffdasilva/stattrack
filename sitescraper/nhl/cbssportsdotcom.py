@@ -184,6 +184,10 @@ class TestNhlCbsSportsDotComSraper(unittest.TestCase):
                 RaskFound += 1
                 p = HockeyPlayer(properties=d)
                 print p
+
+                p.projected_games_played_attr += NhlCbsSportsDotComSraper.ProjectedGamesPlayed
+                p.projected_wins_attr += NhlCbsSportsDotComSraper.ProjectedWins
+
                 self.assertGreater(p.projectedGamesPlayed(),30)
                 self.assertGreater(p.projectedGoaltenderShutOuts(), 0)
                 self.assertGreater(p.projectedGoaltenderWins(),20)
