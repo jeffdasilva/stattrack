@@ -8,7 +8,7 @@
 #############################
 #
 # prerequisites:
-#  % sudo apt-get install python-bs4
+#  % sudo apt-get install make python python-bs4 python-setuptools
 #  % sudo easy_install jsonpickle
 #
 # unittest by doing:
@@ -78,8 +78,8 @@ $(PYTHON_PYLINT_STAMPS): stamps/%.pylint: %.py
 	@mkdir -p $(@D)
 	-pylint $< > $@
 	cat $@
-	
-	
+
+
 .PHONY: uml
 uml:
 	pyreverse -ASmy -k -o png $(PYTHON_SRC) -p stattrack
