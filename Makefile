@@ -8,7 +8,7 @@
 #############################
 #
 # prerequisites:
-#  % sudo apt-get install make python python-bs4 python-setuptools
+#  % sudo apt-get install make python python-bs4 python-setuptools python-pip
 #  % sudo easy_install jsonpickle
 #
 # unittest by doing:
