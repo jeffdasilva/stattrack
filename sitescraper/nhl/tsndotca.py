@@ -61,6 +61,11 @@ class TsnDotCaScraper(SiteScraper):
 
         # scrape Scott Cullen's projections
 
+
+        if year >= 2017:
+            year = 2016
+
+
         if str(year) == "2016":
             #top_300_tsn_version_string = "1.360216"
             top_300_tsn_version_string = "1.565371"

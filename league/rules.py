@@ -50,19 +50,22 @@ class FootballRules(Rules):
         self.pointsPerPassingTouchdown = 4
         self.pointsPerInterception = -1
         self.pointsPerSack = 0
+        self.pointsPerPassingTwoPointConversion = 0
 
         # Rushing
         self.pointsPerRushingAttempt = 0
         self.pointsPerRushingYard = [ (0,1.0/10), (100,2.0/10), (150,4.0/10), (200,6.0/10) ]
         self.pointsPerRushingTouchdown = 6
+        self.pointsPerRushingTwoPointConversion = 0
 
         # Receiving
         self.pointsPerReception = 0
         self.pointsPerReceivingYard = [ (0,1.0/10), (100,2.0/10), (150,4.0/10), (200,6.0/10) ]
         self.pointsPerReceivingTouchdown = 6
-        self.pointsPerReturnYard = [ (0,1.0/20), (100,3.0/20), (200,6.0/20) ]
+        self.pointsPerReceivingTwoPointConversion = 0
 
         # Special Teams
+        self.pointsPerReturnYard = [ (0,1.0/20), (100,3.0/20), (200,6.0/20) ]
         self.pointsPerReturnTouchdown = 6
         self.pointsPerTwoPointConversion = 2
         self.pointsPerFumble = 0

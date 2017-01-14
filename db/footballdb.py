@@ -55,6 +55,17 @@ class FootballPlayerDB(PlayerDB):
             self.numberOfScrubs = 0
             self.moneyPerTeam = 0
             self.totalNumberOfPlayers = 16
+        elif self.leagueName == "IronGut":
+            self.numberOfTeams = 12
+            self.numberOfStarting = {}
+            self.numberOfStarting['qb'] = 1
+            self.numberOfStarting['rb'] = 2
+            self.numberOfStarting['wr'] = 3
+            self.numberOfStarting['def'] = 1
+            self.numberOfStarting['k'] = 1
+            self.numberOfScrubs = 0
+            self.moneyPerTeam = 0
+            self.totalNumberOfPlayers = 9
         else:
             raise ValueError("unknown league type")
 

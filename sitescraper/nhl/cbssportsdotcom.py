@@ -26,6 +26,7 @@ class NhlCbsSportsDotComSraper(SiteScraper):
     ProjectedShutouts = [es.projectedShutouts()]
 
     def __init__(self):
+
         super(NhlCbsSportsDotComSraper, self).__init__(url="http://www.cbssports.com")
         self.maxCacheTime = datetime.timedelta(days=7)
         self.positions = ['C','RW','LW','D','G']
@@ -38,14 +39,16 @@ class NhlCbsSportsDotComSraper(SiteScraper):
 
         url_offset = '/fantasy/hockey/stats/sortable/points/' + position + '/advanced/projections?&print_rows=9999'
 
-        table_attrs = {'class':'data'}
-        table = self.scrapeTable(urlOffset=url_offset,attrs=table_attrs, index="Projections Advanced Stats")
+        table_attrs = {'class':'data compact'}
+        table = self.scrapeTable(urlOffset=url_offset,attrs=table_attrs)
         links = self.scrapeLinks(urlOffset=url_offset)
+
+        if table is None:
+            raise ValueError('table is None')
 
         table_header = table[1]
         table_data = table[2:]
 
-        #stat_type = NhlCbsSportsDotComSraper.es.sanitize(table_header)
 
         stat_type = []
         for statname in table_header:
@@ -68,7 +71,11 @@ class NhlCbsSportsDotComSraper(SiteScraper):
                 data[-1]['position'] = position
 
                 if data[-1]['name'] in links:
-                    data[-1][NhlCbsSportsDotComSraper.es.link()] = self.url + links[data[-1]['name']]
+                    link = links[data[-1]['name']]
+                    if not link.startswith(self.url):
+                        link = self.url + link
+
+                    data[-1][NhlCbsSportsDotComSraper.es.link()] = link
 
                 data[-1]['scraper'] = [NhlCbsSportsDotComSraper.es.prefix]
 
@@ -196,8 +203,6 @@ class TestNhlCbsSportsDotComSraper(unittest.TestCase):
 
                 self.assertEqual(p.age(),'?')
                 s.scrapePlayerList([p])
-                #print p
-                #print p.age()
                 self.assertNotEqual(p.age(),'?')
                 self.assertGreaterEqual(int(p.age()),29)
                 print p.property[NhlCbsSportsDotComSraper.es.link('CareerStats')]

@@ -74,6 +74,7 @@ class HockeyPlayer(Player):
         if teamname is None:
             raise ValueError('ERROR: invalid team name ' + teamname)
 
+        teamname = teamname.strip()
         teamname = teamname.lower()
         teamname = teamname.replace('.','')
 
@@ -169,7 +170,7 @@ class HockeyPlayer(Player):
             return int(self.getStat("GamesPlayed",year))
 
     def projectedGamesPlayed(self):
-        return int(self.getProperty(self.projected_games_played_attr,0))
+        return float(self.getProperty(self.projected_games_played_attr,0))
 
     def points(self,year=datetime.datetime.now().year):
         return self.goals(year) + self.assists(year) + self.goaltenderWins(year)*2 + self.goaltenderTies(year) + self.goaltenderShutOuts(year)*4

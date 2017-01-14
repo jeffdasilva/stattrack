@@ -248,6 +248,7 @@ class SiteScraper(object):
 
         # based on my thumb in the air estimate, set max threads at 6
         numOfThreads = min(numOfThreads,6)
+        #numOfThreads = 0
 
         if numOfThreads == 0:
             result = []

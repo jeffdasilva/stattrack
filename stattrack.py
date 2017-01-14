@@ -8,12 +8,13 @@ import unittest
 
 class StatTrack(object):
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 52
-    StatTrackBuildNumber = 132
+    StatTrackMinorVersion = 53
+    StatTrackBuildNumber = 134
 
     def __init__(self):
-        self.league = "ArrudaCup"
+        #self.league = "ArrudaCup"
         #self.league = "OLeague"
+        self.league = "IronGut"
 
     def getVersion(self):
         return str(StatTrack.StatTrackMajorVersion) + "." + str(StatTrack.StatTrackMinorVersion)
@@ -28,11 +29,13 @@ class StatTrack(object):
         print
         print "Type 'help' to list available commands"
         print
-
+        print " LEAGUE: " + self.league
+        print
 
     def run(self):
         from league.custom.oleague import OLeagueFootballLeague
         from league.custom.arrudacup import ArrudaCupHockeyLeague
+        from league.custom.irongut import IronGutFootballLeague
 
         if self.league == "OLeague":
             self.printBanner()
@@ -40,6 +43,9 @@ class StatTrack(object):
         elif self.league == "ArrudaCup":
             self.printBanner()
             l = ArrudaCupHockeyLeague()
+        elif self.league == "IronGut":
+            self.printBanner()
+            l = IronGutFootballLeague()
         else:
             print "ERROR: Unknown League '" + self.league + "'"
             return
