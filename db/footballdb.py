@@ -98,10 +98,14 @@ class FootballPlayerDB(PlayerDB):
         self.playerCache['wr'] = self.remainingGoodPlayersByPosition(position="wr")
         self.playerCache['rb'] = self.remainingGoodPlayersByPosition(position="rb")
         self.playerCache['qb'] = self.remainingGoodPlayersByPosition(position="qb")
+        #self.playerCache['def'] = self.remainingGoodPlayersByPosition(position="def")
+        #self.playerCache['k'] = self.remainingGoodPlayersByPosition(position="k")
         self.playerCache['bench'] = None
 
     def remainingStarters(self):
+        #return self.playerCache['wr'] + self.playerCache['qb'] + self.playerCache['rb'] + self.playerCache['def'] + self.playerCache['k']
         return self.playerCache['wr'] + self.playerCache['qb'] + self.playerCache['rb']
+
 
     def remainingGoodBenchPlayers(self):
         #total_num_players_remaining = self.totalNumberOfPlayers*self.numberOfTeams - self.numberOfPlayersDrafted()

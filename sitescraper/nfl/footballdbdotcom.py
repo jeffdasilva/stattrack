@@ -91,7 +91,7 @@ class FootballDBDotComScraper(SiteScraper):
         return self.historicalStats
 
 
-class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
+class TestFootballDBDotComScraper(unittest.TestCase):
 
     def testFootballDBDotComScraper(self):
 

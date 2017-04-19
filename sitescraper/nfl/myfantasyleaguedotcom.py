@@ -17,7 +17,7 @@ class MyFantasyLeagueDotComScraper(SiteScraper):
     def scrape(self):
 
         urlOffset = "/" + str(self.year) + "/options?L=" + str(self.leagueID) + "&O=17"
-        data = self.scrapeTable(urlOffset=urlOffset, attrs={'class' : 'report nocaption'})
+        data = self.scrapeTable(urlOffset=urlOffset, attrs={'class' : 'report'})
 
         if data is None:
             self.draftGrid = None
@@ -61,13 +61,15 @@ class MyFantasyLeagueDotComScraper(SiteScraper):
 class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
 
     OracleLeagueID = 43790
-    OracleLeagueYear = 2016
+    OracleLeagueYear = 2017
 
     def testOracleLeague(self):
 
         s = MyFantasyLeagueDotComScraper( TestMyFantasyLeagueDotComScraper.OracleLeagueID, \
                                           TestMyFantasyLeagueDotComScraper.OracleLeagueYear, \
                                           )
+        #s.debug = True
+
         data = s.scrape()
         self.assertNotEquals(data,None)
 

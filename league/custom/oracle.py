@@ -1,5 +1,5 @@
 '''
-Created on Sep 5, 2016
+Created on April 18, 2017
 
 @author: jdasilva
 '''
@@ -11,27 +11,28 @@ from league.football import FootballLeague
 from league.rules import FootballRules
 
 
-class IronGutFootballRules(FootballRules):
+class OracleFootballRules(FootballRules):
 
     def __init__(self):
         super(FootballRules, self).__init__()
 
-        self.settingsURL = "http://www57.myfantasyleague.com/2016/options?L=62153&O=09"
+        # league site is http://www56.myfantasyleague.com/2017/options?L=43790&O=17
+        self.settingsURL = "http://www56.myfantasyleague.com/2017/options?L=43790&O=09"
 
-        self.numTeams = 12
+        self.numTeams = 16
         self.numQB = 1
-        self.numRB = 2
-        self.numWR = 3
+        self.numRB = 3
+        self.numWR = 4
         self.numTE = 0
         self.numDEF = 1
         self.numK = 1
-        self.numReserves = 0
+        self.numReserves = 18 - (self.numQB + self.numRB + self.numWR + self.numTE + self.numDEF + self.numK)
 
         #################################################
         # Passing
         self.pointsPerCompletion = 0.0
         self.pointsPerIncompletePass = 0.0
-        self.pointsPerPassingYards = 1.0/25
+        self.pointsPerPassingYards = 0.04
         self.pointsPerPassingTouchdown = 4
         self.pointsPerInterception = -1
         self.pointsPerSack = 0
@@ -47,7 +48,7 @@ class IronGutFootballRules(FootballRules):
         self.pointsPerReception = 0.5
         self.pointsPerReceivingYard = 1.0/10
         self.pointsPerReceivingTouchdown = 6
-        self.pointsPerReceivingTwoPointConversion = 1
+        self.pointsPerReceivingTwoPointConversion = 2
 
         # Special Teams
         self.pointsPerReturnYard = 0
@@ -56,8 +57,11 @@ class IronGutFootballRules(FootballRules):
         self.pointsPerFumble = 0
         self.pointsPerFumblesLost = 0
 
+        # field goal rules ?
+        # def rules?
+
         # Other
-        self.pointsPerPickSixesThrown = -4
+        self.pointsPerPickSixesThrown = 0
         self.pointsPerFortyPlusYardCompletion = 0
         self.pointsPerFortyPlusYardPassingTouchdown = 0
         self.pointsPerFortyPlusYardRun = 0
@@ -66,15 +70,15 @@ class IronGutFootballRules(FootballRules):
         self.pointsPerFortyPlusYardReceivingTouchdowns = 0
         #################################################
 
-class IronGutFootballLeague(FootballLeague):
+class OracleFootballLeague(FootballLeague):
     def __init__(self):
         from cli.cmd.command import SearchByPositionCommand
         from sitescraper.nfl.fantasyprosdotcom import FantasyProsDotComScraper
 
-        name = "IronGut"
-        rules = IronGutFootballRules()
+        name = "Oracle"
+        rules = OracleFootballRules()
         db = FootballPlayerDB(name)
-        super(IronGutFootballLeague, self).__init__(name, db, rules)
+        super(OracleFootballLeague, self).__init__(name, db, rules)
         db.load()
 
         self.parser.commands.append(SearchByPositionCommand('all'))
@@ -86,7 +90,6 @@ class IronGutFootballLeague(FootballLeague):
         self.parser.commands.append(SearchByPositionCommand('k'))
 
         fpros_scraper = FantasyProsDotComScraper()
-        fpros_scraper.setProjectionURLs(week="19")
 
         self.scrapers = [ fpros_scraper ]
 
@@ -117,20 +120,20 @@ class IronGutFootballLeague(FootballLeague):
 ##########################################################
 
 
-class IronGutFootballLeagueTest(unittest.TestCase):
+class OracleFootballLeagueTest(unittest.TestCase):
 
     def testConstructor(self):
-        ffl = IronGutFootballLeague()
+        ffl = OracleFootballLeague()
         self.assertNotEquals(ffl, None)
         self.assertEquals(ffl.property['isAuctionDraft'], 'false')
-        self.assertEquals(ffl.name,"IronGut")
-        self.assertEquals(ffl.db.leagueName,"IronGut")
+        self.assertEquals(ffl.name,"Oracle")
+        self.assertEquals(ffl.db.leagueName,"Oracle")
         self.assertNotEquals(ffl.rules,None)
         print str(ffl.rules.pointsPerPassingYards)
         pass
 
     def testLeagueDB(self):
-        ffl = IronGutFootballLeague()
+        ffl = OracleFootballLeague()
         if len(ffl.db.player) > 0:
             #if league was previously saved, then aaron rogd
             p = ffl.db.player["aaron rodgers - gb"]
