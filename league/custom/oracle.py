@@ -23,7 +23,7 @@ class OracleFootballRules(FootballRules):
         self.numQB = 1
         self.numRB = 3
         self.numWR = 4
-        self.numTE = 0
+        self.numTE = 1
         self.numDEF = 1
         self.numK = 1
         self.numReserves = 18 - (self.numQB + self.numRB + self.numWR + self.numTE + self.numDEF + self.numK)
@@ -114,6 +114,7 @@ class OracleFootballLeague(FootballLeague):
 
     def update(self):
         self.db.wget(self.scrapers)
+        print "UPDATE!!!!"
 
 
 
