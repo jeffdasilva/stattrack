@@ -153,9 +153,12 @@ class TestFantasyProsDotComScraper(unittest.TestCase):
                 print player
                 tomBradyFound = True
 
-        # this will not work in April/May
-        #self.assertEquals(camNewtonFound,True)
-        #self.assertEquals(tomBradyFound,True)
+        current_month = datetime.datetime.now().month
+
+        if current_month > 6:
+            # this will not work in April/May
+            self.assertEquals(camNewtonFound,True)
+            self.assertEquals(tomBradyFound,True)
 
         andrewLuckFound = 0
         seattleFound = 0

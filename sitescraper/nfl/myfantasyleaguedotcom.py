@@ -73,8 +73,8 @@ class TestMyFantasyLeagueDotComScraper(unittest.TestCase):
         data = s.scrape()
         self.assertNotEquals(data,None)
 
-        #for p in s.draftGrid:
-        #    print p
+        for p in s.draftGrid:
+            print p
 
 if __name__ == '__main__':
     unittest.main()

@@ -7,8 +7,10 @@ Created on April 18, 2017
 import unittest
 
 from db.footballdb import FootballPlayerDB
+from db.player.football import FootballPlayer
 from league.football import FootballLeague
 from league.rules import FootballRules
+from sitescraper.nfl.myfantasyleaguedotcom import MyFantasyLeagueDotComScraper
 
 
 class OracleFootballRules(FootballRules):
@@ -111,11 +113,28 @@ class OracleFootballLeague(FootballLeague):
             if pStats is not None:
                 self.db.player[p].update(pStats)
 
-
     def update(self):
         self.db.wget(self.scrapers)
-        print "UPDATE!!!!"
 
+        OracleLeagueID = 43790
+        OracleLeagueYear = 2017
+        mfl = MyFantasyLeagueDotComScraper(OracleLeagueID, OracleLeagueYear)
+        #self.db.wget(scrapers=[mfl])
+
+        data = mfl.scrape()
+        for player_prop in data:
+            player = FootballPlayer(properties=player_prop)
+
+            player_name = player.name
+
+            players_in_db = self.db.get(searchString=player_name, position="all", team="all", listDrafted=True, listIgnored=False)
+            if players_in_db is not None and len(players_in_db) > 0:
+                for p in players_in_db:
+                    if not p.isDrafted:
+                        print player.name + " - Drafted"
+                        p.draft()
+            else:
+                print player.name + " - Not Found"
 
 
 ##########################################################

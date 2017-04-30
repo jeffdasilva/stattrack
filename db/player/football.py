@@ -419,13 +419,15 @@ class FootballPlayer(Player):
     # ToDo: Make this better!!!
     def value(self):
 
-        #if self.property.has_key("hpprAvgRank"):
-        #    return 300-(float(self.property["hpprAvgRank"]))
-        #elif self.property.has_key("avgRank"):
-        #    return 50-(float(self.property["avgRank"]))
-        #else:
-        #    return 0
+        if datetime.datetime.now().month  < 6:
+            if self.property.has_key("hpprAvgRank"):
+                return 300-(float(self.property["hpprAvgRank"]))
+            elif self.property.has_key("avgRank"):
+                return 50-(float(self.property["avgRank"]))
+            else:
+                return 0
 
+        #...and if we're in July, we have projections
         return self.valuePassing() + self.valueRushing() + self.valueReceiveing() + self.valueMisc()
 
 

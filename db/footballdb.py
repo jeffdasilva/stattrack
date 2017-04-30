@@ -1,7 +1,6 @@
 
 from datetime import datetime
 import os
-import time
 import unittest
 
 from db.player.football import FootballPlayer
