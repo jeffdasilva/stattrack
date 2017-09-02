@@ -596,7 +596,9 @@ class ListCommand(Command):
                     playersToList = self.maxPlayersToList
 
             response = "---------------------------------------------------------------------\n"
-            #cpvu = None
+            
+            cpvu = None
+            
             for i, player in enumerate(parser.player_list):
                 if i >= playersToList:
                     break
@@ -607,24 +609,29 @@ class ListCommand(Command):
                 response += " "
                 response += '{0: >4}'.format(str(player.age()))
 
-                '''
-                # This is super slow!!! and should not be here anyway
-                try:
-                    if parser.league is not None:
-                        # HACK ALERT!!!
-                        if cpvu is None:
-                            cpvu = parser.league.db.costPerValueUnit()
-                            draftEligiblePlayers = parser.league.db.remainingDraftEligiblePlayers()
+                #response += " "
+                #response += '{0: >4}'.format(str(player.value()))
 
-                        if player in draftEligiblePlayers:
-                            playerMarketPrice = player.value() * cpvu
-                        else:
-                            playerMarketPrice = 0.0
-                        response += parser.bold('{0: >10}'.format('$' + str(round(playerMarketPrice,1))))
-                except:
-                    #if parser.debug: raise
-                    pass
-                '''
+                #'''
+                # ToDo: move this out of here
+                if parser.league.name == "O-League":
+
+                    try:
+                        if parser.league is not None:
+                            # HACK ALERT!!!
+                            if cpvu is None:
+                                cpvu = parser.league.db.costPerValueUnit()
+                                draftEligiblePlayers = parser.league.db.remainingDraftEligiblePlayers()
+
+                            if player in draftEligiblePlayers:
+                                playerMarketPrice = player.value() * cpvu
+                            else:
+                                playerMarketPrice = 0.0
+                            response += parser.bold('{0: >10}'.format('$' + str(round(playerMarketPrice,1))))
+                    except:
+                        #if parser.debug: raise
+                        pass
+                #'''
 
                 response += "\n"
 

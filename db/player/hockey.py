@@ -83,12 +83,13 @@ class HockeyPlayer(Player):
         'buffalo sabres':'buf', 'calgary flames':'cgy', 'carolina hurricanes':'car', \
         'chicago blackhawks':'chi', 'colorado avalanche':'col', 'columbus blue jackets':'clb', \
         'dallas stars':'dal', 'detroit red wings':'det', 'edmonton oilers':'edm', \
-        'florida panthers':'fla', 'los angeles kings':'la', 'minnesota wild':'min', \
-        'montreal canadiens':'mon', 'nashville predators':'nsh', 'new jersey devils':'nj', \
-        'new york islanders':'nyi', 'new york rangers':'nyr', 'philadelphia flyers':'phi', \
-        'pittsburgh penguins':'pit', 'ottawa senators':'ott', 'san jose sharks':'sj', \
-        'st louis blues':'stl', 'tampa bay lightning':'tb',  'toronto maple leafs':'tor', \
-        'vancouver canucks':'van', 'washington capitals':'was', 'winnipeg jets':'wpg' \
+        'florida panthers':'fla', 'las vegas golden knights':'lv', 'los angeles kings':'la', \
+        'minnesota wild':'min', 'montreal canadiens':'mon', 'nashville predators':'nsh', \
+        'new jersey devils':'nj', 'new york islanders':'nyi', 'new york rangers':'nyr', \
+        'philadelphia flyers':'phi', 'pittsburgh penguins':'pit', 'ottawa senators':'ott', \
+        'san jose sharks':'sj', 'st louis blues':'stl', 'tampa bay lightning':'tb', \
+        'toronto maple leafs':'tor', 'vancouver canucks':'van', 'washington capitals':'was', \
+        'winnipeg jets':'wpg' \
         }
 
         abbreviated_teamnames = teamNameAbbreviateMap.values()
@@ -99,6 +100,9 @@ class HockeyPlayer(Player):
             if team == 'toronto maple leafs' or team == 'columbus blue jackets' or \
                 team == 'detroit red wings':
                 city,name = team.split(' ',1)
+            elif team == 'las vegas golden knights':
+                city = 'las vegas'
+                name = 'golden knights'
             else:
                 city,name = team.rsplit(' ',1)
 
@@ -114,7 +118,7 @@ class HockeyPlayer(Player):
             teamNameAbbreviateMap[team] = team
 
         if teamname not in teamNameAbbreviateMap:
-            raise ValueError('ERROR: invalid team name ' + teamname)
+            raise ValueError('ERROR: invalid team name: ' + teamname)
 
         return teamNameAbbreviateMap[teamname]
 

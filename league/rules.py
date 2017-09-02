@@ -6,7 +6,6 @@ Created on Sep 5, 2016
 import datetime
 import unittest
 
-
 class Rules(object):
     def __init__(self):
         pass
@@ -144,12 +143,15 @@ class RulesTest(unittest.TestCase):
 
     def testCalculation(self):
         from db.footballdb import FootballPlayerDB
+        #from sitescraper.nfl.footballdbdotcom import FootballDBDotComScraper
 
         r = FootballRules()
         fdb = FootballPlayerDB()
+        #fdb.wget([FootballDBDotComScraper()])
         fdb.wget()
         fp = fdb.player["cam newton - car"]
         print str(fp)
+        print "Passing Points 2016: " + str(r.passingPoints(fp,2017))
         print "Passing Points 2016: " + str(r.passingPoints(fp,2016))
         print "Passing Points 2015: " + str(r.passingPoints(fp,2015))
         print "Passing Points 2014: " + str(r.passingPoints(fp,2014))

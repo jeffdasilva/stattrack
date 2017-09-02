@@ -17,7 +17,10 @@ class OLeagueFootballRules(FootballRules):
     def __init__(self):
         super(FootballRules, self).__init__()
 
-        self.settingsURL = "https://football.fantasysports.yahoo.com/f1/66542/settings"
+        # 2016
+        #self.settingsURL = "https://football.fantasysports.yahoo.com/f1/66542/settings"
+        # 2017
+        self.settingsURL = "https://football.fantasysports.yahoo.com/f1/159148/settings"
 
         self.numTeams = 10
         self.moneyPerTeam = 333
