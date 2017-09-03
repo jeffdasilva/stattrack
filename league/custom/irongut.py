@@ -87,7 +87,6 @@ class IronGutFootballLeague(FootballLeague):
 
         fpros_scraper = FantasyProsDotComScraper()
         fpros_scraper.setProjectionURLs(week="19")
-
         self.scrapers = [ fpros_scraper ]
 
 

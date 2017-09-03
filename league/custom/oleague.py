@@ -10,6 +10,7 @@ from cli.cmd.command import Command
 from db.footballdb import FootballPlayerDB
 from league.football import FootballLeague
 from league.rules import FootballRules
+from sitescraper.nfl.fantasyprosdotcom import FantasyProsDotComScraper
 
 
 class OLeagueFootballRules(FootballRules):
@@ -58,6 +59,13 @@ class OLeagueFootballRules(FootballRules):
         self.pointsPerFortyPlusYardReceivingTouchdown = 3
 
 
+        fpros_scraper = FantasyProsDotComScraper()
+        fpros_scraper.setProjectionURLs(week="draft")
+
+        self.scrapers = [ fpros_scraper ]
+
+
+
 class OLeagueFootballLeague(FootballLeague):
     def __init__(self):
         from cli.cmd.command import SearchByPositionCommand
@@ -79,6 +87,11 @@ class OLeagueFootballLeague(FootballLeague):
 
         self.parser.autosave = True
 
+        fpros_scraper = FantasyProsDotComScraper()
+        fpros_scraper.setProjectionURLs(week="draft")
+        self.scrapers = [ fpros_scraper ]
+
+
 
     def factoryReset(self):
 
@@ -97,6 +110,9 @@ class OLeagueFootballLeague(FootballLeague):
             if pStats is not None:
                 self.db.player[p].update(pStats)
 
+
+    def update(self):
+        self.db.wget(self.scrapers)
 
 ##########################################################
 # stats

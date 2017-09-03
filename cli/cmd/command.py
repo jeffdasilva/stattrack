@@ -596,9 +596,9 @@ class ListCommand(Command):
                     playersToList = self.maxPlayersToList
 
             response = "---------------------------------------------------------------------\n"
-            
+
             cpvu = None
-            
+
             for i, player in enumerate(parser.player_list):
                 if i >= playersToList:
                     break

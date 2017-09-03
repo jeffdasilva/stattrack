@@ -21,8 +21,7 @@ class League(object):
         self.parser.promptLoop()
 
     def update(self):
-        if self.db is not None:
-            self.db.update()
+        raise NotImplementedError
 
     def factoryReset(self):
         raise ValueError('factoryReset is not implemented')

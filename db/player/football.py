@@ -300,7 +300,7 @@ class FootballPlayer(Player):
         points += rushingYards/10
 
         return points
-    
+
     # deprecated
     def __valueReceivingYards(self,receivingYards):
         points = 0.0
@@ -320,7 +320,7 @@ class FootballPlayer(Player):
         points += receivingYards/10
 
         return points
-    
+
     # deprecated
     def valuePassing(self):
         '''

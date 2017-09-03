@@ -8,8 +8,8 @@ import unittest
 
 class StatTrack(object):
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 57
-    StatTrackBuildNumber = 141
+    StatTrackMinorVersion = 58
+    StatTrackBuildNumber = 142
 
     def __init__(self):
         #self.league = "ArrudaCup"
@@ -63,6 +63,7 @@ class StatTrackTest(unittest.TestCase):
         s = StatTrack()
         self.assertEquals(s.getVersion(), str(StatTrack.StatTrackMajorVersion) + "." + str(StatTrack.StatTrackMinorVersion))
         print s.getFullVersionString()
+        #s.run()
 
 if __name__ == '__main__':
     st = StatTrack()
