@@ -8,6 +8,7 @@ import unittest
 
 from cli.cmd.command import Command
 from db.footballdb import FootballPlayerDB
+from db.player.football import FootballPlayer
 from league.football import FootballLeague
 from league.rules import FootballRules
 from sitescraper.nfl.fantasyprosdotcom import FantasyProsDotComScraper
@@ -16,7 +17,7 @@ from sitescraper.nfl.fantasyprosdotcom import FantasyProsDotComScraper
 class OLeagueFootballRules(FootballRules):
 
     def __init__(self):
-        super(FootballRules, self).__init__()
+        super(OLeagueFootballRules, self).__init__()
 
         # 2016
         #self.settingsURL = "https://football.fantasysports.yahoo.com/f1/66542/settings"
@@ -35,18 +36,21 @@ class OLeagueFootballRules(FootballRules):
 
         self.pointsPerCompletion = 0.25
         self.pointsPerIncompletePass = -0.50
-        self.pointsPerPassingYards = [ (0,1.0/25), (300,2.0/25), (350,4.0/25), (400,6.0/25) ]
+        self.pointsPerPassingYard = [ (0,1.0/25), (300,2.0/25), (350,4.0/25), (400,6.0/25) ]
         self.pointsPerPassingTouchdown = 6
         self.pointsPerInterception = -2
         self.pointsPerSack = -0.5
         self.pointsPerRushingAttempt = 0.1
         self.pointsPerRushingYard = [ (0,1.0/10), (100,2.0/10), (150,4.0/10), (200,6.0/10) ]
         self.pointsPerRushingTouchdown = 6
+        self.pointsPerRushingTwoPointConversion = 2
         self.pointsPerReception = 1
         self.pointsPerReceivingYard = [ (0,1.0/10), (100,2.0/10), (150,4.0/10), (200,6.0/10) ]
         self.pointsPerReceivingTouchdown = 6
+        self.pointsPerReceivingTwoPointConversion = 2
         self.pointsPerReturnYard = [ (0,1.0/20), (100,3.0/20), (200,6.0/20) ]
         self.pointsPerReturnTouchdown = 6
+        self.pointsPerFumblesTouchdown = 6
         self.pointsPerTwoPointConversion = 2
         self.pointsPerFumble = -1
         self.pointsPerFumblesLost = -2
@@ -58,12 +62,9 @@ class OLeagueFootballRules(FootballRules):
         self.pointsPerFortyPlusYardReception = 1
         self.pointsPerFortyPlusYardReceivingTouchdown = 3
 
-
         fpros_scraper = FantasyProsDotComScraper()
         fpros_scraper.setProjectionURLs(week="draft")
-
         self.scrapers = [ fpros_scraper ]
-
 
 
 class OLeagueFootballLeague(FootballLeague):
@@ -72,6 +73,9 @@ class OLeagueFootballLeague(FootballLeague):
 
         name = "O-League"
         rules = OLeagueFootballRules()
+
+        FootballPlayer.DefaultRules = rules
+
         db = FootballPlayerDB(name)
         super(OLeagueFootballLeague, self).__init__(name, db, rules)
         self.property['isAuctionDraft'] = 'true'
@@ -84,13 +88,14 @@ class OLeagueFootballLeague(FootballLeague):
         self.parser.commands.append(SearchByPositionCommand('rb'))
 
         self.parser.commands.append(StatsCommand())
+        # give list command some extra needed performance
+        self.parser.getCommand("list").maxPlayersToList = 10
 
         self.parser.autosave = True
 
         fpros_scraper = FantasyProsDotComScraper()
         fpros_scraper.setProjectionURLs(week="draft")
         self.scrapers = [ fpros_scraper ]
-
 
 
     def factoryReset(self):
@@ -154,7 +159,7 @@ class OLeagueFootballLeagueTest(unittest.TestCase):
         self.assertEquals(ffl.name,"O-League")
         self.assertEquals(ffl.db.leagueName,"O-League")
         self.assertNotEquals(ffl.rules,None)
-        print str(ffl.rules.pointsPerPassingYards)
+        print str(ffl.rules.pointsPerPassingYard)
         pass
 
     def testLeagueDB(self):

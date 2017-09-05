@@ -5,11 +5,15 @@
 '''
 import unittest
 
+from league.custom.irongut import IronGutFootballLeague
+from league.custom.oleague import OLeagueFootballLeague
+from league.custom.arrudacup import ArrudaCupHockeyLeague
+from league.custom.oracle import OracleFootballLeague
 
 class StatTrack(object):
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 58
-    StatTrackBuildNumber = 142
+    StatTrackMinorVersion = 59
+    StatTrackBuildNumber = 147
 
     def __init__(self):
         #self.league = "ArrudaCup"
@@ -34,10 +38,6 @@ class StatTrack(object):
         print
 
     def run(self):
-        from league.custom.oleague import OLeagueFootballLeague
-        from league.custom.arrudacup import ArrudaCupHockeyLeague
-        from league.custom.irongut import IronGutFootballLeague
-        from league.custom.oracle import OracleFootballLeague
 
         if self.league == "OLeague":
             self.printBanner()

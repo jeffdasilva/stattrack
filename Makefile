@@ -60,7 +60,7 @@ PYTHON_UNITTEST_STAMPS := $(strip \
 check: $(PYTHON_UNITTEST_STAMPS)
 
 $(PYTHON_UNITTEST_STAMPS): stamps/%.unittest: %.py
-	python -m unittest $(subst /,.,$*)
+	python -B -m unittest $(subst /,.,$*)
 	@mkdir -p $(@D)
 	@touch $@
 
@@ -134,16 +134,13 @@ ifeq ($(shell whoami),jdasilva)
 	@echo "Incrementing minor version number to: $(NEXT_MINOR_VERSION_NUMBER)"
 	@sed -i -e 's,\(MinorVersion = \)\([0-9]*\)$$,\1$(NEXT_MINOR_VERSION_NUMBER),g' $(PYTHON_MAIN)
 endif
-
-
 #############################
-
 
 
 #############################
 .PHONY: run
 run:
-	python $(PYTHON_MAIN)
+	python -B $(PYTHON_MAIN)
 #############################
 
 

@@ -8,6 +8,8 @@ from sitescraper.nfl.footballdbdotcom import FootballDBDotComScraper
 
 class FootballPlayer(Player):
 
+    DefaultRules = None
+
     def __init__(self, name=None, team=None, properties={}):
         super(FootballPlayer, self).__init__(name=name, team=team, properties=properties)
 
@@ -20,6 +22,9 @@ class FootballPlayer(Player):
             return "JAX"
         return super(FootballPlayer,self).team_abbreviate(teamname)
 
+
+    def get_rules(self):
+        return FootballPlayer.DefaultRules
 
 ###################################################################
 #
@@ -234,6 +239,9 @@ class FootballPlayer(Player):
 
     def points(self,year=datetime.datetime.now().year):
 
+        if self.get_rules() is not None:
+            return self.get_rules().points(self, year)
+
         points = 0.0
         points += self.passingTDs(year) * (4)
         points += self.passingYards(year) * (0.04)
@@ -427,7 +435,8 @@ class FootballPlayer(Player):
                 return 0
 
         #...and if we're in July, we have projections
-        return self.valuePassing() + self.valueRushing() + self.valueReceiveing() + self.valueMisc()
+        #return self.valuePassing() + self.valueRushing() + self.valueReceiveing() + self.valueMisc()
+        return self.pointsPerGame()
 
 
 class TestFootballPlayer(unittest.TestCase):

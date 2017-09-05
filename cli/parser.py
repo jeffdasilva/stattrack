@@ -4,6 +4,7 @@ Created on Sep 1, 2016
 @author: jdasilva
 '''
 import os
+from threading import Thread
 import unittest
 
 from cli.cmd.command import Command, SearchCommand
@@ -27,6 +28,7 @@ class StatTrackParser(object):
         self.debug = False
         self.defaultCommand = self.getCommand("search")
         self.db_requires_save = False
+        self.background_threads = []
 
     def recvInput(self, prompt):
         try:
@@ -44,6 +46,7 @@ class StatTrackParser(object):
 
     def prompt(self):
         cmd = self.recvInput('% ')
+
         status = self.processCommandAndResponse(cmd)
         return status
 
@@ -64,10 +67,26 @@ class StatTrackParser(object):
                 return commandIter
         return None
 
+    def waitForBackgroundThreads(self):
+
+        if len(self.background_threads) > 0:
+            if self.debug: print "Waiting for background threads..."
+
+        for bgthread in self.background_threads:
+            bgthread.join()
+
+        self.background_threads = []
+
+    def startBackgroundThread(self, bgthread):
+        bgthread.start()
+        self.background_threads.append(bgthread)
+
     def processCommand(self,cmd):
         self.status = StatTrackParser.StatusTrue
 
         command = self.getCommand(cmd)
+
+        self.waitForBackgroundThreads()
 
         if command is not None:
             if command.preApplyMessage(cmd, self) is not None:
@@ -100,13 +119,26 @@ class StatTrackParser(object):
         #except AttributeError:
         #        print "Update Player Cache Failed. Continuing..."
 
+        db_changed = self.db_requires_save
+
         if self.autosave and self.db_requires_save:
             if status != StatTrackParser.StatusError:
                 if self.league is not None and self.league.db is not None:
                     self.undoMode = True
-                    self.save()
+                    save_thread = Thread(target=self.save)
+                    self.startBackgroundThread(save_thread)
                     self.undoMode = False
                     self.sendDebugOutput("[autosave]")
+
+        if db_changed and status != StatTrackParser.StatusExit and status != StatTrackParser.StatusError:
+            try:
+                update_thread = Thread(target=self.league.db.updatePlayerCache)
+                self.startBackgroundThread(update_thread)
+            except AttributeError:
+                pass
+
+        if status == StatTrackParser.StatusExit or status == StatTrackParser.StatusError:
+            self.waitForBackgroundThreads()
 
         return status
 

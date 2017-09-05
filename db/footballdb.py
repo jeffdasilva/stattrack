@@ -8,7 +8,6 @@ from db.player.player import Player
 from db.playerdb import PlayerDB
 from sitescraper.nfl.fantasyprosdotcom import FantasyProsDotComScraper
 
-
 class FootballPlayerDB(PlayerDB):
 
     def __init__(self, league=None):
@@ -32,6 +31,7 @@ class FootballPlayerDB(PlayerDB):
         self.leagueName = league
 
         self.playerCache = {}
+        self.cost_per_value_unit = None
 
         if self.leagueName is None:
             self.leagueName = "Oracle"
@@ -72,7 +72,8 @@ class FootballPlayerDB(PlayerDB):
 
     def wget(self, scrapers=[]):
 
-        allScrapers = scrapers + [FantasyProsDotComScraper()]
+        #allScrapers = scrapers + [FantasyProsDotComScraper()]
+        allScrapers = scrapers
 
         for s in allScrapers:
             data = s.scrape()
@@ -85,7 +86,7 @@ class FootballPlayerDB(PlayerDB):
 
         for p in self.player.itervalues():
             if p.isDrafted:
-                total_money -= p.cost
+                total_money = total_money - p.cost
 
         return total_money
 
@@ -94,6 +95,8 @@ class FootballPlayerDB(PlayerDB):
         return self.get(position=position)[:num_players_remaining]
 
     def updatePlayerCache(self):
+        if self.debug: print "[UPDATE Player Cache: START]"
+
         total_num_players_remaining = self.totalNumberOfPlayers*self.numberOfTeams - self.numberOfPlayersDrafted()
         self.playerCache['all'] = self.get()[:total_num_players_remaining]
         self.playerCache['wr'] = self.remainingGoodPlayersByPosition(position="wr")
@@ -101,16 +104,12 @@ class FootballPlayerDB(PlayerDB):
         self.playerCache['qb'] = self.remainingGoodPlayersByPosition(position="qb")
         #self.playerCache['def'] = self.remainingGoodPlayersByPosition(position="def")
         #self.playerCache['k'] = self.remainingGoodPlayersByPosition(position="k")
-        self.playerCache['bench'] = None
 
-    def remainingStarters(self):
-        #return self.playerCache['wr'] + self.playerCache['qb'] + self.playerCache['rb'] + self.playerCache['def'] + self.playerCache['k']
-        return self.playerCache['wr'] + self.playerCache['qb'] + self.playerCache['rb']
+        self.playerCache['starters'] = self.playerCache['wr'] + self.playerCache['qb'] + self.playerCache['rb']
+        # + self.playerCache['def'] + self.playerCache['k']
 
 
-    def remainingGoodBenchPlayers(self):
-        #total_num_players_remaining = self.totalNumberOfPlayers*self.numberOfTeams - self.numberOfPlayersDrafted()
-
+        ####
         remainingDraftEligiblePlayers = self.playerCache['all']
         remainingDraftEligibleStarters = self.remainingStarters()
 
@@ -118,7 +117,24 @@ class FootballPlayerDB(PlayerDB):
             if p in remainingDraftEligiblePlayers:
                 remainingDraftEligiblePlayers.remove(p)
 
-        return remainingDraftEligiblePlayers
+        self.playerCache['bench'] = remainingDraftEligiblePlayers
+        ####
+
+        self.updateCostPerValueUnit()
+        if self.debug: print "[UPDATE Player Cache: END]"
+
+
+    def remainingStarters(self):
+        if 'starters' not in self.playerCache:
+            self.updatePlayerCache()
+
+        return self.playerCache['starters']
+
+    def remainingGoodBenchPlayers(self):
+        if 'bench' not in self.playerCache:
+            self.updatePlayerCache()
+
+        return self.playerCache['bench']
 
     def remainingDraftEligiblePlayers(self):
         return self.remainingStarters() + self.remainingGoodBenchPlayers()
@@ -130,18 +146,32 @@ class FootballPlayerDB(PlayerDB):
 
         value = 0.0
         for p in self.remainingStarters():
-            #print p
             value += p.value()
 
-        # bench players are worth a lot less (0.2x compared to a starter
+        # bench players are worth a lot less (0.05x compared to a starter)
         for p in self.remainingGoodBenchPlayers():
-            #print p
-            value += (p.value() * 0.2)
+            value += (p.value() * 0.05)
 
         return value
 
-    def costPerValueUnit(self):
-        return self.moneyRemaining() / max(self.valueRemaining(),0.1)
+    def updateCostPerValueUnit(self):
+        self.cost_per_value_unit = self.moneyRemaining() / max(self.valueRemaining(),0.1)
+
+    def costPerValueUnit(self, position=None):
+        if self.cost_per_value_unit is None:
+            self.updateCostPerValueUnit()
+
+        mult = 1.0
+        # ToDo: make this better i.e. more scientific and dynamic based on how many of each position are left
+        if position is not None:
+            if 'RB' in position:
+                mult = mult * 1.5
+            elif 'WR' in position:
+                mult = mult * 1.3
+            elif 'QB' in position:
+                mult = mult * 0.8
+
+        return self.cost_per_value_unit * mult
 
 
 class TestFootballPlayerDB(unittest.TestCase):
@@ -177,7 +207,7 @@ class TestFootballPlayerDB(unittest.TestCase):
 
     def testWget(self):
         fdb = FootballPlayerDB()
-        fdb.wget()
+        fdb.wget(scrapers=[FantasyProsDotComScraper()])
 
         #print fdb.player
 
@@ -210,7 +240,7 @@ class TestFootballPlayerDB(unittest.TestCase):
 
     def testWgetCheatsheets(self):
         fdb = FootballPlayerDB()
-        fdb.wget()
+        fdb.wget(scrapers=[FantasyProsDotComScraper()])
 
         p = fdb.player["julio jones - atl"]
         print p
@@ -222,7 +252,7 @@ class TestFootballPlayerDB(unittest.TestCase):
 
     def testProjectionMethods(self):
         fdb = FootballPlayerDB()
-        fdb.wget()
+        fdb.wget(scrapers=[FantasyProsDotComScraper()])
 
         for pKey in ["cam newton - car", "drew brees - no", "russell wilson - sea", "aaron rodgers - gb"]:
             p = fdb.player[pKey]

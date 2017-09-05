@@ -34,7 +34,7 @@ class OracleFootballRules(FootballRules):
         # Passing
         self.pointsPerCompletion = 0.0
         self.pointsPerIncompletePass = 0.0
-        self.pointsPerPassingYards = 0.04
+        self.pointsPerPassingYard = 0.04
         self.pointsPerPassingTouchdown = 4
         self.pointsPerInterception = -1
         self.pointsPerSack = 0
@@ -149,7 +149,7 @@ class OracleFootballLeagueTest(unittest.TestCase):
         self.assertEquals(ffl.name,"Oracle")
         self.assertEquals(ffl.db.leagueName,"Oracle")
         self.assertNotEquals(ffl.rules,None)
-        print str(ffl.rules.pointsPerPassingYards)
+        print str(ffl.rules.pointsPerPassingYard)
         pass
 
     def testLeagueDB(self):

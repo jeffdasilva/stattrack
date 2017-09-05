@@ -597,8 +597,7 @@ class ListCommand(Command):
 
             response = "---------------------------------------------------------------------\n"
 
-            cpvu = None
-
+            draftEligiblePlayers = None
             for i, player in enumerate(parser.player_list):
                 if i >= playersToList:
                     break
@@ -609,29 +608,22 @@ class ListCommand(Command):
                 response += " "
                 response += '{0: >4}'.format(str(player.age()))
 
-                #response += " "
-                #response += '{0: >4}'.format(str(player.value()))
-
-                #'''
                 # ToDo: move this out of here
-                if parser.league.name == "O-League":
+                if parser.league is not None and parser.league.property["isAuctionDraft"] == 'true':
 
                     try:
-                        if parser.league is not None:
-                            # HACK ALERT!!!
-                            if cpvu is None:
-                                cpvu = parser.league.db.costPerValueUnit()
-                                draftEligiblePlayers = parser.league.db.remainingDraftEligiblePlayers()
+                        if draftEligiblePlayers is None:
+                            draftEligiblePlayers = parser.league.db.remainingDraftEligiblePlayers()
 
-                            if player in draftEligiblePlayers:
-                                playerMarketPrice = player.value() * cpvu
-                            else:
-                                playerMarketPrice = 0.0
-                            response += parser.bold('{0: >10}'.format('$' + str(round(playerMarketPrice,1))))
+                        if player in draftEligiblePlayers:
+                            playerMarketPrice = player.value() * parser.league.db.costPerValueUnit(position=player.position)
+                        else:
+                            playerMarketPrice = 0.0
+                        response += parser.bold('{0: >10}'.format('$' + str(round(playerMarketPrice,1))))
                     except:
+                        raise
                         #if parser.debug: raise
-                        pass
-                #'''
+                        #pass
 
                 response += "\n"
 

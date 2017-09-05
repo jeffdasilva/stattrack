@@ -31,7 +31,7 @@ class IronGutFootballRules(FootballRules):
         # Passing
         self.pointsPerCompletion = 0.0
         self.pointsPerIncompletePass = 0.0
-        self.pointsPerPassingYards = 1.0/25
+        self.pointsPerPassingYard = 1.0/25
         self.pointsPerPassingTouchdown = 4
         self.pointsPerInterception = -1
         self.pointsPerSack = 0
@@ -125,7 +125,7 @@ class IronGutFootballLeagueTest(unittest.TestCase):
         self.assertEquals(ffl.name,"IronGut")
         self.assertEquals(ffl.db.leagueName,"IronGut")
         self.assertNotEquals(ffl.rules,None)
-        print str(ffl.rules.pointsPerPassingYards)
+        print str(ffl.rules.pointsPerPassingYard)
         pass
 
     def testLeagueDB(self):
