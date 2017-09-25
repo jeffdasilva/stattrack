@@ -42,7 +42,8 @@ class TsnDotCaScraper(SiteScraper):
                              esByPos.projectedGamesPlayed(),
                              esByPos.projectedWins(),
                              esByPos.projectedString('goalsAgainstAverage'),
-                             esByPos.projectedString('savePercentage')
+                             esByPos.projectedString('savePercentage'),
+                             esByPos.projectedString('shutouts')
                              ]
 
     ProjectedGamesPlayed = [esTop300.projectedGamesPlayed(), esByPos.projectedGamesPlayed()]
@@ -68,14 +69,20 @@ class TsnDotCaScraper(SiteScraper):
 
         if str(year) == "2016":
             #top_300_tsn_version_string = "1.360216"
-            top_300_tsn_version_string = "1.565371"
+            #top_300_tsn_version_string = "1.565371"
+            top_300_tsn_version_string = "1.848975"
 
             #by_position_tsn_version_string = "1.362639"
-            by_position_tsn_version_string = "1.566798"
+            #by_position_tsn_version_string = "1.566798"
+            by_position_tsn_version_string = "1.853367"
 
-            top300UrlOffset = "/crosby-leads-list-of-top-300-projected-scorers-" + top_300_tsn_version_string
+            #http://www.tsn.ca/crosby-leads-list-of-top-300-projected-scorers-1.565371
+            #top300UrlOffset = "/crosby-leads-list-of-top-300-projected-scorers-" + top_300_tsn_version_string
+            top300UrlOffset = "/statistically-speaking-projected-top-300-scorers-" + top_300_tsn_version_string
 
-            byPositionOffset = "/fantasy-hockey-rankings-by-position-" + by_position_tsn_version_string
+            #byPositionOffset = "/fantasy-hockey-rankings-by-position-" + by_position_tsn_version_string
+            byPositionOffset = "/statistically-speaking-fantasy-hockey-rankings-" + by_position_tsn_version_string
+
             tableAttrs={'class':'stats-table-scrollable article-table'}
 
         else:

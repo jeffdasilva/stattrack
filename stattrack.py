@@ -16,8 +16,8 @@ class StatTrack(object):
     StatTrackBuildNumber = 147
 
     def __init__(self):
-        #self.league = "ArrudaCup"
-        self.league = "OLeague"
+        self.league = "ArrudaCup"
+        #self.league = "OLeague"
         #self.league = "IronGut"
         #self.league = "Oracle"
 

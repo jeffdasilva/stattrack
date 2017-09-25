@@ -140,7 +140,7 @@ endif
 #############################
 .PHONY: run
 run:
-	python -B $(PYTHON_MAIN)
+	winpty python -B $(PYTHON_MAIN)
 #############################
 
 
