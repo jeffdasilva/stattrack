@@ -95,8 +95,8 @@ class TestFootballDBDotComScraper(unittest.TestCase):
 
     def testFootballDBDotComScraper(self):
 
-        #thisYear = str(datetime.datetime.now().year)
-        thisYear = "2016"
+        thisYear = str(datetime.datetime.now().year)
+        #thisYear = "2017"
 
         s = FootballDBDotComScraper()
         s.testmode = True
