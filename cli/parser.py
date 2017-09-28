@@ -143,7 +143,10 @@ class StatTrackParser(object):
         return status
 
     def bold(self,string):
-        return '\033[1m' + string + '\033[0m'
+        if os.name == 'nt':
+            return string
+        else:
+            return '\033[1m' + string + '\033[0m'
 
     def error(self,errorMsg):
         return self.getCommand("error").apply(errorMsg,self)

@@ -51,7 +51,7 @@ class TsnDotCaScraper(SiteScraper):
     ProjectedAssists = [esTop300.projectedAssists(), esByPos.projectedAssists()]
     ProjectedWins = [ esByPos.projectedWins() ]
     ProjectedTies = []
-    ProjectedShutouts = []
+    ProjectedShutouts = [ esByPos.projectedShutouts() ]
 
     def __init__(self):
         super(TsnDotCaScraper, self).__init__(url="http://www.tsn.ca")
@@ -61,13 +61,7 @@ class TsnDotCaScraper(SiteScraper):
     def scrape(self, year=datetime.datetime.now().year):
 
         # scrape Scott Cullen's projections
-
-
-        if year >= 2017:
-            year = 2016
-
-
-        if str(year) == "2016":
+        if str(year) == "2017":
             #top_300_tsn_version_string = "1.360216"
             #top_300_tsn_version_string = "1.565371"
             top_300_tsn_version_string = "1.848975"
@@ -169,7 +163,7 @@ class TestTsnDotCaScraper(unittest.TestCase):
         s = TsnDotCaScraper()
         s.testmode = True
         s.debug = True
-        data = s.scrape(year="2016")
+        data = s.scrape(year="2017")
 
         McDavidFound = 0
 

@@ -2,7 +2,6 @@ import datetime
 import unittest
 
 from db.player.player import Player
-from sitescraper.nhl.cbssportsdotcom import NhlCbsSportsDotComSraper
 from sitescraper.nhl.tsndotca import TsnDotCaScraper
 
 
@@ -27,7 +26,7 @@ class HockeyPlayer(Player):
         self.projected_assists_attr = TsnDotCaScraper.ProjectedAssists
         self.projected_wins_attr = TsnDotCaScraper.ProjectedWins
         self.projected_ties_attr = TsnDotCaScraper.ProjectedTies
-        self.projected_shutouts_attr = TsnDotCaScraper.ProjectedShutouts + NhlCbsSportsDotComSraper.ProjectedShutouts
+        self.projected_shutouts_attr = TsnDotCaScraper.ProjectedShutouts
 
 
     def __str__(self):
@@ -37,7 +36,7 @@ class HockeyPlayer(Player):
         player_str += "   | " + '{0: <9}'.format(str(round(self.projectedPointsPerGame(),2))
                                     + "(" +  str(self.gamesPlayed()) + ") " ) + "|"
 
-        for year in ['2015','2014','2013']:
+        for year in ['2016','2015','2014']:
             player_str += " " + '{0: <9}'.format(str(round(self.pointsPerGame(year=year),2)) \
                                     + "(" +  str(self.gamesPlayed(year=year)) + ") " ) + "|"
 
@@ -187,13 +186,19 @@ class HockeyPlayer(Player):
         if self.gamesPlayed(year) == 0:
             return 0.0
         else:
-            return self.points(year)/self.gamesPlayed(year)
+            if 'G' in self.position:
+                return self.points(year)/82
+            else:
+                return self.points(year)/self.gamesPlayed(year)
 
     def projectedPointsPerGame(self):
         if self.projectedGamesPlayed() == 0:
             return 0.0
         else:
-            return self.projectedPoints()/self.projectedGamesPlayed()
+            if 'G' in self.position:
+                return self.projectedPoints()/82
+            else:
+                return self.projectedPoints()/self.projectedGamesPlayed()
 
     def value(self):
         if 'G' in self.position:
@@ -201,11 +206,14 @@ class HockeyPlayer(Player):
         else:
             value = self.pointsPerGame()
 
+        '''
         if 'G' in self.position:
             value = value * 0.85
         elif 'D' in self.position:
             value = value * 1.4
+        '''
 
+        '''
         if self.age() != '?':
             # this if is is for keeper leagues (younger players are more valuable
             # use a linear function given age (A) as input find multiplier (F)
@@ -220,6 +228,19 @@ class HockeyPlayer(Player):
             y = ((F_1 * A_2) - (F_2 * A_1)) / (A_2 - A_1)
             F = (self.age() * x) + y
             value = value * F
+        '''
+
+        if self.age() <= 20:
+            value = value * 1.10
+        elif self.age == 21:
+            value = value * 1.08
+        elif self.age == 22:
+            value = value * 1.05
+        elif self.age < 25:
+            value = value * 1.02
+        elif self.age > 37 and 'D' not in self.position:
+            value = value * 0.85
+
 
         return value
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 '''
 @author: jdasilva
@@ -29,12 +29,12 @@ class StatTrack(object):
             "Build: " + str(StatTrack.StatTrackBuildNumber) + "]"
 
     def printBanner(self):
-        print "StatTrack\t" + self.getFullVersionString()
-        print " https://github.com/jeffdasilva/stattrack"
+        print("StatTrack\t" + self.getFullVersionString())
+        print(" https://github.com/jeffdasilva/stattrack")
         print
-        print "Type 'help' to list available commands"
+        print("Type 'help' to list available commands")
         print
-        print " LEAGUE: " + self.league
+        print(" LEAGUE: " + self.league)
         print
 
     def run(self):
@@ -52,7 +52,7 @@ class StatTrack(object):
             self.printBanner()
             l = OracleFootballLeague()
         else:
-            print "ERROR: Unknown League '" + self.league + "'"
+            print("ERROR: Unknown League '" + self.league + "'")
             return
 
         l.draftmode()
@@ -62,7 +62,7 @@ class StatTrackTest(unittest.TestCase):
     def testConstructor(self):
         s = StatTrack()
         self.assertEquals(s.getVersion(), str(StatTrack.StatTrackMajorVersion) + "." + str(StatTrack.StatTrackMinorVersion))
-        print s.getFullVersionString()
+        print(s.getFullVersionString())
         #s.run()
 
 if __name__ == '__main__':
