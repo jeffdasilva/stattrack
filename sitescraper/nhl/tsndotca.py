@@ -43,7 +43,7 @@ class TsnDotCaScraper(SiteScraper):
                              esByPos.projectedWins(),
                              esByPos.projectedString('goalsAgainstAverage'),
                              esByPos.projectedString('savePercentage'),
-                             esByPos.projectedString('shutouts')
+                             esByPos.projectedShutouts()
                              ]
 
     ProjectedGamesPlayed = [esTop300.projectedGamesPlayed(), esByPos.projectedGamesPlayed()]

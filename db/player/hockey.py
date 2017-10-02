@@ -185,14 +185,14 @@ class HockeyPlayer(Player):
         return self.goals(year) + self.assists(year) + self.goaltenderWins(year)*2 + self.goaltenderTies(year) + self.goaltenderShutOuts(year)*4
 
     def projectedPoints(self,year=datetime.datetime.now().year):
-        
+
         #print(year)
         #print(self.projectedGoals())
         #print(self.projectedAssists())
         #print(self.projectedGoaltenderWins())
         #print(self.projectedGoaltenderTies())
         #print(self.projectedGoaltenderShutOuts())
-    
+
         return self.projectedGoals() + self.projectedAssists() + self.projectedGoaltenderWins()*2 + \
             self.projectedGoaltenderTies() + self.projectedGoaltenderShutOuts()*4
 
