@@ -128,7 +128,8 @@ class HockeyPlayer(Player):
             return float(self.getStat("Goals",year))
 
     def projectedGoals(self):
-        return float(self.getProperty(self.projected_goals_attr,0))
+        #return float(self.getProperty(self.projected_goals_attr,0))
+        return float(self.getProperty(TsnDotCaScraper.ProjectedGoals,0))
 
     def assists(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -137,7 +138,8 @@ class HockeyPlayer(Player):
             return float(self.getStat("Assists",year))
 
     def projectedAssists(self):
-        return float(self.getProperty(self.projected_assists_attr,0))
+        #return float(self.getProperty(self.projected_assists_attr,0))
+        return float(self.getProperty(TsnDotCaScraper.ProjectedAssists,0))
 
     def goaltenderWins(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -146,7 +148,8 @@ class HockeyPlayer(Player):
             return float(self.getStat("Wins",year))
 
     def projectedGoaltenderWins(self):
-        return float(self.getProperty(self.projected_wins_attr,0))
+        #return float(self.getProperty(self.projected_wins_attr,0))
+        return float(self.getProperty(TsnDotCaScraper.ProjectedWins,0))
 
     def goaltenderTies(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -155,7 +158,8 @@ class HockeyPlayer(Player):
             return float(self.getStat("Ties",year))
 
     def projectedGoaltenderTies(self):
-        return float(self.getProperty(self.projected_ties_attr,0))
+        #return float(self.getProperty(self.projected_ties_attr,0))
+        return float(self.getProperty(TsnDotCaScraper.ProjectedTies,0))
 
     def goaltenderShutOuts(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -164,7 +168,8 @@ class HockeyPlayer(Player):
             return float(self.getStat("Shutouts",year))
 
     def projectedGoaltenderShutOuts(self):
-        return float(self.getProperty(self.projected_shutouts_attr,0))
+        #return float(self.getProperty(self.projected_shutouts_attr,0))
+        return float(self.getProperty(TsnDotCaScraper.ProjectedShutouts,0))
 
     def gamesPlayed(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -173,12 +178,21 @@ class HockeyPlayer(Player):
             return int(self.getStat("GamesPlayed",year))
 
     def projectedGamesPlayed(self):
-        return float(self.getProperty(self.projected_games_played_attr,0))
+        #return float(self.getProperty(self.projected_games_played_attr,0))
+        return float(self.getProperty(TsnDotCaScraper.ProjectedGamesPlayed,0))
 
     def points(self,year=datetime.datetime.now().year):
         return self.goals(year) + self.assists(year) + self.goaltenderWins(year)*2 + self.goaltenderTies(year) + self.goaltenderShutOuts(year)*4
 
     def projectedPoints(self,year=datetime.datetime.now().year):
+        
+        #print(year)
+        #print(self.projectedGoals())
+        #print(self.projectedAssists())
+        #print(self.projectedGoaltenderWins())
+        #print(self.projectedGoaltenderTies())
+        #print(self.projectedGoaltenderShutOuts())
+    
         return self.projectedGoals() + self.projectedAssists() + self.projectedGoaltenderWins()*2 + \
             self.projectedGoaltenderTies() + self.projectedGoaltenderShutOuts()*4
 
@@ -230,17 +244,17 @@ class HockeyPlayer(Player):
             value = value * F
         '''
 
-        if self.age() <= 20:
-            value = value * 1.10
-        elif self.age == 21:
-            value = value * 1.08
-        elif self.age == 22:
-            value = value * 1.05
-        elif self.age < 25:
-            value = value * 1.02
-        elif self.age > 37 and 'D' not in self.position:
-            value = value * 0.85
-
+        if self.age() is not None and not isinstance(self.age(),str):
+            if self.age() <= 20:
+                value = value * 1.10
+            elif self.age() == 21:
+                value = value * 1.08
+            elif self.age() == 22:
+                value = value * 1.05
+            elif self.age() < 25:
+                value = value * 1.02
+            elif self.age() > 37 and 'D' not in self.position:
+                value = value * 0.85
 
         return value
 
