@@ -120,7 +120,7 @@ NEXT_BUILD_NUMBER = $(shell echo $$[$(CURRENT_BUILD_NUMBER)+1])
 
 .PHONY: increment-build-number
 increment-build-number:
-ifeq ($(shell whoami),jdasilva)
+ifneq ($(filter jdasilva jeff_,$(shell whoami)),)
 	@echo "Incrementing build number to: $(NEXT_BUILD_NUMBER)"
 	@sed -i -e 's,\(BuildNumber = \)\([0-9]*\)$$,\1$(NEXT_BUILD_NUMBER),g' $(PYTHON_MAIN)
 endif
@@ -138,9 +138,14 @@ endif
 
 
 #############################
+
+ifneq ($(COMSPEC),)
+WINPTY := $(if $(shell which winpty 2>/dev/null),winpty)
+endif
+
 .PHONY: run
 run:
-	winpty python -B $(PYTHON_MAIN)
+	$(WINPTY) python -B $(PYTHON_MAIN)
 #############################
 
 

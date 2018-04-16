@@ -9,7 +9,7 @@ class FantasyProsDotComScraper(SiteScraper):
 
     def __init__(self):
         #super(FantasyProsDotComScraper, self).__init__(url="http://www1.fantasypros.com/nfl")
-        super(FantasyProsDotComScraper, self).__init__(url="http://www.fantasypros.com/nfl")
+        super(FantasyProsDotComScraper, self).__init__(url="https://www.fantasypros.com/nfl")
         self.maxCacheTime = datetime.timedelta(days=7)
         self.setProjectionURLs()
         self.setCheatSheetURLs()
@@ -53,13 +53,11 @@ class FantasyProsDotComScraper(SiteScraper):
         self.cheatsheets = []
 
         for p in self.cheatsheetURL:
-            data = self.scrapeTable(urlOffset=self.cheatsheetURL[p], attrs={'id': 'data'})
+            data = self.scrapeTable(urlOffset=self.cheatsheetURL[p], attrs={'id': 'rank-data'})
 
             if data is None:
                 print "ERROR: table for " + p + " from " + self.cheatsheetURL[p] + " could not be extracted"
                 continue
-
-            data = data[1:]
 
             if p == "dst":
                 pos = "DEF"
@@ -76,12 +74,17 @@ class FantasyProsDotComScraper(SiteScraper):
                 dataKeys = ['position', 'positionRank', 'name', 'team', 'byeWeek', 'bestRank', 'worstRank', 'avgRank', 'stdDev']
 
             for data_i in data:
-                if len(data_i) < 2:
-                    continue
+                if len(data_i) < 3: continue
+
+                # remove wsid field
+                data_i = [data_i[0]] + data_i[2:]
+
+                #print str(data_i) + " " + str(len(data_i))
                 if p == "half-point-ppr" or p == "ppr" or p == "consensus":
                     d = dict(zip(dataKeys,[data_i[0]] + self.splitNameTeamString(data_i[1]) + data_i[2:]))
                 else:
                     d = dict(zip(dataKeys,[pos] + [data_i[0]] + self.splitNameTeamString(data_i[1]) + data_i[2:]))
+                #print d
 
                 self.cheatsheets.append(d)
 
@@ -115,6 +118,14 @@ class FantasyProsDotComScraper(SiteScraper):
         return data
 
     def splitNameTeamString(self, nameTeamStr):
+
+        if nameTeamStr.endswith(' DST'):
+            nameTeamStr = nameTeamStr[:-4]
+            nameTeamStr = nameTeamStr[:-3] + ' ' + nameTeamStr[-3:]
+
+        if len(nameTeamStr) > 6 and nameTeamStr.rfind(nameTeamStr[0] + '.') != -1:
+            idx = nameTeamStr.rfind(nameTeamStr[0] + '.')
+            nameTeamStr = nameTeamStr[0:idx] + ' ' +  nameTeamStr[-3:]
 
         if len(nameTeamStr.rsplit(' ',1)) > 1 and \
             len(nameTeamStr.rsplit(' ',1)[1]) == 1:
@@ -164,7 +175,7 @@ class TestFantasyProsDotComScraper(unittest.TestCase):
         seattleFound = 0
         for player in s.cheatsheets:
             if player['name'] == "Andrew Luck":
-                #print player
+                print player
                 self.assertEqual(player['team'], "IND")
                 andrewLuckFound += 1
 

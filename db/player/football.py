@@ -427,11 +427,14 @@ class FootballPlayer(Player):
     def value(self):
 
         if datetime.datetime.now().month  < 6:
-            if self.property.has_key("hpprAvgRank"):
-                return 300-(float(self.property["hpprAvgRank"]))
-            elif self.property.has_key("avgRank"):
-                return 50-(float(self.property["avgRank"]))
-            else:
+            try:
+                if self.property.has_key("hpprAvgRank"):
+                    return 300-(float(self.property["hpprAvgRank"]))
+                elif self.property.has_key("avgRank"):
+                    return 50-(float(self.property["avgRank"]))
+                else:
+                    return 0
+            except ValueError:
                 return 0
 
         #...and if we're in July, we have projections

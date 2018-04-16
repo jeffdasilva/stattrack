@@ -19,7 +19,8 @@ class OracleFootballRules(FootballRules):
         super(FootballRules, self).__init__()
 
         # league site is http://www56.myfantasyleague.com/2017/options?L=43790&O=17
-        self.settingsURL = "http://www56.myfantasyleague.com/2017/options?L=43790&O=09"
+        # self.settingsURL = "http://www56.myfantasyleague.com/2017/options?L=43790&O=09"
+        self.settingsURL = "http://www56.myfantasyleague.com/2018/options?L=43790&O=09"
 
         self.numTeams = 16
         self.numQB = 1
@@ -116,8 +117,10 @@ class OracleFootballLeague(FootballLeague):
     def update(self):
         self.db.wget(self.scrapers)
 
+        #OracleLeagueID = 43790
+        #OracleLeagueYear = 2017
         OracleLeagueID = 43790
-        OracleLeagueYear = 2017
+        OracleLeagueYear = 2018
         mfl = MyFantasyLeagueDotComScraper(OracleLeagueID, OracleLeagueYear)
         #self.db.wget(scrapers=[mfl])
 

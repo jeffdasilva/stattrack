@@ -17,12 +17,14 @@ class IronGutFootballRules(FootballRules):
         super(FootballRules, self).__init__()
 
         self.settingsURL = "http://www57.myfantasyleague.com/2016/options?L=62153&O=09"
+        self.settingsURL = "http://www57.myfantasyleague.com/2017/options?L=71847&O=09"
+
 
         self.numTeams = 12
         self.numQB = 1
         self.numRB = 2
         self.numWR = 3
-        self.numTE = 0
+        self.numTE = 1
         self.numDEF = 1
         self.numK = 1
         self.numReserves = 0
@@ -86,7 +88,7 @@ class IronGutFootballLeague(FootballLeague):
         self.parser.commands.append(SearchByPositionCommand('k'))
 
         fpros_scraper = FantasyProsDotComScraper()
-        fpros_scraper.setProjectionURLs(week="19")
+        fpros_scraper.setProjectionURLs(week="18")
         self.scrapers = [ fpros_scraper ]
 
 
@@ -125,7 +127,7 @@ class IronGutFootballLeagueTest(unittest.TestCase):
         self.assertEquals(ffl.name,"IronGut")
         self.assertEquals(ffl.db.leagueName,"IronGut")
         self.assertNotEquals(ffl.rules,None)
-        print str(ffl.rules.pointsPerPassingYard)
+        print(str(ffl.rules.pointsPerPassingYard))
         pass
 
     def testLeagueDB(self):
@@ -134,9 +136,9 @@ class IronGutFootballLeagueTest(unittest.TestCase):
             #if league was previously saved, then aaron rogd
             p = ffl.db.player["aaron rodgers - gb"]
             self.assertGreaterEqual(p.passingTwoPointers(year=2015),4)
-            print p
-            print "Passing Attempts: " + str(p.passingAttempts())
-            print "Passing TDs: " + str(p.projectedPassingTDs())
+            print(p)
+            print("Passing Attempts: " + str(p.passingAttempts()))
+            print("Passing TDs: " + str(p.projectedPassingTDs()))
 
 
 if __name__ == "__main__":
