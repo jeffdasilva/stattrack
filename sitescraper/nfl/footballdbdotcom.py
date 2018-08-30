@@ -45,8 +45,28 @@ class FootballDBDotComScraper(SiteScraper):
 
         for position in [ "QB", "RB", "WR", "TE"]:
             urlOffset = "/players/current.html?pos=" + position
-            playerList = self.scrapeTable(urlOffset=urlOffset,attrs={'class':'statistics'})
-            playerLinks = self.scrapeLinks(urlOffset=urlOffset)
+
+            #footballdb removed their table :(
+            #playerList = self.scrapeTable(urlOffset=urlOffset,attrs={'class':'statistics'},)
+
+            allLinks = self.scrapeLinks(urlOffset=urlOffset)
+            playerList = []
+
+            for key in allLinks:
+                if not allLinks[key].startswith('/players/'):
+                    continue
+
+                if allLinks[key].startswith('/players/current.html'):
+                    continue
+                if allLinks[key].startswith('/players/index.html'):
+                    continue
+                if allLinks[key].startswith('/players/players.html'):
+                    continue
+
+                playerList.append(key)
+
+            playerLinks = allLinks
+
 
             playerCount = 0
 
@@ -56,11 +76,11 @@ class FootballDBDotComScraper(SiteScraper):
             for player in playerList:
 
                 playerCount += 1
-                if self.testmode and playerCount > 5:
+                if self.testmode and playerCount > 10:
                     break
 
-                if player[0] in playerLinks:
-                    data = self.scrapeTables(urlOffset=playerLinks[player[0]], attrs={'class':'statistics'})
+                if player in playerLinks:
+                    data = self.scrapeTables(urlOffset=playerLinks[player], attrs={'class':'statistics'})
 
                     fantasyStatTbl = None
                     for tbl in data:
@@ -72,7 +92,7 @@ class FootballDBDotComScraper(SiteScraper):
                         continue
 
                     fantasyStatTbl = fantasyStatTbl[2:]
-                    name = str(player[0]).rsplit(',',1)[1].strip() + " " + str(player[0]).rsplit(',',1)[0].strip()
+                    name = str(player).rsplit(',',1)[1].strip() + " " + str(player).rsplit(',',1)[0].strip()
                     stats = {'name':name, 'position':position}
                     for yearData in fantasyStatTbl:
                         year = yearData[0]
@@ -115,9 +135,10 @@ class TestFootballDBDotComScraper(unittest.TestCase):
                 print data[i]['team']
             print data[i]['position']
             self.assertEquals(data[i]['position'],'QB')
-            print data[i][thisYear]['team']
-            print data[i][thisYear]['PassingTD']
-            self.assertGreaterEqual(int(data[i][thisYear]['PassingTD']),0)
+            if thisYear in data[i]:
+                print data[i][thisYear]['team']
+                print data[i][thisYear]['PassingTD']
+                self.assertGreaterEqual(int(data[i][thisYear]['PassingTD']),0)
 
 if __name__ == '__main__':
     unittest.main()

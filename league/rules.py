@@ -184,14 +184,15 @@ class RulesTest(unittest.TestCase):
 
             fp = fdb.player[p]
             print str(fp)
+            print "Passing Points 2018: " + str(r.passingPoints(fp,2018))
             print "Passing Points 2017: " + str(r.passingPoints(fp,2017))
             print "Passing Points 2016: " + str(r.passingPoints(fp,2016))
             print "Passing Points 2015: " + str(r.passingPoints(fp,2015))
             print "Passing Points 2014: " + str(r.passingPoints(fp,2014))
 
-            print "Points 2017: " + str(r.points(fp,2017)/fp.gamesPlayed(2017))
-
-
+            this_year = datetime.datetime.now().year
+            if fp.gamesPlayed(this_year) != 0:
+                print "Points " + str(this_year) + ": " + str(r.points(fp,this_year)/fp.gamesPlayed(this_year))
 
 
 if __name__ == "__main__":

@@ -22,7 +22,9 @@ class OLeagueFootballRules(FootballRules):
         # 2016
         #self.settingsURL = "https://football.fantasysports.yahoo.com/f1/66542/settings"
         # 2017
-        self.settingsURL = "https://football.fantasysports.yahoo.com/f1/159148/settings"
+        #self.settingsURL = "https://football.fantasysports.yahoo.com/f1/159148/settings"
+        # 2018
+        self.settingsURL = "https://football.fantasysports.yahoo.com/f1/897722/settings"
 
         self.numTeams = 10
         self.moneyPerTeam = 333

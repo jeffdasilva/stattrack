@@ -139,10 +139,6 @@ class TestRotoWorldDotComScraper(unittest.TestCase):
         self.assertNotEquals(data, None)
         self.assertGreater(int(data['2015']['G']),0)
 
-        data = s.scrape(playerName="Javorius Allen")
-        self.assertNotEquals(data, None)
-        self.assertGreater(int(data['2015']['G']),0)
-
         data = s.scrape(playerName="Cam Newton")
         self.assertNotEquals(data, None)
         self.assertEquals(int(data['2015']['G']),16)

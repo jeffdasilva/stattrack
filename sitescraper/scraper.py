@@ -190,21 +190,21 @@ class SiteScraper(object):
 
         return data
 
-    def scrapeTable(self, urlOffset=None, attrs={}, index=None):
+    def scrapeTable(self, urlOffset=None, attrs={}, index=None, table_token='table'):
 
         data = SiteScraper.scrape(self,urlOffset=urlOffset)
 
         table = None
         if data is not None:
             if index is None:
-                table = data.find('table', attrs=attrs)
+                table = data.find(table_token, attrs=attrs)
             elif isinstance(index, int):
-                tableList = data.find_all('table', attrs=attrs)
+                tableList = data.find_all(table_token, attrs=attrs)
                 if index >= len(tableList):
                     return None
                 table = tableList[index]
             elif isinstance(index, str):
-                tableList = data.find_all('table', attrs=attrs)
+                tableList = data.find_all(table_token, attrs=attrs)
                 for t in tableList:
                     firstRow = t.find("tr")
                     if index in str(firstRow):

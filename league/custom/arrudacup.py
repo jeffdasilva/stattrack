@@ -1,5 +1,6 @@
 
 import copy
+import datetime
 import unittest
 
 from db.hockeydb import HockeyPlayerDB
@@ -114,6 +115,10 @@ class ArrudaCupHockeyLeagueTest(unittest.TestCase):
         l = ArrudaCupHockeyLeague()
         l.enable_rotoworld_player_scraper = False
         l.enable_cbssports_player_scraper = False
+
+        # this unit test will not work until Sept 20 of any given year
+        if datetime.datetime.now().month < 9 or (datetime.datetime.now().month == 9 and datetime.datetime.now().day < 20): return
+
         l.factoryReset()
 
         for player in l.db.player:
