@@ -8,7 +8,6 @@ from sitescraper.scraper import SiteScraper
 class FantasyProsDotComScraper(SiteScraper):
 
     def __init__(self):
-        #super(FantasyProsDotComScraper, self).__init__(url="http://www1.fantasypros.com/nfl")
         super(FantasyProsDotComScraper, self).__init__(url="https://www.fantasypros.com/nfl")
         self.maxCacheTime = datetime.timedelta(days=7)
         self.setProjectionURLs()
@@ -121,7 +120,11 @@ class FantasyProsDotComScraper(SiteScraper):
 
         if nameTeamStr.endswith(' DST'):
             nameTeamStr = nameTeamStr[:-4]
-            nameTeamStr = nameTeamStr[:-3] + ' ' + nameTeamStr[-3:]
+            if '(' in nameTeamStr and ')' in nameTeamStr:
+                name,team = nameTeamStr.rsplit('(',1)
+                team = team.split(')',1)[0]
+                return [name.strip(), team.strip()]
+
 
         if len(nameTeamStr) > 6 and nameTeamStr.rfind(nameTeamStr[0] + '.') != -1:
             idx = nameTeamStr.rfind(nameTeamStr[0] + '.')
@@ -179,7 +182,7 @@ class TestFantasyProsDotComScraper(unittest.TestCase):
                 self.assertEqual(player['team'], "IND")
                 andrewLuckFound += 1
 
-            if player['name'] == "Seattle Seahawks":
+            if player['name'] == "Seattle":
                 if 'position' in player:
                     self.assertEqual(player['position'], "DEF")
                 seattleFound += 1

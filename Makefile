@@ -176,7 +176,7 @@ archive tarball tgz: $(TARBALL_FILE)
 $(TARBALL_FILE): clean
 	@mkdir -p $(@D)
 	@echo "Generating $@..."
-	tar -czf $@ $(filter-out tgz,$(wildcard *))
+	tar -czf $@ $(filter-out tgz stamps,$(wildcard *))
 #############################
 
 
