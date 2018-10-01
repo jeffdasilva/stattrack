@@ -95,7 +95,7 @@ class FootballPlayerDB(PlayerDB):
         return self.get(position=position)[:num_players_remaining]
 
     def updatePlayerCache(self):
-        if self.debug: print "[UPDATE Player Cache: START]"
+        if self.debug: print ("[UPDATE Player Cache: START]")
 
         total_num_players_remaining = self.totalNumberOfPlayers*self.numberOfTeams - self.numberOfPlayersDrafted()
         self.playerCache['all'] = self.get()[:total_num_players_remaining]
@@ -121,7 +121,7 @@ class FootballPlayerDB(PlayerDB):
         ####
 
         self.updateCostPerValueUnit()
-        if self.debug: print "[UPDATE Player Cache: END]"
+        if self.debug: print ("[UPDATE Player Cache: END]")
 
 
     def remainingStarters(self):
@@ -146,11 +146,28 @@ class FootballPlayerDB(PlayerDB):
 
         value = 0.0
         for p in self.remainingStarters():
-            value += p.value()
+
+            player_value = p.value()
+            if self.leagueName == "O-League":
+                if player_value < 15:
+                    player_value = player_value * 0.7
+                elif player_value < 10:
+                    player_value = player_value * 0.4
+                elif player_value < 8:
+                    player_value = player_value * 0.1
+
+
+            value += player_value
 
         # bench players are worth a lot less (0.05x compared to a starter)
         for p in self.remainingGoodBenchPlayers():
-            value += (p.value() * 0.05)
+
+            player_value = (p.value() * 0.05)
+
+            if self.leagueName == "O-League":
+                if player_value < 10: player_value = player_value * 0.1
+
+            value += player_value
 
         return value
 
@@ -165,11 +182,11 @@ class FootballPlayerDB(PlayerDB):
         # ToDo: make this better i.e. more scientific and dynamic based on how many of each position are left
         if position is not None:
             if 'RB' in position:
-                mult = mult * 1.5
-            elif 'WR' in position:
                 mult = mult * 1.3
+            elif 'WR' in position or 'TE' in position:
+                mult = mult * 1.2
             elif 'QB' in position:
-                mult = mult * 0.8
+                mult = mult * 0.65
 
         return self.cost_per_value_unit * mult
 

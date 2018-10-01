@@ -63,10 +63,12 @@ class ArrudaCupHockeyLeague(HockeyLeague):
 
         self.parser.autosave = False
 
-        self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper(),NhlCbsSportsDotComSraper()]
+        #self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper(), NhlCbsSportsDotComSraper()]
+        self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper()]
+
 
         self.enable_rotoworld_player_scraper = True
-        self.enable_cbssports_player_scraper = True
+        self.enable_cbssports_player_scraper = False
 
     def update(self):
 

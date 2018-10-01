@@ -148,8 +148,12 @@ class HockeyPlayer(Player):
             return float(self.getStat("Wins",year))
 
     def projectedGoaltenderWins(self):
-        #return float(self.getProperty(self.projected_wins_attr,0))
-        return float(self.getProperty(TsnDotCaScraper.ProjectedWins,0))
+        try:
+            #return float(self.getProperty(self.projected_wins_attr,0))
+            return float(self.getProperty(TsnDotCaScraper.ProjectedWins,0))
+        except ValueError:
+            #print("WARNING: projectedGoaltenderWins=" + str(self.getProperty(self.projected_wins_attr,0)))
+            return 0
 
     def goaltenderTies(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -158,7 +162,6 @@ class HockeyPlayer(Player):
             return float(self.getStat("Ties",year))
 
     def projectedGoaltenderTies(self):
-        #return float(self.getProperty(self.projected_ties_attr,0))
         return float(self.getProperty(TsnDotCaScraper.ProjectedTies,0))
 
     def goaltenderShutOuts(self,year=datetime.datetime.now().year):
@@ -168,8 +171,11 @@ class HockeyPlayer(Player):
             return float(self.getStat("Shutouts",year))
 
     def projectedGoaltenderShutOuts(self):
-        #return float(self.getProperty(self.projected_shutouts_attr,0))
-        return float(self.getProperty(TsnDotCaScraper.ProjectedShutouts,0))
+        try:
+            #return float(self.getProperty(self.projected_shutouts_attr,0))
+            return float(self.getProperty(TsnDotCaScraper.ProjectedShutouts,0))
+        except ValueError:
+            return 0
 
     def gamesPlayed(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -178,8 +184,11 @@ class HockeyPlayer(Player):
             return int(self.getStat("GamesPlayed",year))
 
     def projectedGamesPlayed(self):
-        #return float(self.getProperty(self.projected_games_played_attr,0))
-        return float(self.getProperty(TsnDotCaScraper.ProjectedGamesPlayed,0))
+        try:
+            #return float(self.getProperty(self.projected_games_played_attr,0))
+            return float(self.getProperty(TsnDotCaScraper.ProjectedGamesPlayed,0))
+        except ValueError:
+            return 0
 
     def points(self,year=datetime.datetime.now().year):
         return self.goals(year) + self.assists(year) + self.goaltenderWins(year)*2 + self.goaltenderTies(year) + self.goaltenderShutOuts(year)*4

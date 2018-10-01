@@ -24,6 +24,7 @@ class TsnDotCaScraper(SiteScraper):
     ByPositionStats = [esByPos.projectedString('rank'),
                        esByPos.name(),
                        esByPos.statString('team'),
+                       esByPos.position(),
                        esByPos.projectedGamesPlayed(),
                        esByPos.projectedGoals(),
                        esByPos.projectedAssists(),
@@ -39,6 +40,7 @@ class TsnDotCaScraper(SiteScraper):
     ByPositionGoalieStats = [esByPos.projectedString('rank'),
                              esByPos.name(),
                              esByPos.statString('team'),
+                             esByPos.position(),
                              esByPos.projectedGamesPlayed(),
                              esByPos.projectedWins(),
                              esByPos.projectedString('goalsAgainstAverage'),
@@ -61,14 +63,19 @@ class TsnDotCaScraper(SiteScraper):
     def scrape(self, year=datetime.datetime.now().year):
 
         # scrape Scott Cullen's projections
-        if str(year) == "2017":
+        if str(year) == "2018":
             #top_300_tsn_version_string = "1.360216"
             #top_300_tsn_version_string = "1.565371"
-            top_300_tsn_version_string = "1.848975"
+            #top_300_tsn_version_string = "1.848975"
+            #top_300_tsn_version_string = "1.870979"
+            #top_300_tsn_version_string = "1.1171167"
+            top_300_tsn_version_string = "1.1183999"
 
             #by_position_tsn_version_string = "1.362639"
             #by_position_tsn_version_string = "1.566798"
-            by_position_tsn_version_string = "1.853367"
+            #by_position_tsn_version_string = "1.853367"
+            by_position_tsn_version_string = "1.1171737"
+            #by_position_tsn_version_string = top_300_tsn_version_string
 
             #http://www.tsn.ca/crosby-leads-list-of-top-300-projected-scorers-1.565371
             #top300UrlOffset = "/crosby-leads-list-of-top-300-projected-scorers-" + top_300_tsn_version_string
@@ -97,7 +104,7 @@ class TsnDotCaScraper(SiteScraper):
         if self.debug:
             print "Number of players found: " + str(len(self.players))
             # Oct 5, 2016 -- there are two players ranked 140 -- strange...
-            assert(len(self.players) == 300 or len(self.players) == 301)
+            assert(len(self.players) >= 300 and len(self.players) <= 310)
 
         oldMaxCacheTime = self.maxCacheTime
         self.maxCacheTime = datetime.timedelta(weeks=1000)
@@ -119,6 +126,7 @@ class TsnDotCaScraper(SiteScraper):
             for player in playerList[position]:
                 if len(player) != len(TsnDotCaScraper.ByPositionStats):
                     if self.debug and len(player) > 0:
+                        print TsnDotCaScraper.ByPositionStats
                         print player
                         raise ValueError("Something is wrong here with Player Stats!")
                     continue
@@ -146,6 +154,7 @@ class TsnDotCaScraper(SiteScraper):
             for goalie in playerList['G']:
                 if len(goalie) != len(TsnDotCaScraper.ByPositionGoalieStats):
                     if self.debug and len(goalie) > 0:
+                        print TsnDotCaScraper.ByPositionGoalieStats
                         print goalie
                         raise ValueError("Something is wrong here with Goalie Stats!")
                     continue
@@ -163,7 +172,7 @@ class TestTsnDotCaScraper(unittest.TestCase):
         s = TsnDotCaScraper()
         s.testmode = True
         s.debug = True
-        data = s.scrape(year="2017")
+        data = s.scrape(year="2018")
 
         McDavidFound = 0
 
