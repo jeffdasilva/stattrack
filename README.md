@@ -22,4 +22,7 @@ To get started do:
     % cd stattrack
     % make run
 
-[Currently only supports Ubuntu Linux and Python v2.7]
+On Windows, install msys2 + python 2.7 and then do:
+    % pacman -S git make gcc
+    % python -m pip install --upgrade pip
+    % python -m pip install beautifulsoup4 jsonpickle
