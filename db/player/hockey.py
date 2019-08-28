@@ -36,9 +36,11 @@ class HockeyPlayer(Player):
         player_str += "   | " + '{0: <9}'.format(str(round(self.projectedPointsPerGame(),2))
                                     + "(" +  str(self.gamesPlayed()) + ") " ) + "|"
 
-        for year in ['2016','2015','2014']:
-            player_str += " " + '{0: <9}'.format(str(round(self.pointsPerGame(year=year),2)) \
-                                    + "(" +  str(self.gamesPlayed(year=year)) + ") " ) + "|"
+
+        last_year = datetime.datetime.now().year - 1
+        for year in [last_year, last_year-1, last_year-2]:
+            player_str += " " + '{0: <9}'.format(str(round(self.pointsPerGame(year=str(year)),2)) \
+                                    + "(" +  str(self.gamesPlayed(year=str(year))) + ") " ) + "|"
 
         return player_str
 
@@ -191,7 +193,16 @@ class HockeyPlayer(Player):
             return 0
 
     def points(self,year=datetime.datetime.now().year):
-        return self.goals(year) + self.assists(year) + self.goaltenderWins(year)*2 + self.goaltenderTies(year) + self.goaltenderShutOuts(year)*4
+
+        shutout_value = 3
+        # For 2019, change to this
+        #shutout_value = 2
+
+        return self.goals(year) + \
+            self.assists(year) + \
+            self.goaltenderWins(year)*2 + \
+            self.goaltenderTies(year) + \
+            self.goaltenderShutOuts(year)*shutout_value
 
     def projectedPoints(self,year=datetime.datetime.now().year):
 
@@ -301,7 +312,7 @@ class TestHockeyPlayer(unittest.TestCase):
         self.assertEqual(p.pointsPerGame(),1.0)
 
         p.property[p.projected_shutouts_attr[-1]] = "10"
-        self.assertEqual(p.pointsPerGame(),5.0)
+        self.assertEqual(p.pointsPerGame(),4.0)
 
 
 if __name__ == '__main__':

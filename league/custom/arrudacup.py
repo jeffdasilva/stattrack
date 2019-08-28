@@ -15,7 +15,12 @@ class ArrudaCupHockeyRules(HockeyRules):
         super(ArrudaCupHockeyRules, self).__init__()
 
         self.settingsURL = "http://arruda-cup.hockey.cbssports.com/rules"
+
         self.numTeams = 18
+
+        # For 2019, change to this
+        #self.numTeams = 16
+
         self.numForwards = 8
         self.numDefensmen = 5
         self.numGoalies = 2
@@ -63,12 +68,13 @@ class ArrudaCupHockeyLeague(HockeyLeague):
 
         self.parser.autosave = False
 
-        #self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper(), NhlCbsSportsDotComSraper()]
-        self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper()]
+        self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper(), NhlCbsSportsDotComSraper()]
+        #self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper()]
 
 
         self.enable_rotoworld_player_scraper = True
-        self.enable_cbssports_player_scraper = False
+        self.enable_cbssports_player_scraper = True
+        #self.enable_cbssports_player_scraper = False
 
     def update(self):
 
