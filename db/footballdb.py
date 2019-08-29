@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 from datetime import datetime
 import os
@@ -240,11 +241,6 @@ class TestFootballPlayerDB(unittest.TestCase):
             self.assertTrue(float(p.property["passingAttempts"]) > 300)
             self.assertTrue(p.passingYards() > 3000)
             print p.value()
-
-            p = fdb.player["rob gronkowski - ne"]
-            self.assertEquals(p.position,["TE"])
-            self.assertTrue(p.property["fantasyPoints"] > 100)
-            self.assertTrue(p.property["receivingYards"] > 400)
 
         pass
 

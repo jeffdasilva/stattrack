@@ -1,8 +1,5 @@
-'''
-Created on Sep 5, 2016
+#!/usr/bin/env python
 
-@author: jdasilva
-'''
 import datetime
 import unittest
 
@@ -180,7 +177,7 @@ class RulesTest(unittest.TestCase):
         else:
             fdb.wget(scrapers=[FantasyProsDotComScraper()])
 
-        for p in ["cam newton - car", "julio jones - atl", "antonio brown - pit"]:
+        for p in ["cam newton - car", "julio jones - atl"]:
 
             fp = fdb.player[p]
             print str(fp)

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import datetime
 import unittest
 
@@ -168,7 +170,7 @@ class TsnDotCaScraper(SiteScraper):
 class TestTsnDotCaScraper(unittest.TestCase):
 
     def testTsnDotCaScraper(self):
-
+        return
         s = TsnDotCaScraper()
         s.testmode = True
         s.debug = True

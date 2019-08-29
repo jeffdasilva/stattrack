@@ -1,8 +1,5 @@
-'''
-Created on Sep 1, 2016
+#!/usr/bin/env python
 
-@author: jdasilva
-'''
 import unittest
 
 
@@ -35,7 +32,6 @@ class LeagueTest(unittest.TestCase):
         self.assertEquals(l.name,"foo")
         self.assertEquals(l.db, None)
         self.assertEquals(l.property['isAuctionDraft'], 'false')
-
         pass
 
 

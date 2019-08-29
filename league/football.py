@@ -1,8 +1,5 @@
-'''
-Created on Sep 3, 2016
+#!/usr/bin/env python
 
-@author: jdasilva
-'''
 import unittest
 
 from db.footballdb import FootballPlayerDB
