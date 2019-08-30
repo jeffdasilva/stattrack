@@ -87,8 +87,8 @@ class OLeagueFootballLeague(FootballLeague):
     
         # 0.8, 1.6, and 2.6 are my best guess
         #  would be good to make those numbers accurate somehow for the future
-        db.numberTotalToDraft['qb'] = int((rules.numQB+0.9)*rules.numTeams)
-        db.numberTotalToDraft['rb'] = int((rules.numRB+1.5)*rules.numTeams)    
+        db.numberTotalToDraft['qb'] = int((rules.numQB+0.8)*rules.numTeams)
+        db.numberTotalToDraft['rb'] = int((rules.numRB+1.6)*rules.numTeams)    
         db.numberTotalToDraft['wr'] = int((rules.numWR+2.6)*rules.numTeams) 
         db.numberTotalToDraft['all'] = 0
         

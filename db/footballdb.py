@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 
+import copy
 from datetime import datetime
+import math
 import os
 import unittest
-import pandas as pd
 
 from db.player.football import FootballPlayer
 from db.player.player import Player
 from db.playerdb import PlayerDB
 from league.rules import FootballRules
+import pandas as pd
 from sitescraper.nfl.fantasyprosdotcom import FantasyProsDotComScraper
+from utils.knapsack import KnapSack, KnapSackItem
 
 
 class FootballPlayerDB(PlayerDB):
@@ -66,6 +69,8 @@ class FootballPlayerDB(PlayerDB):
         self.updateValueRemaining()
         self.updateCostPerValueUnit()
         self.updatePlayerAuctionCostValues()
+        
+        self.runKnapSackSolver()
 
         if self.debug: print ("[UPDATE Auction Stats: END]")
 
@@ -97,31 +102,13 @@ class FootballPlayerDB(PlayerDB):
         for p in self.positions:
             self.playerCache[p] = self.players_remaining[p]
             self.playerCache['starters'].extend(self.playerCache[p])
-
-        '''
-        ####
-        remainingDraftEligiblePlayers = self.playerCache['all']
-        remainingDraftEligibleStarters = self.remainingStarters()
-
-        for p in remainingDraftEligibleStarters:
-            if p in remainingDraftEligiblePlayers:
-                remainingDraftEligiblePlayers.remove(p)
-
-        self.playerCache['bench'] = remainingDraftEligiblePlayers
-        ####
-        '''
             
         if self.debug: print ("[UPDATE Player Cache: END]")
 
         
     def updateValueRemaining(self):
         total_value = 0.0
-        '''
-        for p in self.playerCache['starters']:
-            player_value = float(p.value())
-            value += player_value
-        '''
-        
+                
         self.value_remaining_by_position = {}
         
         for pos in self.positions:
@@ -182,71 +169,42 @@ class FootballPlayerDB(PlayerDB):
             for player in self.players_remaining[pos]:
                 player.auction_value = self.cost_per_value_unit_by_position[pos] * float(player.value())
             
-            
-            
-            
-            '''
-                (self.playerValueMAD[pos] / self.playerValueMADTotal) * \
-                3*(self.value_remaining_by_position[pos] / value_remaining)
-            '''
+
+    def runKnapSackSolver(self):
         
-        '''
-        self.pointsRemainingMAD = {}
-        total_mad = 0
-        for pos in ['qb', 'wr', 'rb']:
-            self.pointsRemainingMAD[pos] = self.meanAbsoluteDeviation(pos)
-            total_mad += self.pointsRemainingMAD[pos]
-        '''
-
-
-    '''
-    def remainingGoodPlayersByPosition(self, position):
-        if position in self.numberTotalToDraft:
-            num_players_total = self.numberTotalToDraft[position]
-        else:
-            num_players_total = int(self.numberOfStarting[position]*self.numberOfTeams)
+        for pos in self.positions:
+            max_weight = self.money_remaining_by_position[pos] / self.numberOfTeams
+            num_of_items = min(3, int(math.trunc(float(len(self.players_remaining[pos])) / self.numberOfTeams)))
+            if num_of_items == 1: num_of_items = 2
+            if num_of_items <= 1: return
             
-        num_players_remaining = num_players_total - self.numberOfPlayersDrafted(position=position)
+            #print("(" + str(max_weight) + ", " + str(num_of_items) + ")")
+            ks = KnapSack(num_of_items=num_of_items, max_weight=max_weight)
+            for p in self.players_remaining[pos]:
+                ksItem = KnapSackItem(name=p.name, value=p.value(), weight=p.auction_value)
+                ksItem.playerobj = p
+                ks.items.append(ksItem)
             
-        return self.get(position=position)[:num_players_remaining]
-    '''
-
-
-
-    '''
-    def remainingStarters(self):
-        if 'starters' not in self.playerCache:
-            self.updatePlayerCache()
-
-        return self.playerCache['starters']
-
-    def remainingBenchPlayers(self):
-        if 'bench' not in self.playerCache:
-            self.updatePlayerCache()
-
-        return self.playerCache['bench']
-
-    def remainingDraftEligiblePlayers(self):
-        return self.remainingStarters() + self.remainingBenchPlayers()
-    '''
+            print("-----------------------------------")
+            opt = ks.solve()
+            print(opt)
+            
+            if num_of_items <= 3:
+                n = 100
+            else:
+                n = 50
+            
+            bump = 3.0 * num_of_items
     
-
-    '''
-    def costPerValueUnit(self, position=None):
-        #if self.cost_per_value_unit is None:
-        self.updateCostPerValueUnit()
-
-        mult = 1.0
-        # ToDo: make this better i.e. more scientific and dynamic based on how many of each position are left
-        if position is not None:
-            if 'RB' in position:
-                mult = mult * 1.3
-            elif 'WR' in position or 'TE' in position:
-                mult = mult * 1.2
-            elif 'QB' in position:
-                mult = mult * 0.65
-        return self.cost_per_value_unit * mult
-    '''
+            # not sure what a good number for n and bump are here. These are trial and error numbers
+            ks.weightOptimize(n=n, bump=bump)
+            for ksItem in ks.items:
+                ksItem.playerobj.ks_auction_value = ksItem.weight
+            
+            opt = ks.solve()
+            print(opt)
+            print("-----------------------------------")
+            
 
 class TestFootballPlayerDB(unittest.TestCase):
     
@@ -257,9 +215,12 @@ class TestFootballPlayerDB(unittest.TestCase):
         db.numberOfStarting['rb'] = 5
         db.numberOfStarting['wr'] = 4
         db.numberOfScrubs = 5 
+        db.numberTotalToDraft = copy.copy(db.numberOfStarting)
         db.totalNumberOfPlayers = 15       
         db.moneyPerTeam = 100
         FootballPlayer.DefaultRules = FootballRules()
+        db.update_auction_stats()
+        
 
     def testNewFootballPlayerDB(self):
         fdb = FootballPlayerDB()
@@ -282,7 +243,7 @@ class TestFootballPlayerDB(unittest.TestCase):
     def testMoneyRemaining(self):
         fdb = FootballPlayerDB(league='O-League')
         self.init_fdb(fdb)
-        self.assertEqual(fdb.moneyRemaining(),1000)
+        self.assertEqual(fdb.money_remaining,1000)
         fdb.moneyPerTeam = 333
         fdb.add(Player("June"))
         fdb.add(Player("Sophia"))
