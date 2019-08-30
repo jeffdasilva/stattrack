@@ -37,7 +37,7 @@ class FootballRules(Rules):
         self.numTE = 0
         self.numDEF = 0
         numStarters = self.numQB + self.numRB + self.numWR + self.numTE + self.numDEF
-        self.numReserves = 14 - numStarters
+        self.numReserves = 13 - numStarters
 
         #################################################
         # Passing
@@ -87,7 +87,6 @@ class FootballRules(Rules):
             if avg > (i[0]/2):
                 mult = (mult*mult_weight + i[1]) / (mult_weight+1)
                 mult_weight = mult_weight + 5
-
         return mult
 
     def yardPoints(self, player, yard_stat, year, points_per_yard):
@@ -138,7 +137,6 @@ class FootballRules(Rules):
         return points
 
     def points(self, player, year=datetime.datetime.now().year):
-
         points = 0.0
         points += self.passingPoints(player=player,year=year)
         points += self.rushingPoints(player=player,year=year)

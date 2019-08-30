@@ -12,7 +12,7 @@ from league.custom.oracle import OracleFootballLeague
 
 class StatTrack(object):
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 62
+    StatTrackMinorVersion = 63
     StatTrackBuildNumber = 157
 
     def __init__(self):

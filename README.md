@@ -25,4 +25,4 @@ To get started do:
 On Windows, install msys2 + python 2.7 and then do:
     % pacman -S git make gcc
     % python -m pip install --upgrade pip
-    % python -m pip install beautifulsoup4 jsonpickle
+    % python -m pip install beautifulsoup4 jsonpickle scrapy

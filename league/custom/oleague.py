@@ -24,17 +24,19 @@ class OLeagueFootballRules(FootballRules):
         # 2017
         #self.settingsURL = "https://football.fantasysports.yahoo.com/f1/159148/settings"
         # 2018
-        self.settingsURL = "https://football.fantasysports.yahoo.com/f1/897722/settings"
-
+        # self.settingsURL = "https://football.fantasysports.yahoo.com/f1/897722/settings"
+        # 2019        
+        self.settingsURL = "https://football.fantasysports.yahoo.com/f1/410075/5/settings"
+        
         self.numTeams = 10
-        self.moneyPerTeam = 200
+        self.moneyPerTeam = 333
         self.numQB = 2
-        self.numRB = 3
-        self.numWR = 4
-        self.numTE = 0
+        self.numRB = 2.5 # 3 #2.5
+        self.numWR = 3.5   # 4 #3
+        self.numTE = 0 # 0.5 # 0 #0.5
         self.numDEF = 0
         numStarters = self.numQB + self.numRB + self.numWR + self.numTE + self.numDEF
-        self.numReserves = 14 - numStarters
+        self.numReserves = 13 - numStarters  # 5
 
         self.pointsPerCompletion = 0.25
         self.pointsPerIncompletePass = -0.50
@@ -70,18 +72,47 @@ class OLeagueFootballRules(FootballRules):
 
 
 class OLeagueFootballLeague(FootballLeague):
+    
+    def initdb(self, db):
+        assert(self.rules is not None)
+        rules = self.rules
+        db.numberOfTeams = rules.numTeams
+        db.numberOfStarting['qb'] = rules.numQB
+        db.numberOfStarting['rb'] = rules.numRB
+        db.numberOfStarting['wr'] = rules.numWR
+        db.numberOfStarting['te'] = rules.numTE
+        db.numberOfScrubs = rules.numReserves 
+        db.totalNumberOfPlayers = rules.numQB + rules.numRB + rules.numWR + rules.numReserves        
+        db.moneyPerTeam = rules.moneyPerTeam
+    
+        # 0.8, 1.6, and 2.6 are my best guess
+        #  would be good to make those numbers accurate somehow for the future
+        db.numberTotalToDraft['qb'] = int((rules.numQB+0.9)*rules.numTeams)
+        db.numberTotalToDraft['rb'] = int((rules.numRB+1.5)*rules.numTeams)    
+        db.numberTotalToDraft['wr'] = int((rules.numWR+2.6)*rules.numTeams) 
+        db.numberTotalToDraft['all'] = 0
+        
+        for k in db.numberTotalToDraft:
+            if 'k' == 'all': continue
+            db.numberTotalToDraft['all'] += db.numberTotalToDraft[k]
+    
+        assert(int(db.totalNumberOfPlayers*db.numberOfTeams) == int(db.numberTotalToDraft['all']))
+    
     def __init__(self):
         from cli.cmd.command import SearchByPositionCommand
 
         name = "O-League"
-        rules = OLeagueFootballRules()
-
-        FootballPlayer.DefaultRules = rules
 
         db = FootballPlayerDB(name)
+        
+        rules = OLeagueFootballRules()
+        FootballPlayer.DefaultRules = rules
+
         super(OLeagueFootballLeague, self).__init__(name, db, rules)
-        self.property['isAuctionDraft'] = 'true'
+        self.initdb(db)
         db.load()
+
+        self.property['isAuctionDraft'] = 'true'
 
         self.parser.commands.append(SearchByPositionCommand('all'))
         self.parser.commands.append(SearchByPositionCommand('qb'))
@@ -101,22 +132,12 @@ class OLeagueFootballLeague(FootballLeague):
 
 
     def factoryReset(self):
-
-        from sitescraper.nfl.footballdbdotcom import FootballDBDotComScraper
-        from sitescraper.multisport.rotoworlddotcom import RotoWorldDotComScraper
-
+        #from sitescraper.nfl.footballdbdotcom import FootballDBDotComScraper
         self.db = FootballPlayerDB(self.name)
-        self.db.wget(scrapers=[FootballDBDotComScraper()])
-
-        rotoScrape = RotoWorldDotComScraper(league="nfl")
-        for p in self.db.player:
-            if 'DEF' in self.db.player[p].position:
-                continue
-            #print "RotoWorld: Learning about " + self.db.player[p].name + "..."
-            pStats = rotoScrape.scrape(playerName=self.db.player[p].name)
-            if pStats is not None:
-                self.db.player[p].update(pStats)
-
+        self.initdb(self.db)        
+        
+        # does this have any value?
+        #self.db.wget(scrapers=[FootballDBDotComScraper()])
 
     def update(self):
         self.db.wget(self.scrapers)
@@ -132,8 +153,8 @@ class StatsCommand(Command):
         return "Print out the current O-League statistics"
 
     def apply(self, cmd, parser):
+        assert(cmd is not None)
         self.statusTrue(parser)
-
 
         leagueOrResponse = self.getLeague(parser)
         if not self.isCurrentStatusTrue(parser):
@@ -141,12 +162,22 @@ class StatsCommand(Command):
             return response
 
         league = leagueOrResponse
-
+        
+        league.db.update_auction_stats()
+        
         response = ""
-        response += "Money Remaining: $" + str(league.db.moneyRemaining()) + "\n"
-        response += "Points Remaining: " + str(round(league.db.valueRemaining(),2)) + "\n"
-        response += "Cost Per Value Unit: " + str(round(league.db.costPerValueUnit(),2)) + "\n"
+        response += "Total Money Remaining: $" + str(league.db.money_remaining) + "\n"
+        
+        response += "Total Points Remaining: " + str(round(league.db.value_remaining,2)) + "\n"
+        response += "AVG Cost Per Value Unit: " + str(round(league.db.cost_per_value_unit,2)) + "\n"
+        
+        for pos in ['qb', 'wr', 'rb']:
+            response += "Remaining " + pos + "'s: " + str(len(league.db.players_remaining[pos]))  + "\n"
+            response += "MAD " + pos + ": " + str(round(league.db.playerValueMAD[pos],2)) + "\n"
+            response += "Money Remaining " + pos + ": $" + str(round(league.db.money_remaining_by_position[pos],2)) + "\n"
+            response += "Cost Per Value Unit " + pos + ": $" + str(round(league.db.cost_per_value_unit_by_position[pos],2)) + "\n"
 
+        
         return response
 
 ##########################################################

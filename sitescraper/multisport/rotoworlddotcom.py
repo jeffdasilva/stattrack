@@ -3,20 +3,67 @@
 import datetime
 import unittest
 
+
 from sitescraper.scraper import SiteScraper
+
+
+'''
+import scrapy
+from scrapy.crawler import CrawlerProcess
+
+# from https://stackoverflow.com/questions/50777358/for-loops-with-scrapy
+# Thanks google!
+# unfortunatly it does not work
+class Roto_News_Spider2(scrapy.Spider):
+
+    name = "PlayerNews2"
+    
+    start_urls = [
+        'http://www.rotoworld.com/football/nfl/player-news',
+    ]
+    
+    def parse(self, response):
+        for item in response.xpath("//div[@class='page-football-nfl-player-news section-football page--entity-type--league page--player-news role--anonymous with-subnav sidebar-first one-sidebar']"):
+            player = item.xpath(".//div[@class='player']/a/text()").extract_first()
+            report = item.xpath(".//div[@class='report']/p/text()").extract_first()
+            date = item.xpath(".//div[@class='date']/text()").extract_first()
+            impact = item.xpath(".//div[@class='impact']/text()").extract_first().strip()
+            source = item.xpath(".//div[@class='source']/a/text()").extract_first()
+            print('HERE')
+            raise ValueError()
+            print(str(player))
+    
+            yield {"Player": player,"Report":report,"Date":date,"Impact":impact,"Source":source}
+'''           
 
 class RotoWorldDotComScraper(SiteScraper):
 
     GamesPlayed = 'G'
 
     def __init__(self, league=None):
+        raise NotImplementedError('RotoWorldDotComScraper no longer works')
         super(RotoWorldDotComScraper, self).__init__(url="http://www.rotoworld.com")
 
-        self.maxCacheTime = datetime.timedelta(days=30)
+        #self.maxCacheTime = datetime.timedelta(days=30)
         #self.maxCacheTime = datetime.timedelta(days=4)
-        #self.maxCacheTime = datetime.timedelta(hours=1)
-
+        self.maxCacheTime = datetime.timedelta(hours=1)
         self.league = league
+        self.playerlist = None
+        
+    def update_player_list(self):
+        
+        '''
+        # https://stackoverflow.com/questions/13437402/how-to-run-scrapy-from-within-a-python-script
+        process = CrawlerProcess({
+            'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
+        })
+
+        process.crawl(Roto_News_Spider2)
+        process.start() # the script will block here until the crawling is finished
+        process.stop()
+        '''
+        #https://www.rotoworld.com/football/nfl/depth-charts
+        pass
 
 
     def scrape(self, playerName):
@@ -115,11 +162,15 @@ class RotoWorldDotComScraper(SiteScraper):
 class TestRotoWorldDotComScraper(unittest.TestCase):
 
     def testRotoWorldDotComScraper(self):
-        
-        return 
+        return
         s = RotoWorldDotComScraper(league="nfl")
         s.testmode = True
         s.debug = True
+
+
+        s.update_player_list()
+
+        return 
 
         data = s.scrape(playerName="Eli Manning")
         print(data)

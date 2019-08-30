@@ -10,10 +10,14 @@ class FantasyProsDotComScraper(SiteScraper):
 
     def __init__(self):
         super(FantasyProsDotComScraper, self).__init__(url="https://www.fantasypros.com/nfl")
-        self.maxCacheTime = datetime.timedelta(days=7)
+        #self.maxCacheTime = datetime.timedelta(days=7)
+        #self.maxCacheTime = datetime.timedelta(hours=1)
+        self.maxCacheTime = datetime.timedelta(days=1)
+        #self.maxCacheTime = datetime.timedelta()
+        
         self.setProjectionURLs()
         self.setCheatSheetURLs()
-        #self.debug = True
+        self.debug = True
 
     def setProjectionURLs(self, week="draft"):
         url_offset = "/projections/"
@@ -35,7 +39,7 @@ class FantasyProsDotComScraper(SiteScraper):
         self.keys = {}
         self.keys['QB'] = keysPositionNameTeam + keysPassingStats + keysRushingStats + keysMiscStats
         self.keys['RB'] = keysPositionNameTeam + keysRushingStats + keysReceivingStats + keysMiscStats
-        self.keys['WR'] = keysPositionNameTeam + keysRushingStats + keysReceivingStats + keysMiscStats
+        self.keys['WR'] = keysPositionNameTeam + keysReceivingStats + keysRushingStats + keysMiscStats
         self.keys['TE'] = keysPositionNameTeam + keysReceivingStats + keysMiscStats
         self.keys['K'] = keysPositionNameTeam + ['fieldGoals', 'fieldGoalAttempts', 'extraPoints', 'fantasyPoints']
 
@@ -47,7 +51,6 @@ class FantasyProsDotComScraper(SiteScraper):
         for p in [ 'QB', 'RB', 'WR', 'TE', 'K', 'dst', 'consensus', 'ppr', 'half-point-ppr' ]:
             self.cheatsheetURL[p] = url_offset + p.lower() + url_suffix
 
-
     def scrapeCheatSheets(self):
 
         self.cheatsheets = []
@@ -56,7 +59,7 @@ class FantasyProsDotComScraper(SiteScraper):
             data = self.scrapeTable(urlOffset=self.cheatsheetURL[p], attrs={'id': 'rank-data'})
 
             if data is None:
-                print "ERROR: table for " + p + " from " + self.cheatsheetURL[p] + " could not be extracted"
+                print("ERROR: table for " + p + " from " + self.cheatsheetURL[p] + " could not be extracted")
                 continue
 
             if p == "dst":
@@ -75,7 +78,8 @@ class FantasyProsDotComScraper(SiteScraper):
 
             for data_i in data:
                 if len(data_i) < 3: continue
-
+                #print(data_i)
+                
                 # remove wsid field
                 data_i = [data_i[0]] + data_i[2:]
 
@@ -84,7 +88,13 @@ class FantasyProsDotComScraper(SiteScraper):
                     d = dict(zip(dataKeys,[data_i[0]] + self.splitNameTeamString(data_i[1]) + data_i[2:]))
                 else:
                     d = dict(zip(dataKeys,[pos] + [data_i[0]] + self.splitNameTeamString(data_i[1]) + data_i[2:]))
-                #print d
+
+                d['name'] = d['name'].rstrip()
+                
+                if d['name'] in ['&nbsp', 'Team']: continue
+                if '(Team)' in d['name']: continue
+                
+                #print('NAME:' + d['name'] + " POS:" + pos)
 
                 self.cheatsheets.append(d)
 
@@ -106,8 +116,9 @@ class FantasyProsDotComScraper(SiteScraper):
 
             for data_i in data:
                 d = dict(zip(self.keys[p],[p] + self.splitNameTeamString(data_i[0]) + data_i[1:]))
+                if d['name'].startswith('  '):
+                    raise ValueError("Space char found at the beginning of name: " + d['name'] + " --- " + data_i)
                 self.projections.append(d)
-                #print d
 
     def scrape(self):
         self.cheatsheets = []
@@ -129,7 +140,8 @@ class FantasyProsDotComScraper(SiteScraper):
 
         if len(nameTeamStr) > 6 and nameTeamStr.rfind(nameTeamStr[0] + '.') != -1:
             idx = nameTeamStr.rfind(nameTeamStr[0] + '.')
-            nameTeamStr = nameTeamStr[0:idx] + ' ' +  nameTeamStr[-3:]
+            if idx != 0:
+                nameTeamStr = nameTeamStr[0:idx] + ' ' +  nameTeamStr[-3:]
 
         if len(nameTeamStr.rsplit(' ',1)) > 1 and \
             len(nameTeamStr.rsplit(' ',1)[1]) == 1:
@@ -175,21 +187,13 @@ class TestFantasyProsDotComScraper(unittest.TestCase):
             self.assertEquals(camNewtonFound,True)
             self.assertEquals(tomBradyFound,True)
 
-        #andrewLuckFound = 0
         seattleFound = 0
         for player in s.cheatsheets:
-            '''
-            if player['name'] == "Andrew Luck":
-                print player
-                self.assertEqual(player['team'], "IND")
-                andrewLuckFound += 1
-            '''
             if player['name'] == "Seattle":
                 if 'position' in player:
                     self.assertEqual(player['position'], "DEF")
                 seattleFound += 1
 
-        #self.assertEquals(andrewLuckFound,4)
         self.assertEquals(seattleFound,4)
 
     def testsplitNameTeamString(self):

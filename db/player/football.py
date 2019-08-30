@@ -13,15 +13,21 @@ class FootballPlayer(Player):
     def __init__(self, name=None, team=None, properties={}):
         super(FootballPlayer, self).__init__(name=name, team=team, properties=properties)
 
+        '''
         self.passingSDMult = 1.6
         self.rushingSDMult = 2.4
         self.receivingSDMult = 2.0
+        '''
+        '''
+        self.passingSDMult = 1.0
+        self.rushingSDMult = 1.0
+        self.receivingSDMult = 1.0
+        '''
 
     def team_abbreviate(self,teamname):
         if teamname == "JAC":
             return "JAX"
         return super(FootballPlayer,self).team_abbreviate(teamname)
-
 
     def get_rules(self):
         return FootballPlayer.DefaultRules
@@ -82,7 +88,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedPassingInterceptionsThrown()
         else:
-            return int(self.getStat(FootballDBDotComScraper.PassingInterceptionsThrown, year))
+            return float(self.getStat(FootballDBDotComScraper.PassingInterceptionsThrown, year))
 
     def projectedPassingInterceptionsThrown(self):
         if self.getProperty('passingInterceptions') is None:
@@ -94,7 +100,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedPassingTwoPointers()
         else:
-            return int(self.getStat(FootballDBDotComScraper.PassingTwoPointers, year))
+            return float(self.getStat(FootballDBDotComScraper.PassingTwoPointers, year))
 
     def projectedPassingTwoPointers(self):
         return self.passingTwoPointers(year=(datetime.datetime.now().year-1))
@@ -107,7 +113,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedRushingAttempts()
         else:
-            return int(self.getStat(FootballDBDotComScraper.RushingAttempts, year))
+            return float(self.getStat(FootballDBDotComScraper.RushingAttempts, year))
 
     def projectedRushingAttempts(self):
         if self.getProperty('rushingAttempts') is None:
@@ -241,27 +247,10 @@ class FootballPlayer(Player):
 
         if self.get_rules() is not None:
             return self.get_rules().points(self, year)
-
-        points = 0.0
-        points += self.passingTDs(year) * (4)
-        points += self.passingYards(year) * (0.04)
-        points += self.passingInterceptionsThrown(year) * (-1)
-        points += self.passingTwoPointers(year) * (2)
-        points += self.rushingTDs(year) * (6)
-        points += self.rushingYards(year) * (0.1)
-        points += self.rushingTwoPointers(year) * (2)
-        points += self.receivingTDs(year) * (6)
-        points += self.receivingYards(year) * (0.1)
-        points += self.receptions(year) * (0.5)
-        points += self.receivingTwoPointers(year) * (2)
-        # fieldgoal stats needed
-        # punt return TDs * 6
-        # kick return TDs * 6
-        points += self.fumblesLost(year) * (-2)
-        points += self.fumbleTDs(year) * (6)
-
-        return points
-
+        
+        raise ValueError('Should not reach here')
+        return 0.0
+    
     def pointsPerGame(self,year=datetime.datetime.now().year):
         if self.gamesPlayed(year) == 0:
             return 0.0
@@ -426,6 +415,7 @@ class FootballPlayer(Player):
     # ToDo: Make this better!!!
     def value(self):
 
+        '''
         if datetime.datetime.now().month  < 6:
             try:
                 if self.property.has_key("hpprAvgRank"):
@@ -436,7 +426,7 @@ class FootballPlayer(Player):
                     return 0
             except ValueError:
                 return 0
-
+        '''
         #...and if we're in July, we have projections
         #return self.valuePassing() + self.valueRushing() + self.valueReceiveing() + self.valueMisc()
         return self.pointsPerGame()

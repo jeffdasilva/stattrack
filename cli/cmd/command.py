@@ -483,7 +483,6 @@ class FactoryResetCommand(Command):
 
     def apply(self, cmd, parser):
 
-
         leagueOrResponse = self.getLeague(parser)
         if not self.isCurrentStatusTrue(parser):
             response = leagueOrResponse
@@ -597,7 +596,7 @@ class ListCommand(Command):
 
             response = "---------------------------------------------------------------------\n"
 
-            draftEligiblePlayers = None
+            #draftEligiblePlayers = None
             for i, player in enumerate(parser.player_list):
                 if i >= playersToList:
                     break
@@ -612,6 +611,14 @@ class ListCommand(Command):
                 if parser.league is not None and parser.league.property["isAuctionDraft"] == 'true':
 
                     try:
+                        #parser.league.db.update_auction_stats()
+                        
+                        try:
+                            playerMarketPrice = player.auction_value
+                        except AttributeError:
+                            playerMarketPrice = 0.0
+                        
+                        '''
                         if draftEligiblePlayers is None:
                             draftEligiblePlayers = parser.league.db.remainingDraftEligiblePlayers()
 
@@ -619,7 +626,10 @@ class ListCommand(Command):
                             playerMarketPrice = player.value() * parser.league.db.costPerValueUnit(position=player.position)
                         else:
                             playerMarketPrice = 0.0
+                        '''
                         response += parser.bold('{0: >10}'.format('$' + str(round(playerMarketPrice,1))))
+                        
+                        
                     except:
                         raise
                         #if parser.debug: raise
