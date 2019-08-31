@@ -11,10 +11,10 @@ class FantasyProsDotComScraper(SiteScraper):
     def __init__(self):
         super(FantasyProsDotComScraper, self).__init__(url="https://www.fantasypros.com/nfl")
         #self.maxCacheTime = datetime.timedelta(days=7)
-        self.maxCacheTime = datetime.timedelta(hours=1)
-        #self.maxCacheTime = datetime.timedelta(days=1)
+        #self.maxCacheTime = datetime.timedelta(hours=1)
+        self.maxCacheTime = datetime.timedelta(days=1)
         #self.maxCacheTime = datetime.timedelta()
-        
+
         self.setProjectionURLs()
         self.setCheatSheetURLs()
         self.debug = True
@@ -79,7 +79,7 @@ class FantasyProsDotComScraper(SiteScraper):
             for data_i in data:
                 if len(data_i) < 3: continue
                 #print(data_i)
-                
+
                 # remove wsid field
                 data_i = [data_i[0]] + data_i[2:]
 
@@ -90,10 +90,10 @@ class FantasyProsDotComScraper(SiteScraper):
                     d = dict(zip(dataKeys,[pos] + [data_i[0]] + self.splitNameTeamString(data_i[1]) + data_i[2:]))
 
                 d['name'] = d['name'].rstrip()
-                
+
                 if d['name'] in ['&nbsp', 'Team']: continue
                 if '(Team)' in d['name']: continue
-                
+
                 #print('NAME:' + d['name'] + " POS:" + pos)
 
                 self.cheatsheets.append(d)

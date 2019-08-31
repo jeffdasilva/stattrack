@@ -13,17 +13,6 @@ class FootballPlayer(Player):
     def __init__(self, name=None, team=None, properties={}):
         super(FootballPlayer, self).__init__(name=name, team=team, properties=properties)
 
-        '''
-        self.passingSDMult = 1.6
-        self.rushingSDMult = 2.4
-        self.receivingSDMult = 2.0
-        '''
-        '''
-        self.passingSDMult = 1.0
-        self.rushingSDMult = 1.0
-        self.receivingSDMult = 1.0
-        '''
-
     def team_abbreviate(self,teamname):
         if teamname == "JAC":
             return "JAX"
@@ -247,10 +236,10 @@ class FootballPlayer(Player):
 
         if self.get_rules() is not None:
             return self.get_rules().points(self, year)
-        
+
         raise ValueError('Should not reach here')
         return 0.0
-    
+
     def pointsPerGame(self,year=datetime.datetime.now().year):
         if self.gamesPlayed(year) == 0:
             return 0.0
@@ -414,6 +403,9 @@ class FootballPlayer(Player):
 
     # ToDo: Make this better!!!
     def value(self):
+
+        if 'K' in self.position or 'DEF' in self.position:
+            return (500.0 - float(self.property.get("pprRank", 500.0)))/40.0
 
         '''
         if datetime.datetime.now().month  < 6:

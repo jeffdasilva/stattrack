@@ -17,11 +17,11 @@ from scrapy.crawler import CrawlerProcess
 class Roto_News_Spider2(scrapy.Spider):
 
     name = "PlayerNews2"
-    
+
     start_urls = [
         'http://www.rotoworld.com/football/nfl/player-news',
     ]
-    
+
     def parse(self, response):
         for item in response.xpath("//div[@class='page-football-nfl-player-news section-football page--entity-type--league page--player-news role--anonymous with-subnav sidebar-first one-sidebar']"):
             player = item.xpath(".//div[@class='player']/a/text()").extract_first()
@@ -32,9 +32,9 @@ class Roto_News_Spider2(scrapy.Spider):
             print('HERE')
             raise ValueError()
             print(str(player))
-    
+
             yield {"Player": player,"Report":report,"Date":date,"Impact":impact,"Source":source}
-'''           
+'''
 
 class RotoWorldDotComScraper(SiteScraper):
 
@@ -49,9 +49,9 @@ class RotoWorldDotComScraper(SiteScraper):
         self.maxCacheTime = datetime.timedelta(hours=1)
         self.league = league
         self.playerlist = None
-        
+
     def update_player_list(self):
-        
+
         '''
         # https://stackoverflow.com/questions/13437402/how-to-run-scrapy-from-within-a-python-script
         process = CrawlerProcess({
@@ -170,7 +170,7 @@ class TestRotoWorldDotComScraper(unittest.TestCase):
 
         s.update_player_list()
 
-        return 
+        return
 
         data = s.scrape(playerName="Eli Manning")
         print(data)

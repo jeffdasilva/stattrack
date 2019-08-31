@@ -612,19 +612,19 @@ class ListCommand(Command):
 
                     try:
                         #parser.league.db.update_auction_stats()
-                        
+
                         try:
                             playerMarketPrice = player.auction_value
                         except AttributeError:
                             playerMarketPrice = 0.0
-                        
-                        
+
+
                         try:
                             ksMarketPrice = player.ks_auction_value
                         except AttributeError:
                             ksMarketPrice = 0.0
-                        
-                        
+
+
                         '''
                         if draftEligiblePlayers is None:
                             draftEligiblePlayers = parser.league.db.remainingDraftEligiblePlayers()
@@ -635,10 +635,10 @@ class ListCommand(Command):
                             playerMarketPrice = 0.0
                         '''
                         response += parser.bold('{0: >10}'.format('$' + str(round(playerMarketPrice,1))))
-                        
+
                         response += parser.bold('{0: >10}'.format('$' + str(round(ksMarketPrice,1))))
-                        
-                        
+
+
                     except:
                         raise
                         #if parser.debug: raise

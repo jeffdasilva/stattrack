@@ -125,7 +125,7 @@ class TestFootballDBDotComScraper(unittest.TestCase):
         for d in data:
             #print(str(d))
             print(d['name'])
-            
+
         for i in range(0,3):
             print "--- data[" + str(i) + "] ---"
             print data[i]

@@ -30,6 +30,7 @@ class FootballPlayerDB(PlayerDB):
         pmap["tightend"] = [ "TE" ]
         pmap["k"] = [ "K" ]
         pmap["kicker"] = [ "K" ]
+        pmap["pk"] = [ "K" ]
         pmap["def"] = [ "DEF" ]
         pmap["defence"] = [ "DEF" ]
         pmap["defense"] = [ "DEF" ]
@@ -41,11 +42,11 @@ class FootballPlayerDB(PlayerDB):
 
         self.playerCache = {}
         self.cost_per_value_unit = None
-        
+
         self.numberOfStarting = {}
         self.numberTotalToDraft = {}
-    
-    
+
+
     def wget(self, scrapers=[]):
         allScrapers = scrapers + [FantasyProsDotComScraper()]
 
@@ -55,21 +56,21 @@ class FootballPlayerDB(PlayerDB):
                 player = FootballPlayer(properties=player_prop)
                 self.add(player)
 
-    
+
     def update(self, playerData):
         super(FootballPlayerDB, self).update(playerData)
-      
+
     def update_auction_stats(self):
-        #self.debug = True  
+        #self.debug = True
         if self.debug: print ("[UPDATE Auction Stats: START]")
-        
+
         # order matters
         self.updateMoneyRemaining()
         self.updatePlayerCache()
         self.updateValueRemaining()
         self.updateCostPerValueUnit()
         self.updatePlayerAuctionCostValues()
-        
+
         self.runKnapSackSolver()
 
         if self.debug: print ("[UPDATE Auction Stats: END]")
@@ -86,11 +87,11 @@ class FootballPlayerDB(PlayerDB):
         self.num_players_remaining = {}
         self.players_remaining = {}
         self.drafted_players = {}
-        for position in self.positions: 
+        for position in self.positions:
             assert(position in self.numberTotalToDraft)
             self.drafted_players[position] = self.numberOfPlayersDrafted(position=position)
             self.num_players_remaining[position] = self.numberTotalToDraft[position] - self.drafted_players[position]
-            self.players_remaining[position] = self.get(position=position)[:self.num_players_remaining[position]]
+            self.players_remaining[position] = self.get(position=position)[:int(self.num_players_remaining[position])]
 
     def updatePlayerCache(self):
         if self.debug: print ("[UPDATE Player Cache: START]")
@@ -102,41 +103,41 @@ class FootballPlayerDB(PlayerDB):
         for p in self.positions:
             self.playerCache[p] = self.players_remaining[p]
             self.playerCache['starters'].extend(self.playerCache[p])
-            
+
         if self.debug: print ("[UPDATE Player Cache: END]")
 
-        
+
     def updateValueRemaining(self):
         total_value = 0.0
-                
+
         self.value_remaining_by_position = {}
-        
+
         for pos in self.positions:
-            self.value_remaining_by_position[pos] = 0        
+            self.value_remaining_by_position[pos] = 0
             for p in self.players_remaining[pos]:
                 player_value = float(p.value())
                 self.value_remaining_by_position[pos] += player_value
                 total_value += player_value
-                        
+
         self.value_remaining = total_value
-        
+
     def updateMeanAbsoluteDeviation(self):
         self.playerValueMAD = {}
         self.playerValueMADTotal = 0.0
         for position in self.positions:
             players = self.players_remaining[position]
-            if len(players) == 0: 
+            if len(players) == 0:
                 self.playerValueMAD[position] = 0
                 continue
-        
+
             values = []
             for p in players:
-                values.append(float(p.value())) 
+                values.append(float(p.value()))
             series = pd.Series(values)
             result = series.mad()
             self.playerValueMAD[position] = result
             self.playerValueMADTotal += result
-    
+
     def updateCostPerValueUnit(self):
         self.updateMeanAbsoluteDeviation()
         money_remaining = float(max(self.money_remaining,1))
@@ -144,86 +145,84 @@ class FootballPlayerDB(PlayerDB):
         self.cost_per_value_unit =  money_remaining / value_remaining
 
         self.money_remaining_by_position = {}
-        
+
         if self.playerValueMADTotal == 0.0: return
 
         unnormalized_money_remaining = 0.0
         for pos in self.positions:
             self.money_remaining_by_position[pos] = money_remaining * (self.value_remaining_by_position[pos] / value_remaining)
-            
+
             # scale the numbers based on MAD factor
             self.money_remaining_by_position[pos] *= (self.playerValueMAD[pos] / self.playerValueMADTotal)
             unnormalized_money_remaining += self.money_remaining_by_position[pos]
-            
-        # normalize the numbers so that it still equals total value_remaining 
+
+        # normalize the numbers so that it still equals total value_remaining
         normalizing_multiplier = money_remaining / unnormalized_money_remaining
         for pos in self.positions:
             self.money_remaining_by_position[pos] *= normalizing_multiplier
-            
-            
+
+
         self.cost_per_value_unit_by_position = {}
         for pos in self.positions:
             self.cost_per_value_unit_by_position[pos] = self.money_remaining_by_position[pos] /self.value_remaining_by_position[pos]
-
 
     def updatePlayerAuctionCostValues(self):
         for pos in self.positions:
             for player in self.players_remaining[pos]:
                 player.auction_value = self.cost_per_value_unit_by_position[pos] * float(player.value())
-            
 
     def runKnapSackSolver(self):
-        
+
         for pos in self.positions:
             if pos not in self.money_remaining_by_position: continue
             max_weight = self.money_remaining_by_position[pos] / self.numberOfTeams
             num_of_items = min(3, int(math.trunc(float(len(self.players_remaining[pos])) / self.numberOfTeams)))
             if num_of_items == 1: num_of_items = 2
             if num_of_items <= 1: return
-            
+
             #print("(" + str(max_weight) + ", " + str(num_of_items) + ")")
             ks = KnapSack(num_of_items=num_of_items, max_weight=max_weight)
             for p in self.players_remaining[pos]:
                 ksItem = KnapSackItem(name=p.name, value=p.value(), weight=p.auction_value)
                 ksItem.playerobj = p
                 ks.items.append(ksItem)
-            
+
             print("-----------------------------------")
             opt = ks.solve()
             print(opt)
-            
+
             if num_of_items <= 3:
                 n = 160
             else:
                 n = 50
-            
+
             bump = 1.5 * num_of_items
-    
+
             # not sure what a good number for n and bump are here. These are trial and error numbers
             ks.weightOptimize(n=n, bump=bump)
             for ksItem in ks.items:
                 ksItem.playerobj.ks_auction_value = ksItem.weight
-            
+
             opt = ks.solve()
             print(opt)
             print("-----------------------------------")
-            
+
 
 class TestFootballPlayerDB(unittest.TestCase):
-    
+
     def init_fdb(self, db):
         db.numberOfTeams = 10
         db.numberOfStarting = {}
         db.numberOfStarting['qb'] = 1
         db.numberOfStarting['rb'] = 5
         db.numberOfStarting['wr'] = 4
-        db.numberOfScrubs = 5 
+        db.numberOfScrubs = 5
         db.numberTotalToDraft = copy.copy(db.numberOfStarting)
-        db.totalNumberOfPlayers = 15       
+        db.totalNumberOfPlayers = 15
         db.moneyPerTeam = 100
         FootballPlayer.DefaultRules = FootballRules()
         db.update_auction_stats()
-        
+
 
     def testNewFootballPlayerDB(self):
         fdb = FootballPlayerDB()
@@ -303,7 +302,7 @@ class TestFootballPlayerDB(unittest.TestCase):
         fdb = FootballPlayerDB()
         fdb.wget(scrapers=[FantasyProsDotComScraper()])
         self.init_fdb(fdb)
-        
+
         for pKey in ["cam newton - car", "drew brees - no", "russell wilson - sea", "aaron rodgers - gb"]:
             p = fdb.player[pKey]
             print(p)

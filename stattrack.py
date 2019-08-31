@@ -5,21 +5,24 @@
 '''
 import unittest
 
+from league.custom.arrudacup import ArrudaCupHockeyLeague
+from league.custom.ffl import FFLFootballLeague
 from league.custom.irongut import IronGutFootballLeague
 from league.custom.oleague import OLeagueFootballLeague
-from league.custom.arrudacup import ArrudaCupHockeyLeague
 from league.custom.oracle import OracleFootballLeague
+
 
 class StatTrack(object):
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 66
-    StatTrackBuildNumber = 157
+    StatTrackMinorVersion = 67
+    StatTrackBuildNumber = 158
 
     def __init__(self):
         #self.league = "ArrudaCup"
-        self.league = "OLeague"
+        #self.league = "OLeague"
         #self.league = "IronGut"
         #self.league = "Oracle"
+        self.league = "FFL"
 
     def getVersion(self):
         return str(StatTrack.StatTrackMajorVersion) + "." + str(StatTrack.StatTrackMinorVersion)
@@ -51,6 +54,9 @@ class StatTrack(object):
         elif self.league == "Oracle":
             self.printBanner()
             l = OracleFootballLeague()
+        elif self.league == "FFL":
+            self.printBanner()
+            l = FFLFootballLeague()
         else:
             print("ERROR: Unknown League '" + self.league + "'")
             return
