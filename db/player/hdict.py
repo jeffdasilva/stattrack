@@ -55,7 +55,7 @@ class TestHierarchicalDict(unittest.TestCase):
         db = {'b':13}
 
         da.update(db)
-        print da
+        print(da)
         self.assertEquals(len(da), 2)
         self.assertEquals(len(db), 1)
         self.assertEquals(da['b'], 13)
@@ -63,7 +63,7 @@ class TestHierarchicalDict(unittest.TestCase):
         dc = {'c':17, 'b':db}
         da.update(dc)
         self.assertEquals(len(da), 3)
-        print da
+        print(da)
         self.assertEquals(da['b']['b'], 13)
 
         dd = {'a':da, 'b':{'b':0}, 'c':dc}
@@ -72,7 +72,7 @@ class TestHierarchicalDict(unittest.TestCase):
 
         dc.update(dd)
         self.assertEquals(dc['b']['b'],0)
-        print dc
+        print(dc)
 
     def testUpdate2(self):
 
@@ -144,7 +144,7 @@ class TestHierarchicalDict(unittest.TestCase):
         hd = HierarchicalDict({})
         hd.update({'a':'1','b':[2]})
         hd.update({'a':['2'],'b':'1'})
-        print hd
+        print(hd)
         self.assertEquals(len(hd['a']),2)
         self.assertEquals(len(hd['b']),2)
 

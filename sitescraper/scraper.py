@@ -59,7 +59,7 @@ class SiteScraper(object):
             with open(self.cacheFileName(), 'wb') as handle:
                 pickle.dump(self.cache, handle)
         finally:
-            if self.debug: print " [Cache Save] " + self.cacheFileName()
+            if self.debug: print(" [Cache Save] " + self.cacheFileName())
             #self.cacheLock.release()
 
     def cacheLoad(self):
@@ -95,31 +95,31 @@ class SiteScraper(object):
                     if 'timestamp' in self.cache[url]:
                         elapsedTimeInCache = datetime.datetime.now() - self.cache[url]['timestamp']
                         if elapsedTimeInCache < self.maxCacheTime:
-                            if self.debug: print " [Cache Hit] " + url
+                            if self.debug: print(" [Cache Hit] " + url)
                             html = self.cache[url]['html']
                             soup = BeautifulSoup(html, "lxml")
                             data = soup
                             return data
                         else:
                             if self.debug:
-                                print " [Cache Expired] " + url
-                                print "   Timestamp is:           " + str(self.cache[url]['timestamp'])
-                                print "   Elapsed time in cache: " + str(elapsedTimeInCache)
-                                print "   Max time in cache:     " + str(self.maxCacheTime)
+                                print(" [Cache Expired] " + url)
+                                print("   Timestamp is:           " + str(self.cache[url]['timestamp']))
+                                print("   Elapsed time in cache: " + str(elapsedTimeInCache))
+                                print("   Max time in cache:     " + str(self.maxCacheTime))
                     else:
-                        if self.debug: print " [Cache Miss with No Timestamp] " + url
+                        if self.debug: print(" [Cache Miss with No Timestamp] " + url)
                 else:
-                    if self.debug: print " [Cache Miss] " + url
+                    if self.debug: print(" [Cache Miss] " + url)
             finally:
                 self.cacheLock.release()
         else:
-            if self.debug: print " [Cache Disabled] " + url
+            if self.debug: print(" [Cache Disabled] " + url)
 
         retryCount = 0
         while True:
             error = False
             try:
-                if self.debug or self.verbose: print " [SCRAPE] " + url
+                if self.debug or self.verbose: print(" [SCRAPE] " + url)
                 hdr = {'User-Agent':'Mozilla/5.0'}
 
                 if self.cookiefile is not None:
@@ -130,13 +130,13 @@ class SiteScraper(object):
 
                 proxy = os.environ.get('HTTP_PROXY')
                 if proxy is not None:
-                    if self.debug: print "   [DEBUG] HTTP_PROXY set to " + proxy
+                    if self.debug: print("   [DEBUG] HTTP_PROXY set to " + proxy)
 
                 request = urllib2.Request(url,headers=hdr)
-                if self.debug: print "   [DEBUG] urllib2.Request() - Done"
+                if self.debug: print("   [DEBUG] urllib2.Request() - Done")
 
                 htmlFP = urllib2.urlopen(request, timeout=30)
-                if self.debug: print "   [DEBUG] urllib2.urlopen() - Done"
+                if self.debug: print("   [DEBUG] urllib2.urlopen() - Done")
 
                 html = htmlFP.read()
             except (socket.error, httplib.BadStatusLine, urllib2.HTTPError, httplib.IncompleteRead):
@@ -144,7 +144,7 @@ class SiteScraper(object):
                 error = True
 
             if error:
-                if self.debug: print " [SCRAPE ERROR] " + url
+                if self.debug: print(" [SCRAPE ERROR] " + url)
 
             if not error and html is not None:
                 soup = BeautifulSoup(html, "lxml")
@@ -152,15 +152,15 @@ class SiteScraper(object):
                 if self.cache is not None:
                     self.cacheLock.acquire()
                     try:
-                        if self.debug: print " [Cache Updated] " + url
+                        if self.debug: print(" [Cache Updated] " + url)
                         self.cache[url] = {'html':html, 'timestamp':datetime.datetime.now()}
                         self.cacheSave()
-                        if self.debug: print "   Timestamp is:           " + str(self.cache[url]['timestamp'])
+                        if self.debug: print("   Timestamp is:           " + str(self.cache[url]['timestamp']))
                     finally:
                         self.cacheLock.release()
                 break
             else:
-                if self.debug: print " [SCRAPE returned no html] " + url
+                if self.debug: print(" [SCRAPE returned no html] " + url)
 
             if retryCount >= self.retries:
                 print >>sys.stderr, 'ERROR: site "' + url + '" is not responding'
@@ -321,7 +321,7 @@ class TestSiteScraper(unittest.TestCase):
         self.assertNotEquals(table,None)
 
         data = s.scrapeTable(attrs={'class': 'example'})
-        print data
+        print(data)
 
         s.cache = None
         data = s.scrape()

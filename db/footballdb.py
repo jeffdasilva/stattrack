@@ -266,7 +266,7 @@ class TestFootballPlayerDB(unittest.TestCase):
         #print fdb.player
 
         p = fdb.player["tom brady - ne"]
-        print p
+        print(p)
 
         current_month = datetime.now().month
 
@@ -275,7 +275,7 @@ class TestFootballPlayerDB(unittest.TestCase):
             self.assertTrue(float(p.property["fantasyPoints"]) > 200)
             self.assertTrue(float(p.property["passingAttempts"]) > 300)
             self.assertTrue(p.passingYards() > 3000)
-            print p.value()
+            print(p.value())
 
         pass
 

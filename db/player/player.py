@@ -67,7 +67,7 @@ class Player(object):
         return playerStr
 
     def printAll(self):
-        print self.printAllToString()
+        print(self.printAllToString())
 
     def getProperty(self,statName,return_value_if_none=None):
 
@@ -247,7 +247,7 @@ class TestPlayer(unittest.TestCase):
     def testNamedPlayer(self):
         p = Player("Jeff DaSilva")
         self.assertEquals(p.name, "Jeff DaSilva")
-        print p
+        print(p)
 
     def testTeamSet(self):
         p = Player(team="NJ", name="foo")
@@ -306,19 +306,19 @@ class TestPlayer(unittest.TestCase):
     def testKeyMethod(self):
 
         p = Player(name="Jeff")
-        print p.key()
+        print(p.key())
         self.assertEqual(p.key(), "jeff - unknown")
 
         p = Player(name="Jeff", team="JDS")
-        print p.key()
+        print(p.key())
         self.assertEqual(p.key(), "jeff - jds")
 
         p = Player(name="JeFF III", team="JdSx")
-        print p.key()
+        print(p.key())
         self.assertEqual(p.key(), "jeff - jdsx")
 
         p = Player(name="Jeff JR.")
-        print p.key()
+        print(p.key())
         self.assertEqual(p.key(), "jeff - unknown")
 
 

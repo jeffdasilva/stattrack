@@ -128,7 +128,7 @@ class RotoWorldDotComScraper(SiteScraper):
 
         statsTable = self.scrapeTable(urlOffset=urlOffset, attrs={'class':'statstable'},index="Career Stats")
         if statsTable is None:
-            print "No Rotoworld data found for " + playerName
+            print("No Rotoworld data found for " + playerName)
             return None
 
         while len(statsTable) > 0 and len(statsTable[0]) == 0:
@@ -138,7 +138,7 @@ class RotoWorldDotComScraper(SiteScraper):
             statCategories = statsTable[2]
             statsTable = statsTable[3:]
         else:
-            print "No Rotoworld data found for " + playerName
+            print("No Rotoworld data found for " + playerName)
             return None
 
         stats = []
@@ -205,7 +205,7 @@ class TestRotoWorldDotComScraper(unittest.TestCase):
         self.assertEquals(int(data['2015']['G']),16)
 
         data = s.scrape(playerName="Austin Seferian-Jenkins")
-        print data
+        print(data)
         self.assertNotEquals(data, None)
 
         s.cache = None
@@ -213,7 +213,7 @@ class TestRotoWorldDotComScraper(unittest.TestCase):
                      "Marvin Jones", "Jonathan Stewart", "Matt Jones", "Zach Miller", "Charles Clay", \
                      "Ryan Griffin",  "Chris Thompson", "Josh Hill", "Kevin White"]:
             data = s.scrape(playerName=name)
-            print data
+            print(data)
             self.assertNotEquals(data, None)
 
 
