@@ -36,7 +36,8 @@ class FootballRules(Rules):
         self.numWR = 4
         self.numTE = 0
         self.numDEF = 0
-        numStarters = self.numQB + self.numRB + self.numWR + self.numTE + self.numDEF
+        self.numPK = 0
+        numStarters = self.numQB + self.numRB + self.numWR + self.numTE + self.numDEF + self.numPK
         self.numReserves = 13 - numStarters
 
         #################################################

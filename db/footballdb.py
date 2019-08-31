@@ -142,9 +142,11 @@ class FootballPlayerDB(PlayerDB):
         money_remaining = float(max(self.money_remaining,1))
         value_remaining = float(max(self.value_remaining,1.0))
         self.cost_per_value_unit =  money_remaining / value_remaining
-        
 
         self.money_remaining_by_position = {}
+        
+        if self.playerValueMADTotal == 0.0: return
+
         unnormalized_money_remaining = 0.0
         for pos in self.positions:
             self.money_remaining_by_position[pos] = money_remaining * (self.value_remaining_by_position[pos] / value_remaining)
@@ -173,6 +175,7 @@ class FootballPlayerDB(PlayerDB):
     def runKnapSackSolver(self):
         
         for pos in self.positions:
+            if pos not in self.money_remaining_by_position: continue
             max_weight = self.money_remaining_by_position[pos] / self.numberOfTeams
             num_of_items = min(3, int(math.trunc(float(len(self.players_remaining[pos])) / self.numberOfTeams)))
             if num_of_items == 1: num_of_items = 2
@@ -190,11 +193,11 @@ class FootballPlayerDB(PlayerDB):
             print(opt)
             
             if num_of_items <= 3:
-                n = 100
+                n = 160
             else:
                 n = 50
             
-            bump = 3.0 * num_of_items
+            bump = 1.5 * num_of_items
     
             # not sure what a good number for n and bump are here. These are trial and error numbers
             ks.weightOptimize(n=n, bump=bump)
@@ -234,11 +237,11 @@ class TestFootballPlayerDB(unittest.TestCase):
         self.init_fdb(fdb)
         fdb.load()
 
-        cpv_mult = fdb.costPerValueUnit()
+        cpv_mult = fdb.cost_per_value_unit
         for p in fdb.remainingStarters():
-            print str(p) + " $" + str(cpv_mult * p.value())
+            print(str(p) + " $" + str(cpv_mult * p.value()))
 
-        print fdb.valueRemaining(), fdb.moneyRemaining(), fdb.costPerValueUnit()
+        print(fdb.value_remaining, fdb.money_remaining, fdb.cost_per_value_unit)
 
     def testMoneyRemaining(self):
         fdb = FootballPlayerDB(league='O-League')
