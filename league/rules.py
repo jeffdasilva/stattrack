@@ -22,7 +22,7 @@ class HockeyRules(Rules):
         self.pointsPerGoal = 1
         self.pointsPerAssist = 1
         self.pointsPerGoalieWin = 2
-        self.pointsPerGoalieShutout = 4
+        self.pointsPerGoalieShutout = 2
 
 
 class FootballRules(Rules):

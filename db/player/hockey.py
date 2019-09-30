@@ -2,7 +2,9 @@ import datetime
 import unittest
 
 from db.player.player import Player
-from sitescraper.nhl.tsndotca import TsnDotCaScraper
+#from sitescraper.nhl.tsndotca import TsnDotCaScraper
+from sitescraper.nhl.scottcullen import ScottCullenScraper
+from sitescraper.nhl.cbssportsdotcom import NhlCbsSportsDotComSraper
 
 
 class HockeyPlayer(Player):
@@ -21,12 +23,13 @@ class HockeyPlayer(Player):
         self.projected_ties_attr = TsnDotCaScraper.ProjectedTies + NhlCbsSportsDotComSraper.ProjectedTies
         self.projected_shutouts_attr = TsnDotCaScraper.ProjectedShutouts + NhlCbsSportsDotComSraper.ProjectedShutouts
         '''
-        self.projected_games_played_attr = TsnDotCaScraper.ProjectedGamesPlayed
-        self.projected_goals_attr = TsnDotCaScraper.ProjectedGoals
-        self.projected_assists_attr = TsnDotCaScraper.ProjectedAssists
-        self.projected_wins_attr = TsnDotCaScraper.ProjectedWins
-        self.projected_ties_attr = TsnDotCaScraper.ProjectedTies
-        self.projected_shutouts_attr = TsnDotCaScraper.ProjectedShutouts
+        
+        self.projected_games_played_attr = ScottCullenScraper.ProjectedGamesPlayed + NhlCbsSportsDotComSraper.ProjectedGamesPlayed
+        self.projected_goals_attr = ScottCullenScraper.ProjectedGoals
+        self.projected_assists_attr = ScottCullenScraper.ProjectedAssists
+        self.projected_wins_attr = NhlCbsSportsDotComSraper.ProjectedWins
+        self.projected_ties_attr = NhlCbsSportsDotComSraper.ProjectedTies
+        self.projected_shutouts_attr = NhlCbsSportsDotComSraper.ProjectedShutouts
 
 
     def __str__(self):
@@ -114,6 +117,8 @@ class HockeyPlayer(Player):
 
         teamNameAbbreviateMap['ny islanders'] = teamNameAbbreviateMap['new york islanders']
         teamNameAbbreviateMap['ny rangers'] = teamNameAbbreviateMap['new york rangers']
+        teamNameAbbreviateMap['vegas'] = teamNameAbbreviateMap['las vegas golden knights']
+
 
         for team in abbreviated_teamnames:
             teamNameAbbreviateMap[team] = team
@@ -130,8 +135,7 @@ class HockeyPlayer(Player):
             return float(self.getStat("Goals",year))
 
     def projectedGoals(self):
-        #return float(self.getProperty(self.projected_goals_attr,0))
-        return float(self.getProperty(TsnDotCaScraper.ProjectedGoals,0))
+        return float(self.getProperty(self.projected_goals_attr,0))
 
     def assists(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -140,8 +144,7 @@ class HockeyPlayer(Player):
             return float(self.getStat("Assists",year))
 
     def projectedAssists(self):
-        #return float(self.getProperty(self.projected_assists_attr,0))
-        return float(self.getProperty(TsnDotCaScraper.ProjectedAssists,0))
+        return float(self.getProperty(self.projected_assists_attr,0))
 
     def goaltenderWins(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -151,10 +154,9 @@ class HockeyPlayer(Player):
 
     def projectedGoaltenderWins(self):
         try:
-            #return float(self.getProperty(self.projected_wins_attr,0))
-            return float(self.getProperty(TsnDotCaScraper.ProjectedWins,0))
+            return float(self.getProperty(self.projected_wins_attr,0))
         except ValueError:
-            #print("WARNING: projectedGoaltenderWins=" + str(self.getProperty(self.projected_wins_attr,0)))
+            print("WARNING: projectedGoaltenderWins=" + str(self.getProperty(self.projected_wins_attr,0)))
             return 0
 
     def goaltenderTies(self,year=datetime.datetime.now().year):
@@ -164,7 +166,7 @@ class HockeyPlayer(Player):
             return float(self.getStat("Ties",year))
 
     def projectedGoaltenderTies(self):
-        return float(self.getProperty(TsnDotCaScraper.ProjectedTies,0))
+        return float(self.getProperty(self.projected_ties_attr,0))
 
     def goaltenderShutOuts(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
@@ -174,8 +176,7 @@ class HockeyPlayer(Player):
 
     def projectedGoaltenderShutOuts(self):
         try:
-            #return float(self.getProperty(self.projected_shutouts_attr,0))
-            return float(self.getProperty(TsnDotCaScraper.ProjectedShutouts,0))
+            return float(self.getProperty(self.projected_shutouts_attr,0))
         except ValueError:
             return 0
 
@@ -187,16 +188,12 @@ class HockeyPlayer(Player):
 
     def projectedGamesPlayed(self):
         try:
-            #return float(self.getProperty(self.projected_games_played_attr,0))
-            return float(self.getProperty(TsnDotCaScraper.ProjectedGamesPlayed,0))
+            return float(self.getProperty(self.projected_games_played_attr,0))
         except ValueError:
             return 0
 
     def points(self,year=datetime.datetime.now().year):
-
-        shutout_value = 3
-        # For 2019, change to this
-        #shutout_value = 2
+        shutout_value = 2
 
         return self.goals(year) + \
             self.assists(year) + \
@@ -312,7 +309,7 @@ class TestHockeyPlayer(unittest.TestCase):
         self.assertEqual(p.pointsPerGame(),1.0)
 
         p.property[p.projected_shutouts_attr[-1]] = "10"
-        self.assertEqual(p.pointsPerGame(),4.0)
+        self.assertEqual(p.pointsPerGame(),3.0)
 
 
 if __name__ == '__main__':

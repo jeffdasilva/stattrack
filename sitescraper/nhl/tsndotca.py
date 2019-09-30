@@ -182,7 +182,7 @@ class TestTsnDotCaScraper(unittest.TestCase):
             #print player['name']
             if str(player['name']) == "Connor McDavid":
                 if TsnDotCaScraper.esTop300.statString('team') in player:
-                    print player
+                    #print player
                     self.assertEqual(player[TsnDotCaScraper.esTop300.statString('team')], "Edmonton")
                     self.assertGreaterEqual(player[TsnDotCaScraper.esTop300.projectedPoints()], 70)
                     self.assertEqual(player[TsnDotCaScraper.esTop300.position()], 'C')

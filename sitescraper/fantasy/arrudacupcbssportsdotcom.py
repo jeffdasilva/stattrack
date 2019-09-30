@@ -30,7 +30,7 @@ class ArrudaCupCbsSportsDotComSraper(SiteScraper):
         self.team[3] = "Will"
         self.team[4] = "Dave"
         self.team[5] = "Donny"
-        self.team[6] = "Mike"
+        #self.team[6] = "Nobody1"
         self.team[7] = "Jeff"
         self.team[8] = "Alex"
         self.team[9] = "Al"
@@ -42,9 +42,9 @@ class ArrudaCupCbsSportsDotComSraper(SiteScraper):
         self.team[15] = "Jad"
         self.team[16] = "Johnny"
         self.team[17] = "Art"
-        self.team[18] = "Fab"
+        #self.team[18] = "Nobody2"
 
-    def scrapeIndividualTeam(self,team_number):
+    def scrapeIndividualTeam(self, team_number):
         urlOffset = '/teams/' + str(team_number)
 
         playerTableAttrs={'class':'data data3 pinHeader borderTop'}

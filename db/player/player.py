@@ -62,7 +62,10 @@ class Player(object):
         if self.property is not None:
             playerStr += "Properties: " + "\n"
             for prop in self.property:
-                playerStr += "  " + prop + ": " + str(self.property[prop]) + "\n"
+                try:
+                    playerStr += "  " + str(prop) + ": " + str(self.property[prop]) + "\n"
+                except UnicodeEncodeError:
+                    pass
 
         return playerStr
 

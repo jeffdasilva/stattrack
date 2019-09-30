@@ -7,20 +7,15 @@ from db.hockeydb import HockeyPlayerDB
 from league.hockey import HockeyLeague
 from league.rules import HockeyRules
 from sitescraper.nhl.cbssportsdotcom import NhlCbsSportsDotComSraper
+from sitescraper.nhl.scottcullen import ScottCullenScraper
 
 
 class ArrudaCupHockeyRules(HockeyRules):
 
     def __init__(self):
         super(ArrudaCupHockeyRules, self).__init__()
-
         self.settingsURL = "http://arruda-cup.hockey.cbssports.com/rules"
-
-        self.numTeams = 18
-
-        # For 2019, change to this
-        #self.numTeams = 16
-
+        self.numTeams = 16
         self.numForwards = 8
         self.numDefensmen = 5
         self.numGoalies = 2
@@ -29,7 +24,7 @@ class ArrudaCupHockeyRules(HockeyRules):
 class ArrudaCupHockeyLeague(HockeyLeague):
     def __init__(self):
         from cli.cmd.command import SearchByPositionCommand, DraftedByCommand
-        from sitescraper.nhl.tsndotca import TsnDotCaScraper
+        #from sitescraper.nhl.tsndotca import TsnDotCaScraper
         from sitescraper.fantasy.arrudacupcbssportsdotcom import ArrudaCupCbsSportsDotComSraper
 
         name = "ArrudaCup"
@@ -68,13 +63,18 @@ class ArrudaCupHockeyLeague(HockeyLeague):
 
         self.parser.autosave = False
 
-        self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper(), NhlCbsSportsDotComSraper()]
+        #self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper(), NhlCbsSportsDotComSraper()]
         #self.scrapers = [TsnDotCaScraper(), ArrudaCupCbsSportsDotComSraper()]
-
-
-        self.enable_rotoworld_player_scraper = True
+        #self.scrapers = [ArrudaCupCbsSportsDotComSraper(), NhlCbsSportsDotComSraper()]
+        #self.scrapers = [ArrudaCupCbsSportsDotComSraper()]
+        self.scrapers = [ScottCullenScraper(), ArrudaCupCbsSportsDotComSraper(), NhlCbsSportsDotComSraper()]
+        
+        
+        # no longer works:
+        self.enable_rotoworld_player_scraper = False
+        
         self.enable_cbssports_player_scraper = True
-        #self.enable_cbssports_player_scraper = False
+        
 
     def update(self):
 
