@@ -26,10 +26,10 @@ class ScottCullenScraper(SiteScraper):
         self.stat_map = {
             'player': ScottCullenScraper.ES.name(),
             'team': ScottCullenScraper.ES.team(),
-            'g': ScottCullenScraper.ES.goals(),
-            'a': ScottCullenScraper.ES.assists(),
-            'pts': ScottCullenScraper.ES.points(),
-            'gp': ScottCullenScraper.ES.gamesPlayed(),
+            'g': ScottCullenScraper.ES.projectedGoals(),
+            'a': ScottCullenScraper.ES.projectedAssists(),
+            'pts': ScottCullenScraper.ES.projectedPoints(),
+            'gp': ScottCullenScraper.ES.projectedGamesPlayed()
             }
         
         

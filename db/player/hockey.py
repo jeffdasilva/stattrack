@@ -156,8 +156,11 @@ class HockeyPlayer(Player):
         try:
             return float(self.getProperty(self.projected_wins_attr,0))
         except ValueError:
-            print("WARNING: projectedGoaltenderWins=" + str(self.getProperty(self.projected_wins_attr,0)))
-            return 0
+            try:
+                print("WARNING: projectedGoaltenderWins=" + str(self.getProperty(self.projected_wins_attr,0)))
+            except:
+                pass
+        return 0.0
 
     def goaltenderTies(self,year=datetime.datetime.now().year):
         if year == datetime.datetime.now().year:
