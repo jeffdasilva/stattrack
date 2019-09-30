@@ -11,8 +11,8 @@ class FantasyProsDotComScraper(SiteScraper):
     def __init__(self):
         super(FantasyProsDotComScraper, self).__init__(url="https://www.fantasypros.com/nfl")
         #self.maxCacheTime = datetime.timedelta(days=7)
-        #self.maxCacheTime = datetime.timedelta(hours=1)
-        self.maxCacheTime = datetime.timedelta(days=1)
+        self.maxCacheTime = datetime.timedelta(hours=1)
+        #self.maxCacheTime = datetime.timedelta(days=1)
         #self.maxCacheTime = datetime.timedelta()
 
         self.setProjectionURLs()
