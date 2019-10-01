@@ -29,7 +29,8 @@ class ScottCullenScraper(SiteScraper):
             'g': ScottCullenScraper.ES.projectedGoals(),
             'a': ScottCullenScraper.ES.projectedAssists(),
             'pts': ScottCullenScraper.ES.projectedPoints(),
-            'gp': ScottCullenScraper.ES.projectedGamesPlayed()
+            'gp': ScottCullenScraper.ES.projectedGamesPlayed(),
+            'pos':  ScottCullenScraper.ES.position(),
             }
         
         
@@ -77,7 +78,7 @@ class ScottCullenScraper(SiteScraper):
                 player = dict(zip(stats,row))
                 if player['name'] == '': continue
                 #print(str(player))
-                if position is not None:
+                if 'position' not in player and position is not None:
                     player['position'] = position
                 player['scraper'] = [ScottCullenScraper.ES.prefix]
                 
