@@ -16,7 +16,9 @@ class FFLFootballRules(FootballRules):
         super(FFLFootballRules, self).__init__()
 
         # 2019
-        self.settingsURL = "https://fantasy.espn.com/football/league/settings?leagueId=6549253&seasonId=2019"
+        # self.settingsURL = "https://fantasy.espn.com/football/league/settings?leagueId=6549253&seasonId=2019"
+        # 2020
+        self.settingsURL = "https://fantasy.espn.com/football/league/settings?leagueId=6549253&seasonId=2020"
 
         self.numTeams = 14
         self.moneyPerTeam = 0
@@ -28,6 +30,7 @@ class FFLFootballRules(FootballRules):
         self.numPK = 1
         numStarters = self.numQB + self.numRB + self.numWR + self.numTE + self.numDEF + self.numPK
         self.numReserves = 14 - numStarters  # 5
+        # 3 IR in 2020 (2 reserved for covid)
 
         self.pointsPerCompletion = 0.05
         self.pointsPerIncompletePass = 0
@@ -127,7 +130,8 @@ class FFLFootballLeague(FootballLeague):
         self.initdb(self.db)
 
         # does this have any value?
-        #self.db.wget(scrapers=[FootballDBDotComScraper()])
+        # self.db.wget(scrapers=[FootballDBDotComScraper()])
+        # removed because it messes everything up and I don't want to debug it
 
     def update(self):
         self.db.wget(self.scrapers)

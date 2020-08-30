@@ -108,7 +108,6 @@ class KnapSack(object):
             self.normalizeWeights(goal_total_weight=total_weight)
 
             '''
-
             for item in set(self.items) - set(best_combo):
                 item.weight *= weith_decr_mult
             '''

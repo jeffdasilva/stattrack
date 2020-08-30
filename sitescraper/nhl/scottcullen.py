@@ -20,9 +20,9 @@ class ScottCullenScraper(SiteScraper):
 
     def __init__(self):
         super(ScottCullenScraper, self).__init__(url="https://docs.google.com/spreadsheets/d/e")
-        
+
         self.maxCacheTime = datetime.timedelta(days=1)
-        
+
         self.stat_map = {
             'player': ScottCullenScraper.ES.name(),
             'team': ScottCullenScraper.ES.team(),
@@ -32,8 +32,8 @@ class ScottCullenScraper(SiteScraper):
             'gp': ScottCullenScraper.ES.projectedGamesPlayed(),
             'pos':  ScottCullenScraper.ES.position(),
             }
-        
-        
+
+
     def scrape(self, year=datetime.datetime.now().year):
 
         # scrape Scott Cullen's projections
@@ -46,34 +46,34 @@ class ScottCullenScraper(SiteScraper):
         #tableAttrs={'class':'stats-table-scrollable article-table'}
         #data = self.scrapeTable(urlOffset=offset,attrs=tableAttrs,index=1)
         data = self.scrapeTables(urlOffset=offset)
-        
+
         self.players = []
-        
+
         for table in data:
             if len(table) < 2: continue
-            
+
             ptable = table
-            if len(ptable[0]) == 0: 
+            if len(ptable[0]) == 0:
                 ptable = ptable[1:]
-            
+
             assert(len(ptable[0]) > 0)
-             
+
             assert(len(ptable[0][0]) > 0)
-            
+
             if (len(ptable[0][1]) == 0):
                 position = ptable[0][0]
                 ptable = ptable[1:]
             else:
                 position = None
-            
+
             stats = []
             for col in ptable[0]:
                 col = col.lower()
                 statname = self.stat_map.get(col, ScottCullenScraper.ES.statString(col))
                 stats.append(statname)
-        
+
             ptable = ptable[1:]
-            
+
             for row in ptable:
                 player = dict(zip(stats,row))
                 if player['name'] == '': continue
@@ -81,15 +81,15 @@ class ScottCullenScraper(SiteScraper):
                 if 'position' not in player and position is not None:
                     player['position'] = position
                 player['scraper'] = [ScottCullenScraper.ES.prefix]
-                
+
                 if player[ScottCullenScraper.ES.team()] == '':
                     print(str(player))
                     assert(False)
-                
+
                 self.players.append(player)
-            
+
             break
-                
+
         return self.players
 
 

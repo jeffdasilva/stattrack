@@ -23,7 +23,7 @@ class HockeyPlayer(Player):
         self.projected_ties_attr = TsnDotCaScraper.ProjectedTies + NhlCbsSportsDotComSraper.ProjectedTies
         self.projected_shutouts_attr = TsnDotCaScraper.ProjectedShutouts + NhlCbsSportsDotComSraper.ProjectedShutouts
         '''
-        
+
         self.projected_games_played_attr = ScottCullenScraper.ProjectedGamesPlayed + NhlCbsSportsDotComSraper.ProjectedGamesPlayed
         self.projected_goals_attr = ScottCullenScraper.ProjectedGoals
         self.projected_assists_attr = ScottCullenScraper.ProjectedAssists

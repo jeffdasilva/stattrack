@@ -14,12 +14,12 @@ from league.custom.oracle import OracleFootballLeague
 
 class StatTrack(object):
     StatTrackMajorVersion = 0
-    StatTrackMinorVersion = 71
-    StatTrackBuildNumber = 158
+    StatTrackMinorVersion = 73
+    StatTrackBuildNumber = 159
 
     def __init__(self):
-        self.league = "ArrudaCup"
-        #self.league = "OLeague"
+        #self.league = "ArrudaCup"
+        self.league = "OLeague"
         #self.league = "IronGut"
         #self.league = "Oracle"
         #self.league = "FFL"

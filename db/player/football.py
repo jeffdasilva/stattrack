@@ -21,6 +21,14 @@ class FootballPlayer(Player):
     def get_rules(self):
         return FootballPlayer.DefaultRules
 
+    
+    def toInt(self, val):
+        try:
+            ret_val = int(val)
+        except ValueError:
+            return 0
+        return ret_val
+
 ###################################################################
 #
 # PASSING STATS
@@ -41,7 +49,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedPassingCompletions()
         else:
-            return int(self.getStat(FootballDBDotComScraper.PassingCompletions, year))
+            return self.toInt(self.getStat(FootballDBDotComScraper.PassingCompletions, year))
 
     def projectedPassingCompletions(self):
         if self.getProperty('passingCompletions') is None:
@@ -65,7 +73,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedPassingTDs()
         else:
-            return int(self.getStat(FootballDBDotComScraper.PassingTDs, year))
+            return self.toInt(self.getStat(FootballDBDotComScraper.PassingTDs, year))
 
     def projectedPassingTDs(self):
         if self.getProperty('passingTDs') is None:
@@ -126,7 +134,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedRushingTDs()
         else:
-            return int(self.getStat(FootballDBDotComScraper.RushingTDs, year))
+            return self.toInt(self.getStat(FootballDBDotComScraper.RushingTDs, year))
 
     def projectedRushingTDs(self):
         if self.getProperty('rushingTDs') is None:
@@ -138,7 +146,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedRushingTwoPointers()
         else:
-            return int(self.getStat(FootballDBDotComScraper.ReceivingTwoPointers, year))
+            return self.toInt(self.getStat(FootballDBDotComScraper.ReceivingTwoPointers, year))            
 
     def projectedRushingTwoPointers(self):
         return self.rushingTwoPointers(year=(datetime.datetime.now().year-1))
@@ -152,7 +160,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedReceptions()
         else:
-            return int(self.getStat(FootballDBDotComScraper.Receptions, year))
+            return self.toInt(self.getStat(FootballDBDotComScraper.Receptions, year))
 
     def projectedReceptions(self):
         if self.getProperty('receptions') is None:
@@ -176,7 +184,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedReceivingTDs()
         else:
-            return int(self.getStat(FootballDBDotComScraper.ReceivingTDs, year))
+            return self.toInt(self.getStat(FootballDBDotComScraper.ReceivingTDs, year))
 
     def projectedReceivingTDs(self):
         if self.getProperty('receivingTDs') is None:
@@ -188,7 +196,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedReceivingTwoPointers()
         else:
-            return int(self.getStat(FootballDBDotComScraper.ReceivingTwoPointers, year))
+            return self.toInt(self.getStat(FootballDBDotComScraper.ReceivingTwoPointers, year))
 
     def projectedReceivingTwoPointers(self):
         return self.receivingTwoPointers(year=(datetime.datetime.now().year-1))
@@ -202,7 +210,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedFumblesLost()
         else:
-            return int(self.getStat(FootballDBDotComScraper.FumblesLost, year))
+            return self.toInt(self.getStat(FootballDBDotComScraper.FumblesLost, year))
 
     def projectedFumblesLost(self):
         if self.getProperty('fumblesLost') is None:
@@ -214,7 +222,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedFumbleTDs()
         else:
-            return int(self.getStat(FootballDBDotComScraper.FumbleTDs, year))
+            return self.toInt(self.getStat(FootballDBDotComScraper.FumbleTDs, year))
 
     def projectedFumbleTDs(self):
         return self.fumbleTDs(year=(datetime.datetime.now().year-1))
@@ -223,7 +231,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedGamesPlayed()
         else:
-            return int(self.getStat(RotoWorldDotComScraper.GamesPlayed, year))
+            return self.toInt(self.getStat(RotoWorldDotComScraper.GamesPlayed, year))
 
     def projectedGamesPlayed(self):
         return 17

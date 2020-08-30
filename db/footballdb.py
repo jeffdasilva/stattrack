@@ -56,7 +56,6 @@ class FootballPlayerDB(PlayerDB):
                 player = FootballPlayer(properties=player_prop)
                 self.add(player)
 
-
     def update(self, playerData):
         super(FootballPlayerDB, self).update(playerData)
 
@@ -74,7 +73,6 @@ class FootballPlayerDB(PlayerDB):
         self.runKnapSackSolver()
 
         if self.debug: print ("[UPDATE Auction Stats: END]")
-
 
     def updateMoneyRemaining(self):
         money_remaining = self.numberOfTeams * self.moneyPerTeam
@@ -161,7 +159,6 @@ class FootballPlayerDB(PlayerDB):
         for pos in self.positions:
             self.money_remaining_by_position[pos] *= normalizing_multiplier
 
-
         self.cost_per_value_unit_by_position = {}
         for pos in self.positions:
             self.cost_per_value_unit_by_position[pos] = self.money_remaining_by_position[pos] /self.value_remaining_by_position[pos]
@@ -191,12 +188,14 @@ class FootballPlayerDB(PlayerDB):
             opt = ks.solve()
             print(opt)
 
+            print('num_of_items: ' + str(num_of_items))
             if num_of_items <= 3:
-                n = 160
+                n = 200
             else:
                 n = 50
 
-            bump = 1.5 * num_of_items
+            #bump = 1.5 * num_of_items
+            bump = 0.8 * num_of_items
 
             # not sure what a good number for n and bump are here. These are trial and error numbers
             ks.weightOptimize(n=n, bump=bump)

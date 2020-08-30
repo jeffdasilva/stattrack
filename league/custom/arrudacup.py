@@ -68,13 +68,13 @@ class ArrudaCupHockeyLeague(HockeyLeague):
         #self.scrapers = [ArrudaCupCbsSportsDotComSraper(), NhlCbsSportsDotComSraper()]
         #self.scrapers = [ArrudaCupCbsSportsDotComSraper()]
         self.scrapers = [ScottCullenScraper(), ArrudaCupCbsSportsDotComSraper(), NhlCbsSportsDotComSraper()]
-        
-        
+
+
         # no longer works:
         self.enable_rotoworld_player_scraper = False
-        
+
         self.enable_cbssports_player_scraper = True
-        
+
 
     def update(self):
 

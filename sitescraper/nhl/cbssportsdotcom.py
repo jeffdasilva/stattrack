@@ -39,12 +39,12 @@ class NhlCbsSportsDotComSraper(SiteScraper):
             raise ValueError("Error: Postition " + position + " is not a valid position")
 
         #url_offset = '/fantasy/hockey/stats/sortable/points/' + position + '/advanced/projections?&print_rows=9999'
-        
+
         url_offset = '/fantasy/hockey/stats/' + position + '/2019/restofseason/projections/'
-        
+
         #table_attrs = {'class':'data compact'}
         table_attrs = {'class':'TableBase-table'}
-        
+
         table = self.scrapeTable(urlOffset=url_offset,attrs=table_attrs)
         links = self.scrapeLinks(urlOffset=url_offset)
 
@@ -55,8 +55,8 @@ class NhlCbsSportsDotComSraper(SiteScraper):
         table_data = table[1:]
 
         stat_type = []
-        for statname in table_header:            
-            statname = statname.split(' ',1)[0].strip().replace('\n','')          
+        for statname in table_header:
+            statname = statname.split(' ',1)[0].strip().replace('\n','')
 
             if statname.lower() in NhlCbsSportsDotComSraper.ProjStatMap:
                 stat_type.append(NhlCbsSportsDotComSraper.ProjStatMap[statname.lower()])
@@ -68,29 +68,29 @@ class NhlCbsSportsDotComSraper(SiteScraper):
         data = []
 
         for ele in table_data:
-            
+
             #print(str(ele))
             if len(stat_type) == len(ele):
                 data.append(dict(zip(stat_type,ele)))
 
-                assert(NhlCbsSportsDotComSraper.es.projectedString('player') in data[-1])                
-                name_pos_team = data[-1][NhlCbsSportsDotComSraper.es.projectedString('player')].replace(u'\xa0',u'').split()                
+                assert(NhlCbsSportsDotComSraper.es.projectedString('player') in data[-1])
+                name_pos_team = data[-1][NhlCbsSportsDotComSraper.es.projectedString('player')].replace(u'\xa0',u'').split()
                 team = name_pos_team[-1]
-                
+
                 if (len(team) > 3):
                     # ignore players that don't have a team
-                    data.pop() 
+                    data.pop()
                     continue
-                
+
                 team_index_first = name_pos_team.index(team)
                 assert(team_index_first < len(name_pos_team)-1)
-                
+
                 data[-1]['team'] = team
                 data[-1]['position'] = name_pos_team[-2]
                 data[-1]['name'] = ' '.join(name_pos_team[team_index_first+1:-2])
-                
+
                 del data[-1][NhlCbsSportsDotComSraper.es.projectedString('player')]
-                
+
                 if data[-1]['name'] in links:
                     link = links[data[-1]['name']]
                     if not link.startswith(self.url):
@@ -192,7 +192,7 @@ class TestNhlCbsSportsDotComSraper(unittest.TestCase):
         s = NhlCbsSportsDotComSraper()
         s.testmode = True
         s.debug = True
-        
+
         #data = s.scrapeProjectionsByPosition('F')
         #self.assertGreater(len(data), 50)
 

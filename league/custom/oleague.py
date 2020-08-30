@@ -22,7 +22,9 @@ class OLeagueFootballRules(FootballRules):
         # 2018
         # self.settingsURL = "https://football.fantasysports.yahoo.com/f1/897722/settings"
         # 2019
-        self.settingsURL = "https://football.fantasysports.yahoo.com/f1/410075/5/settings"
+        #self.settingsURL = "https://football.fantasysports.yahoo.com/f1/410075/5/settings"
+        # 2020
+        self.settingsURL = "https://football.fantasysports.yahoo.com/f1/789733/5/settings"
 
         self.numTeams = 10
         self.moneyPerTeam = 333
@@ -82,10 +84,11 @@ class OLeagueFootballLeague(FootballLeague):
         db.moneyPerTeam = rules.moneyPerTeam
 
         # 0.8, 1.6, and 2.6 are my best guess
+        # 0.9, 1.6, 2.5 was the 2019 values used
         #  would be good to make those numbers accurate somehow for the future
-        db.numberTotalToDraft['qb'] = int((rules.numQB+0.9)*rules.numTeams)
-        db.numberTotalToDraft['rb'] = int((rules.numRB+1.6)*rules.numTeams)
-        db.numberTotalToDraft['wr'] = int((rules.numWR+2.5)*rules.numTeams)
+        db.numberTotalToDraft['qb'] = int((rules.numQB+0.5)*rules.numTeams)
+        db.numberTotalToDraft['rb'] = int((rules.numRB+2.5)*rules.numTeams)
+        db.numberTotalToDraft['wr'] = int((rules.numWR+2.0)*rules.numTeams)
         db.numberTotalToDraft['all'] = 0
 
         for pos in db.numberTotalToDraft:
