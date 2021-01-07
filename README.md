@@ -23,6 +23,6 @@ To get started do:
     % make run
 
 On Windows, install msys2 + python 2.7 and then do:
-    % pacman -S git make gcc
+    % pacman -S git make gcc dos2unix
     % python -m pip install --upgrade pip
     % python -m pip install beautifulsoup4 jsonpickle scrapy pandas lxml

@@ -21,7 +21,7 @@ class FootballPlayer(Player):
     def get_rules(self):
         return FootballPlayer.DefaultRules
 
-    
+
     def toInt(self, val):
         try:
             ret_val = int(val)
@@ -146,7 +146,7 @@ class FootballPlayer(Player):
         if year == datetime.datetime.now().year:
             return self.projectedRushingTwoPointers()
         else:
-            return self.toInt(self.getStat(FootballDBDotComScraper.ReceivingTwoPointers, year))            
+            return self.toInt(self.getStat(FootballDBDotComScraper.ReceivingTwoPointers, year))
 
     def projectedRushingTwoPointers(self):
         return self.rushingTwoPointers(year=(datetime.datetime.now().year-1))
