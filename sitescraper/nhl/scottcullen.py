@@ -40,6 +40,9 @@ class ScottCullenScraper(SiteScraper):
         if str(year) == "2019":
             #offset = "/2PACX-1vS67DjgNW1vzTR3CSpRuARm1xJKHQXyseaXCgKtbCdCVsCQadIOg84ZVNCziy3I28ctaeMVn5nZ5Etx/pubhtml#"
             offset = "/2PACX-1vS67DjgNW1vzTR3CSpRuARm1xJKHQXyseaXCgKtbCdCVsCQadIOg84ZVNCziy3I28ctaeMVn5nZ5Etx/pubhtml#"
+        if str(year) in [ "2020", "2021" ]:
+            # This year is special because 2020-2021 seasons starts in 2021
+            offset = "/2PACX-1vTF1VL50HZ6WIMlRWqm5Ls7b0Zy-U0pwl0byW50hVxJ--UBahp8cWnJNQDge3H4X3KGoy2hau0YKVIt/pubhtml"
         else:
             raise ValueError("projections for " + str(year) + " are not available yet")
 
