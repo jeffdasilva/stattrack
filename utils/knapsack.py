@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 from itertools import combinations
 import unittest
-from audioop import avg
-
 
 class KnapSackItem(object):
     def __init__(self, name, value, weight):

@@ -39,8 +39,12 @@ class HockeyPlayer(Player):
         player_str += "   | " + '{0: <9}'.format(str(round(self.projectedPointsPerGame(),2))
                                     + "(" +  str(self.gamesPlayed()) + ") " ) + "|"
 
+        current_year = datetime.datetime.now().year
+        
+        # pandemic year - remove this once 2020/2021 draft is all done
+        if current_year == 2021 and datetime.datetime.now().month <= 2: current_year = 2020
 
-        last_year = datetime.datetime.now().year - 1
+        last_year = current_year - 1
         for year in [last_year, last_year-1, last_year-2]:
             player_str += " " + '{0: <9}'.format(str(round(self.pointsPerGame(year=str(year)),2)) \
                                     + "(" +  str(self.gamesPlayed(year=str(year))) + ") " ) + "|"
@@ -236,16 +240,17 @@ class HockeyPlayer(Player):
 
     def value(self):
         if 'G' in self.position:
-            value = self.points() / 82
+            if datetime.datetime.now().year == 2021 and datetime.datetime.now().month <= 2:
+                value = self.points() / 56
+            else:
+                value = self.points() / 82
         else:
             value = self.pointsPerGame()
 
-        '''
         if 'G' in self.position:
-            value = value * 0.85
+            value = value * 0.80
         elif 'D' in self.position:
-            value = value * 1.4
-        '''
+            value = value * 1.3
 
         '''
         if self.age() != '?':

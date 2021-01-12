@@ -9,6 +9,15 @@ from sitescraper.scraper import SiteScraper
 
 class ScottCullenScraper(SiteScraper):
 
+    TEAM_NAME_REAMAP = {
+    'arz':'ari',
+    'cbj':'clb',
+    'mtl':'mon',
+    'vgk':'lv',
+    'wsh':'was',
+    }
+
+
     ES = HockeyPlayerStrings('scottcullen')
 
     ProjectedGamesPlayed = [ES.projectedGamesPlayed()]
@@ -40,9 +49,9 @@ class ScottCullenScraper(SiteScraper):
         if str(year) == "2019":
             #offset = "/2PACX-1vS67DjgNW1vzTR3CSpRuARm1xJKHQXyseaXCgKtbCdCVsCQadIOg84ZVNCziy3I28ctaeMVn5nZ5Etx/pubhtml#"
             offset = "/2PACX-1vS67DjgNW1vzTR3CSpRuARm1xJKHQXyseaXCgKtbCdCVsCQadIOg84ZVNCziy3I28ctaeMVn5nZ5Etx/pubhtml#"
-        if str(year) in [ "2020", "2021" ]:
+        elif str(year) in [ "2020", "2021" ]:
             # This year is special because 2020-2021 seasons starts in 2021
-            offset = "/2PACX-1vTF1VL50HZ6WIMlRWqm5Ls7b0Zy-U0pwl0byW50hVxJ--UBahp8cWnJNQDge3H4X3KGoy2hau0YKVIt/pubhtml"
+            offset = "/2PACX-1vTF1VL50HZ6WIMlRWqm5Ls7b0Zy-U0pwl0byW50hVxJ--UBahp8cWnJNQDge3H4X3KGoy2hau0YKVIt/pubhtml#"
         else:
             raise ValueError("projections for " + str(year) + " are not available yet")
 
@@ -53,14 +62,15 @@ class ScottCullenScraper(SiteScraper):
         self.players = []
 
         for table in data:
-            if len(table) < 2: continue
+            if len(table) < 2:
+                continue
 
             ptable = table
+            
             if len(ptable[0]) == 0:
                 ptable = ptable[1:]
 
             assert(len(ptable[0]) > 0)
-
             assert(len(ptable[0][0]) > 0)
 
             if (len(ptable[0][1]) == 0):
@@ -80,17 +90,23 @@ class ScottCullenScraper(SiteScraper):
             for row in ptable:
                 player = dict(zip(stats,row))
                 if player['name'] == '': continue
-                #print(str(player))
+                                
                 if 'position' not in player and position is not None:
                     player['position'] = position
                 player['scraper'] = [ScottCullenScraper.ES.prefix]
 
+                #print(player['name'])
+                #print(", " + player['position'])
+
                 if player[ScottCullenScraper.ES.team()] == '':
-                    print(str(player))
-                    assert(False)
+                    player[ScottCullenScraper.ES.team()] = '???'
+                    
+                if player[ScottCullenScraper.ES.team()].lower() in ScottCullenScraper.TEAM_NAME_REAMAP:
+                    player[ScottCullenScraper.ES.team()] = ScottCullenScraper.TEAM_NAME_REAMAP[player[ScottCullenScraper.ES.team()].lower()]
 
                 self.players.append(player)
-
+                #print(player)
+                
             break
 
         return self.players
@@ -102,8 +118,9 @@ class TestScottCullenScraper(unittest.TestCase):
         s = ScottCullenScraper()
         s.testmode = True
         s.debug = True
-        data = s.scrape(year="2019")
-        print(str(data))
+        #data = s.scrape(year="2019")
+        _data = s.scrape(year="2021")
+        #print(str(data))
 
 
 if __name__ == "__main__":
